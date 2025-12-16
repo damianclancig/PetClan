@@ -1,0 +1,95 @@
+{
+    "HomePage": {
+        "title": "Bem-vindo ao PetClan 🐾",
+        "subtitle": "Gerencie a saúde dos seus animais de estimação, lembretes de vacinas e muito mais.",
+        "start": "Começar Agora"
+    },
+    "Dashboard": {
+        "home": "Início",
+        "myPets": "Meus Pets",
+        "logout": "Sair",
+        "profile": "Perfil",
+        "greeting": "Olá, {name}!"
+    },
+    "Theme": {
+        "title": "Tema",
+        "light": "Modo Claro",
+        "dark": "Modo Escuro",
+        "auto": "Sistema"
+    },
+    "Common": {
+        "cancel": "Cancelar",
+        "save": "Salvar",
+        "back": "Voltar",
+        "species": {
+            "dog": "Cão 🐶",
+            "cat": "Gato 🐱",
+            "other": "Outro"
+        },
+        "sex": {
+            "male": "Macho",
+            "female": "Fêmea"
+        }
+    },
+    "Pets": {
+        "title": "Meus Pets 🐾",
+        "addPet": "Registrar Pet",
+        "noPets": "Você ainda não registrou nenhum pet.",
+        "breed": "Raça",
+        "weight": "Peso",
+        "viewHealthRecord": "Ver Histórico de Saúde"
+    },
+    "NewPet": {
+        "title": "Registrar Novo Pet",
+        "name": "Nome",
+        "species": "Espécie",
+        "breed": "Raça",
+        "birthDate": "Data de Nascimento",
+        "sex": "Sexo",
+        "weight": "Peso (kg)",
+        "chipId": "Nº do Chip (Opcional)",
+        "placeholders": {
+            "name": "Rex",
+            "breed": "Mestiço",
+            "chipId": "123456789"
+        },
+        "submit": "Salvar Pet"
+    },
+    "PetDetail": {
+        "notFound": "Pet não encontrado.",
+        "birthDate": "Nascimento"
+    },
+    "Health": {
+        "title": "Histórico de Saúde",
+        "addRecord": "Adicionar Registro",
+        "noRecords": "Sem registros ainda.",
+        "loading": "Carregando histórico...",
+        "newRecordTitle": "Novo Registro Médico",
+        "form": {
+            "type": "Tipo",
+            "title": "Título",
+            "description": "Descrição",
+            "appliedAt": "Data de Aplicação",
+            "nextDueAt": "Próximo Vencimento",
+            "vetName": "Veterinário",
+            "clinicName": "Clínica",
+            "placeholders": {
+                "title": "Ex: Vacina Antirrábica",
+                "description": "Detalhes da aplicação..."
+            }
+        },
+        "types": {
+            "vaccine": "Vacina",
+            "deworming": "Desparasitação",
+            "consultation": "Consulta"
+        }
+    },
+    "Validation": {
+        "nameLength": "O nome deve ter pelo menos 2 caracteres",
+        "breedRequired": "A raça é obrigatória",
+        "invalidDate": "Data inválida",
+        "weightPositive": "O peso deve ser maior que 0",
+        "titleRequired": "O título é obrigatório",
+        "descriptionRequired": "A descrição é obrigatória"
+    }
+}

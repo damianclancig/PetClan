@@ -1,0 +1,95 @@
+{
+    "HomePage": {
+        "title": "Bienvenido a PetClan 🐾",
+        "subtitle": "Gestiona la salud de tus mascotas, recordatorios de vacunas y más.",
+        "start": "Empezar Ahora"
+    },
+    "Dashboard": {
+        "home": "Inicio",
+        "myPets": "Mis Mascotas",
+        "logout": "Cerrar Sesión",
+        "profile": "Perfil",
+        "greeting": "Hola, {name}!"
+    },
+    "Theme": {
+        "title": "Tema",
+        "light": "Modo Claro",
+        "dark": "Modo Oscuro",
+        "auto": "Sistema"
+    },
+    "Common": {
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "back": "Volver",
+        "species": {
+            "dog": "Perro 🐶",
+            "cat": "Gato 🐱",
+            "other": "Otro"
+        },
+        "sex": {
+            "male": "Macho",
+            "female": "Hembra"
+        }
+    },
+    "Pets": {
+        "title": "Mis Mascotas 🐾",
+        "addPet": "Registrar Mascota",
+        "noPets": "No tienes mascotas registradas aún.",
+        "breed": "Raza",
+        "weight": "Peso",
+        "viewHealthRecord": "Ver Libreta Sanitaria"
+    },
+    "NewPet": {
+        "title": "Registrar Nueva Mascota",
+        "name": "Nombre",
+        "species": "Especie",
+        "breed": "Raza",
+        "birthDate": "Fecha de Nacimiento",
+        "sex": "Sexo",
+        "weight": "Peso (kg)",
+        "chipId": "Nro de Chip (Opcional)",
+        "placeholders": {
+            "name": "Firulais",
+            "breed": "Mestizo",
+            "chipId": "123456789"
+        },
+        "submit": "Guardar Mascota"
+    },
+    "PetDetail": {
+        "notFound": "Mascota no encontrada.",
+        "birthDate": "Nacimiento"
+    },
+    "Health": {
+        "title": "Historia Clínica",
+        "addRecord": "Agregar Registro",
+        "noRecords": "No hay registros aún.",
+        "loading": "Cargando historia clínica...",
+        "newRecordTitle": "Nuevo Registro Médico",
+        "form": {
+            "type": "Tipo",
+            "title": "Título",
+            "description": "Descripción",
+            "appliedAt": "Fecha Aplicación",
+            "nextDueAt": "Próximo Vencimiento",
+            "vetName": "Veterinario",
+            "clinicName": "Clínica",
+            "placeholders": {
+                "title": "Ej: Vacuna Triple Viral",
+                "description": "Detalles de la aplicación..."
+            }
+        },
+        "types": {
+            "vaccine": "Vacuna",
+            "deworming": "Desparasitación",
+            "consultation": "Consulta"
+        }
+    },
+    "Validation": {
+        "nameLength": "El nombre debe tener al menos 2 caracteres",
+        "breedRequired": "La raza es requerida",
+        "invalidDate": "Fecha inválida",
+        "weightPositive": "El peso debe ser mayor a 0",
+        "titleRequired": "Título requerido",
+        "descriptionRequired": "Descripción requerida"
+    }
+}

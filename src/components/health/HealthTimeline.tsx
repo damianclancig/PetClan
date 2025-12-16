@@ -1,0 +1,121 @@
+'use client';
+
+import { Timeline, Text, Group, Paper, Badge, Button, Modal, Select, TextInput, Textarea } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { useHealthRecords } from '@/hooks/useHealthRecords';
+// import { IconVaccine, IconStethoscope, IconBug } from '@tabler/icons-react'; // Si tuviéramos iconos
+import dayjs from 'dayjs';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useTranslations } from 'next-intl';
+
+// Types definition outside
+type RecordFormValues = {
+    type: 'vaccine' | 'deworming' | 'consultation';
+    title: string;
+    description: string;
+    appliedAt: string;
+    nextDueAt?: string;
+    vetName?: string;
+    clinicName?: string;
+};
+
+export function HealthTimeline({ petId }: { petId: string }) {
+    const { records, isLoading, createRecord, isCreating } = useHealthRecords(petId);
+    const [opened, { open, close }] = useDisclosure(false);
+    const t = useTranslations('Health');
+    const tValidation = useTranslations('Validation');
+    const tCommon = useTranslations('Common');
+
+    const recordSchema = z.object({
+        type: z.enum(['vaccine', 'deworming', 'consultation']),
+        title: z.string().min(2, tValidation('titleRequired')),
+        description: z.string().min(2, tValidation('descriptionRequired')),
+        appliedAt: z.string(),
+        nextDueAt: z.string().optional(),
+        vetName: z.string().optional(),
+        clinicName: z.string().optional(),
+    });
+
+    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<RecordFormValues>({
+        resolver: zodResolver(recordSchema),
+        defaultValues: {
+            type: 'consultation',
+            appliedAt: dayjs().format('YYYY-MM-DD'),
+        },
+    });
+
+    const onSubmit = async (data: RecordFormValues) => {
+        try {
+            await createRecord({ ...data, petId });
+            close();
+            reset();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    if (isLoading) return <Text>{t('loading')}</Text>;
+
+    return (
+        <>
+            <Group justify="space-between" mb="lg">
+                <Text size="lg" fw={500}>{t('title')}</Text>
+                <Button onClick={open} size="xs" variant="light">{t('addRecord')}</Button>
+            </Group>
+
+            {(!records || records.length === 0) && <Text c="dimmed">{t('noRecords')}</Text>}
+
+            <Timeline active={-1} bulletSize={24} lineWidth={2}>
+                {records?.map((record: any) => (
+                    <Timeline.Item
+                        key={record._id}
+                        title={record.title}
+                        bullet={
+                            <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'currentColor' }} />
+                        }
+                    >
+                        <Text c="dimmed" size="sm">{record.description}</Text>
+                        <Group gap="xs" mt={4}>
+                            <Badge size="xs" color={record.type === 'vaccine' ? 'blue' : record.type === 'deworming' ? 'green' : 'gray'}>
+                                {t(`types.${record.type}`)}
+                            </Badge>
+                            <Text size="xs" c="dimmed">{dayjs(record.appliedAt).format('DD/MM/YYYY')}</Text>
+                        </Group>
+                    </Timeline.Item>
+                ))}
+            </Timeline>
+
+            <Modal opened={opened} onClose={close} title={t('newRecordTitle')}>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <Select
+                        label={t('form.type')}
+                        data={[
+                            { value: 'vaccine', label: t('types.vaccine') },
+                            { value: 'deworming', label: t('types.deworming') },
+                            { value: 'consultation', label: t('types.consultation') },
+                        ]}
+                        defaultValue="consultation"
+                        onChange={(val) => setValue('type', val as 'vaccine' | 'deworming' | 'consultation')}
+                        mb="sm"
+                    />
+                    <TextInput label={t('form.title')} placeholder={t('form.placeholders.title')} {...register('title')} error={errors.title?.message} mb="sm" />
+                    <Textarea label={t('form.description')} placeholder={t('form.placeholders.description')} {...register('description')} error={errors.description?.message} mb="sm" />
+
+                    <Group grow mb="sm">
+                        <TextInput type="date" label={t('form.appliedAt')} {...register('appliedAt')} error={errors.appliedAt?.message} />
+                        <TextInput type="date" label={t('form.nextDueAt')} {...register('nextDueAt')} />
+                    </Group>
+
+                    <Group grow mb="lg">
+                        <TextInput label={t('form.vetName')} {...register('vetName')} />
+                        <TextInput label={t('form.clinicName')} {...register('clinicName')} />
+                    </Group>
+
+                    <Button type="submit" fullWidth loading={isCreating}>{tCommon('save')}</Button>
+                </form>
+            </Modal>
+        </>
+    );
+}

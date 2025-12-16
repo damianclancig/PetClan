@@ -1,0 +1,95 @@
+{
+    "HomePage": {
+        "title": "Welcome to PetClan 🐾",
+        "subtitle": "Manage your pets' health, vaccine reminders, and more.",
+        "start": "Start Now"
+    },
+    "Dashboard": {
+        "home": "Home",
+        "myPets": "My Pets",
+        "logout": "Log Out",
+        "profile": "Profile",
+        "greeting": "Hello, {name}!"
+    },
+    "Theme": {
+        "title": "Theme",
+        "light": "Light Mode",
+        "dark": "Dark Mode",
+        "auto": "System"
+    },
+    "Common": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "back": "Back",
+        "species": {
+            "dog": "Dog 🐶",
+            "cat": "Cat 🐱",
+            "other": "Other"
+        },
+        "sex": {
+            "male": "Male",
+            "female": "Female"
+        }
+    },
+    "Pets": {
+        "title": "My Pets 🐾",
+        "addPet": "Register Pet",
+        "noPets": "You haven't registered any pets yet.",
+        "breed": "Breed",
+        "weight": "Weight",
+        "viewHealthRecord": "View Health Record"
+    },
+    "NewPet": {
+        "title": "Register New Pet",
+        "name": "Name",
+        "species": "Species",
+        "breed": "Breed",
+        "birthDate": "Date of Birth",
+        "sex": "Sex",
+        "weight": "Weight (kg)",
+        "chipId": "Chip No. (Optional)",
+        "placeholders": {
+            "name": "Buddy",
+            "breed": "Mixed",
+            "chipId": "123456789"
+        },
+        "submit": "Save Pet"
+    },
+    "PetDetail": {
+        "notFound": "Pet not found.",
+        "birthDate": "Birth Date"
+    },
+    "Health": {
+        "title": "Health History",
+        "addRecord": "Add Record",
+        "noRecords": "No records yet.",
+        "loading": "Loading health history...",
+        "newRecordTitle": "New Health Record",
+        "form": {
+            "type": "Type",
+            "title": "Title",
+            "description": "Description",
+            "appliedAt": "Application Date",
+            "nextDueAt": "Next Due Date",
+            "vetName": "Veterinarian",
+            "clinicName": "Clinic",
+            "placeholders": {
+                "title": "Ex: Rabies Vaccine",
+                "description": "Details of application..."
+            }
+        },
+        "types": {
+            "vaccine": "Vaccine",
+            "deworming": "Deworming",
+            "consultation": "Consultation"
+        }
+    },
+    "Validation": {
+        "nameLength": "Name must be at least 2 characters",
+        "breedRequired": "Breed is required",
+        "invalidDate": "Invalid date",
+        "weightPositive": "Weight must be greater than 0",
+        "titleRequired": "Title is required",
+        "descriptionRequired": "Description is required"
+    }
+}
