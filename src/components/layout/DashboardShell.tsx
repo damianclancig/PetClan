@@ -26,7 +26,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
             <AppShell.Header>
                 <Group h="100%" px="md">
                     <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-                    <Text fw={700}> PetrClan 🐶</Text>
+                    <Text fw={700}> PetClan 🐶</Text>
                     <Box style={{ flex: 1 }} />
 
                     <Group mr="md">

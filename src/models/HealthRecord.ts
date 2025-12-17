@@ -3,6 +3,7 @@ import mongoose, { Schema, Model, Types } from 'mongoose';
 export interface IHealthRecord {
     petId: Types.ObjectId;
     type: 'vaccine' | 'deworming' | 'consultation';
+    vaccineType?: string;
     title: string;
     description: string;
     appliedAt: Date;
@@ -22,6 +23,7 @@ const HealthRecordSchema = new Schema<IHealthRecord>({
         enum: ['vaccine', 'deworming', 'consultation'],
         required: true
     },
+    vaccineType: { type: String }, // Opcional, solo si type === 'vaccine'
     title: { type: String, required: true },
     description: { type: String, required: true },
     appliedAt: { type: Date, required: true },

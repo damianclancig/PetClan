@@ -2,6 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import { sendWelcomeEmail } from '@/lib/email';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -27,6 +28,13 @@ export const authOptions: NextAuthOptions = {
                             image: user.image || '',
                             role: 'OWNER',
                         });
+
+                        // Enviar email de bienvenida de forma asíncrona (no bloqueante)
+                        if (user.email && user.name) {
+                            sendWelcomeEmail({ email: user.email, name: user.name }).catch(err =>
+                                console.error('Error sending welcome email:', err)
+                            );
+                        }
                     }
                     return true;
                 } catch (error) {

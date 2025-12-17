@@ -13,6 +13,7 @@ import { useTranslations } from 'next-intl';
 // Types definition outside
 type RecordFormValues = {
     type: 'vaccine' | 'deworming' | 'consultation';
+    vaccineType?: string;
     title: string;
     description: string;
     appliedAt: string;
@@ -30,6 +31,7 @@ export function HealthTimeline({ petId }: { petId: string }) {
 
     const recordSchema = z.object({
         type: z.enum(['vaccine', 'deworming', 'consultation']),
+        vaccineType: z.string().optional(),
         title: z.string().min(2, tValidation('titleRequired')),
         description: z.string().min(2, tValidation('descriptionRequired')),
         appliedAt: z.string(),
@@ -38,7 +40,7 @@ export function HealthTimeline({ petId }: { petId: string }) {
         clinicName: z.string().optional(),
     });
 
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<RecordFormValues>({
+    const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<RecordFormValues>({
         resolver: zodResolver(recordSchema),
         defaultValues: {
             type: 'consultation',
@@ -97,10 +99,72 @@ export function HealthTimeline({ petId }: { petId: string }) {
                             { value: 'consultation', label: t('types.consultation') },
                         ]}
                         defaultValue="consultation"
-                        onChange={(val) => setValue('type', val as 'vaccine' | 'deworming' | 'consultation')}
+                        onChange={(val) => {
+                            const type = val as 'vaccine' | 'deworming' | 'consultation';
+                            setValue('type', type);
+                            if (type !== 'vaccine') {
+                                setValue('vaccineType', undefined);
+                                setValue('title', '');
+                            }
+                        }}
                         mb="sm"
                     />
-                    <TextInput label={t('form.title')} placeholder={t('form.placeholders.title')} {...register('title')} error={errors.title?.message} mb="sm" />
+
+                    {watch('type') === 'vaccine' && (
+                        <Select
+                            label="Tipo de Vacuna"
+                            placeholder="Seleccionar vacuna"
+                            data={[
+                                { value: 'sextuple', label: 'Séxtuple' },
+                                { value: 'quintuple', label: 'Quíntuple' },
+                                { value: 'triple', label: 'Triple Felina/Canina' },
+                                { value: 'antirabica', label: 'Antirábica' },
+                                { value: 'other', label: 'Otra' }
+                            ]}
+                            onChange={(val) => {
+                                setValue('vaccineType', val || undefined);
+                                if (val && val !== 'other') {
+                                    // Map value to label for title
+                                    const labels: Record<string, string> = {
+                                        'sextuple': 'Vacuna Séxtuple',
+                                        'quintuple': 'Vacuna Quíntuple',
+                                        'triple': 'Vacuna Triple',
+                                        'antirabica': 'Vacuna Antirábica'
+                                    };
+                                    setValue('title', labels[val]);
+                                } else if (val === 'other') {
+                                    setValue('title', '');
+                                }
+                            }}
+                            mb="sm"
+                        />
+                    )}
+
+                    {/* Show title input if NOT vaccine, OR if vaccine type is OTHER or undefined (so user can type custom title) */}
+                    {(watch('type') !== 'vaccine' || watch('vaccineType') === 'other') && (
+                        <TextInput
+                            label={t('form.title')}
+                            placeholder={t('form.placeholders.title')}
+                            {...register('title')}
+                            error={errors.title?.message}
+                            mb="sm"
+                        />
+                    )}
+
+                    {/* If vaccine type is selected and is NOT other, we render a hidden or read-only input just to verify user sees what's being saved, 
+                        or better yet, just show it as disabled input if we want clarity. 
+                        Let's stick to hiding the text input and letting the Select logic handle setValue('title'). 
+                    */}
+                    {watch('type') === 'vaccine' && watch('vaccineType') && watch('vaccineType') !== 'other' && (
+                        <TextInput
+                            label={t('form.title')}
+                            {...register('title')}
+                            readOnly
+                            variant="filled" // Visual cue it's auto-filled
+                            mb="sm"
+                        />
+                    )}
+
                     <Textarea label={t('form.description')} placeholder={t('form.placeholders.description')} {...register('description')} error={errors.description?.message} mb="sm" />
 
                     <Group grow mb="sm">

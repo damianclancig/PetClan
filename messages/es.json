@@ -21,6 +21,8 @@
         "cancel": "Cancelar",
         "save": "Guardar",
         "back": "Volver",
+        "edit": "Editar",
+        "share": "Compartir",
         "species": {
             "dog": "Perro 🐶",
             "cat": "Gato 🐱",

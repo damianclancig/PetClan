@@ -23,6 +23,16 @@ async function fetchPet(id: string) {
     return res.json();
 }
 
+async function updatePet({ id, data }: { id: string; data: any }) {
+    const res = await fetch(`/api/pets/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Error updating pet');
+    return res.json();
+}
+
 export function usePets() {
     const queryClient = useQueryClient();
 
@@ -42,21 +52,33 @@ export function usePets() {
         pets: petsQuery.data,
         isLoading: petsQuery.isLoading,
         isError: petsQuery.isError,
-        createPet: createPetMutation.mutateAsync, // Exponer como async para manejar promesas en UI
+        createPet: createPetMutation.mutateAsync,
         isCreating: createPetMutation.isPending,
     };
 }
 
 export function usePet(id: string) {
+    const queryClient = useQueryClient();
+
     const query = useQuery<IPet>({
         queryKey: ['pet', id],
         queryFn: () => fetchPet(id),
         enabled: !!id,
     });
 
+    const updatePetMutation = useMutation({
+        mutationFn: updatePet,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['pet', id] });
+            queryClient.invalidateQueries({ queryKey: ['pets'] });
+        },
+    });
+
     return {
         pet: query.data,
         isLoading: query.isLoading,
         isError: query.isError,
+        updatePet: updatePetMutation.mutateAsync,
+        isUpdating: updatePetMutation.isPending,
     };
 }
