@@ -125,3 +125,55 @@ export async function sendReminderEmail(
 
     return sendMailerooEmail(user.email, user.name, subject, html);
 }
+
+export async function sendPetUpdateEmail(
+    user: { email: string; name: string },
+    petName: string,
+    updatedBy: string
+) {
+    const subject = `Actualización en el perfil de ${petName} 🐾`;
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: #0d9488;">Actualización de Mascota</h2>
+            <p>Hola <strong>${user.name}</strong>,</p>
+            <p>Te informamos que <strong>${updatedBy}</strong> ha realizado cambios en el perfil de tu mascota compartida, <strong>${petName}</strong>.</p>
+            <p>Puedes ver los detalles actualizados en tu panel.</p>
+            <a href="${process.env.NEXTAUTH_URL}/dashboard" style="display: inline-block; background: #0d9488; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 15px;">Ir al Dashboard</a>
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+
+    return sendMailerooEmail(user.email, user.name, subject, html);
+}
+
+export async function sendInvitationEmail(
+    toEmail: string,
+    inviterName: string,
+    petName: string
+) {
+    const subject = `¡${inviterName} te invitó a unirte a PetClan! 🐾`;
+    const signupUrl = `${process.env.NEXTAUTH_URL}/register`; // Assuming register page or just login
+
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: #0d9488;">¡Has sido invitado a PetClan!</h2>
+            <p>Hola,</p>
+            <p><strong>${inviterName}</strong> quiere compartir contigo el cuidado de su mascota <strong>${petName}</strong> en PetClan.</p>
+            <p>Para poder acceder y gestionar la ficha de esta mascota, necesitas activar tu cuenta.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="${signupUrl}" style="background: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                    Crear mi cuenta en PetClan
+                </a>
+            </div>
+            
+            <p style="font-size: 0.9em; color: #666;">Si ya tienes una cuenta con otro correo, pídele a ${inviterName} que te envíe la invitación a ese correo.</p>
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+
+    // We don't have the user's name, so we use empty string or a placeholder
+    return sendMailerooEmail(toEmail, 'Futuro Usuario', subject, html);
+}

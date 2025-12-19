@@ -1,11 +1,11 @@
 'use client';
 
-import { Container, Grid, Paper, Title, Text, Group, Badge, Avatar, Loader, Button, ActionIcon, Modal, Stack } from '@mantine/core';
+import { Container, Grid, Paper, Title, Text, Group, Badge, Avatar, Loader, Button, ActionIcon, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { usePet } from '@/hooks/usePets';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
-import { PetQRCode } from '@/components/pets/PetQRCode';
+import { SharePetModal } from '@/components/pets/SharePetModal';
 import dayjs from 'dayjs';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -109,17 +109,14 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 </Grid.Col>
             </Grid>
 
-            <Modal opened={opened} onClose={close} title="Perfil Público" centered>
-                <Stack align="center">
-                    <Text size="sm" ta="center" mb="md">
-                        Compartí este código QR para que otros puedan ver la ficha básica de <strong>{pet.name}</strong>.
-                    </Text>
-                    <PetQRCode petId={pet._id as unknown as string} petName={pet.name} />
-                    <Button component={Link} href={`/public/pets/${pet._id}`} target="_blank" variant="subtle" size="xs" mt="md">
-                        Abrir enlace directo
-                    </Button>
-                </Stack>
-            </Modal>
-        </Container>
+
+            <SharePetModal
+                opened={opened}
+                onClose={close}
+                petId={pet._id as unknown as string}
+                petName={pet.name}
+                owners={pet.owners as any[]}
+            />
+        </Container >
     );
 }

@@ -16,7 +16,7 @@ export default async function PublicPetPage({ params }: { params: Promise<{ id: 
     await dbConnect();
 
     let pet;
-    let records = [];
+    let records: any[] = [];
 
     try {
         pet = await Pet.findById(id);

@@ -5,7 +5,7 @@ import dbConnect from '@/lib/mongodb';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
 
-export async function GET() {
+export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -19,8 +19,24 @@ export async function GET() {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Buscar mascotas donde el usuario sea owner
-    const pets = await Pet.find({ owners: user._id }).sort({ createdAt: -1 });
+    const { searchParams } = new URL(req.url);
+    const statusParam = searchParams.get('status');
+
+    let filter: any = { owners: user._id };
+
+    if (statusParam === 'all') {
+        // No filter by status, return everything (historial)
+    } else if (statusParam === 'history') {
+        filter.status = { $in: ['deceased', 'archived'] };
+    } else if (statusParam && ['active', 'lost', 'deceased', 'archived'].includes(statusParam)) {
+        filter.status = statusParam;
+    } else {
+        // Default: active and lost (visible in dashboard)
+        filter.status = { $in: ['active', 'lost'] };
+    }
+
+    // Buscar mascotas donde el usuario sea owner y cumplan el filtro de estado
+    const pets = await Pet.find(filter).sort({ createdAt: -1 });
 
     return NextResponse.json(pets);
 }

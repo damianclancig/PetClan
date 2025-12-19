@@ -1,14 +1,17 @@
 'use client';
 
-import { Title, Text, Button, Group, Container, SimpleGrid, Card, Badge, Loader, Avatar, Stack, ThemeIcon, Paper } from '@mantine/core';
+import { Title, Text, Button, Group, Container, SimpleGrid, Card, Badge, Loader, Avatar, Stack, ThemeIcon, Paper, Tabs } from '@mantine/core';
 import { Link } from '@/i18n/routing';
 import { usePets } from '@/hooks/usePets';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { IconDog, IconCat, IconPaw } from '@tabler/icons-react';
+import { useState } from 'react';
 
 export default function PetsPage() {
-    const { pets, isLoading, isError } = usePets();
+    const [activeTab, setActiveTab] = useState<string | null>('active');
+    // Si tab es 'active', enviamos undefined para traer (active+lost). Si es 'history', enviamos 'history' (deceased+archived).
+    const { pets, isLoading, isError } = usePets(activeTab === 'active' ? undefined : 'history');
     const t = useTranslations('Pets');
     const tCommon = useTranslations('Common');
 
@@ -27,21 +30,54 @@ export default function PetsPage() {
         return 'gray';
     };
 
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'lost':
+                return <Badge color="red" variant="filled">🚨 PERDIDO</Badge>;
+            case 'deceased':
+                return <Badge color="gray" variant="light">🕊️ FALLECIDO</Badge>;
+            case 'archived':
+                return <Badge color="gray" variant="outline">ARCHIVADO</Badge>;
+            default:
+                return null;
+        }
+    };
+
     return (
         <Container size="lg">
-            <Group justify="space-between" mb="xl">
+            <Group justify="space-between" mb="xs">
                 <Title order={2}>{t('title')}</Title>
                 <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan">
                     {t('addPet')}
                 </Button>
             </Group>
 
+            <Tabs value={activeTab} onChange={setActiveTab} mb="xl">
+                <Tabs.List>
+                    <Tabs.Tab value="active">Mis Mascotas</Tabs.Tab>
+                    <Tabs.Tab value="history">Historial</Tabs.Tab>
+                </Tabs.List>
+            </Tabs>
+
             {pets && pets.length === 0 ? (
-                <Text c="dimmed" fs="italic">{t('noPets')}</Text>
+                <Text c="dimmed" fs="italic" ta="center" py="xl">
+                    {activeTab === 'active' ? t('noPets') : 'No tienes mascotas en el historial.'}
+                </Text>
             ) : (
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
                     {pets?.map((pet: any) => (
-                        <Card key={pet._id} shadow="sm" padding="lg" radius="md" withBorder>
+                        <Card
+                            key={pet._id}
+                            shadow="sm"
+                            padding="lg"
+                            radius="md"
+                            withBorder
+                            style={{
+                                borderColor: pet.status === 'lost' ? 'red' : undefined,
+                                borderWidth: pet.status === 'lost' ? 2 : 1,
+                                opacity: pet.status === 'deceased' || pet.status === 'archived' ? 0.7 : 1
+                            }}
+                        >
                             <Group wrap="nowrap" mb="md" align="flex-start">
                                 <Avatar size={60} radius="xl" color="cyan" src={pet.photoUrl || null} alt={pet.name}>
                                     {pet.name.charAt(0)}
@@ -54,6 +90,9 @@ export default function PetsPage() {
                                             {dayjs().diff(pet.birthDate, 'year')} años
                                         </Text>
                                     )}
+                                    <div style={{ marginTop: 4 }}>
+                                        {getStatusBadge(pet.status)}
+                                    </div>
                                 </div>
 
                                 <Paper

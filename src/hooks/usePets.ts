@@ -1,8 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { IPet } from '@/models/Pet';
 
-async function fetchPets() {
-    const res = await fetch('/api/pets');
+async function fetchPets(status?: string) {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+
+    const res = await fetch(`/api/pets?${params.toString()}`);
     if (!res.ok) throw new Error('Error fetching pets');
     return res.json();
 }
@@ -32,13 +35,21 @@ async function updatePet({ id, data }: { id: string; data: any }) {
     if (!res.ok) throw new Error('Error updating pet');
     return res.json();
 }
+async function deletePet(id: string) {
+    const res = await fetch(`/api/pets/${id}`, {
+        method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Error deleting pet');
+    return res.json();
+}
 
-export function usePets() {
+export function usePets(status?: string) {
+    // ... (unchanged)
     const queryClient = useQueryClient();
 
     const petsQuery = useQuery<IPet[]>({
-        queryKey: ['pets'],
-        queryFn: fetchPets,
+        queryKey: ['pets', status],
+        queryFn: () => fetchPets(status),
     });
 
     const createPetMutation = useMutation({
@@ -74,11 +85,21 @@ export function usePet(id: string) {
         },
     });
 
+    const deletePetMutation = useMutation({
+        mutationFn: () => deletePet(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['pets'] });
+            // Cannot invalidate 'pet' because it's gone or archived, but 'pets' list needs refresh
+        },
+    });
+
     return {
         pet: query.data,
         isLoading: query.isLoading,
         isError: query.isError,
         updatePet: updatePetMutation.mutateAsync,
         isUpdating: updatePetMutation.isPending,
+        deletePet: deletePetMutation.mutateAsync,
+        isDeleting: deletePetMutation.isPending,
     };
 }

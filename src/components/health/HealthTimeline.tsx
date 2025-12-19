@@ -4,6 +4,8 @@ import { Timeline, Text, Group, Paper, Badge, Button, Modal, Select, TextInput, 
 import { useDisclosure } from '@mantine/hooks';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 // import { IconVaccine, IconStethoscope, IconBug } from '@tabler/icons-react'; // Si tuviéramos iconos
+import { IconCheck } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,10 +53,24 @@ export function HealthTimeline({ petId }: { petId: string }) {
     const onSubmit = async (data: RecordFormValues) => {
         try {
             await createRecord({ ...data, petId });
+
+            const typeLabel = t(`types.${data.type}`);
+            notifications.show({
+                title: 'Registro agregado',
+                message: `Se ha registrado ${typeLabel} exitosamente`,
+                color: 'green',
+                icon: <IconCheck size={16} />,
+            });
+
             close();
             reset();
         } catch (error) {
             console.error(error);
+            notifications.show({
+                title: 'Error',
+                message: 'No se pudo guardar el registro',
+                color: 'red',
+            });
         }
     };
 
