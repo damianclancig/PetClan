@@ -7,7 +7,7 @@ import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { PetForm, PetFormValues } from '@/components/pets/PetForm';
 import React, { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
+import { formatDateForInput } from '@/lib/dateUtils';
 import { IconAlertTriangle, IconArchive, IconTrash } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 
@@ -37,7 +37,7 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
         name: pet.name,
         species: pet.species,
         breed: pet.breed,
-        birthDate: dayjs(pet.birthDate).format('YYYY-MM-DD'),
+        birthDate: formatDateForInput(pet.birthDate),
         sex: pet.sex,
         weight: pet.weight,
         chipId: pet.chipId,

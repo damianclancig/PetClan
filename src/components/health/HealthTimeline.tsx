@@ -6,7 +6,7 @@ import { useHealthRecords } from '@/hooks/useHealthRecords';
 // import { IconVaccine, IconStethoscope, IconBug } from '@tabler/icons-react'; // Si tuviéramos iconos
 import { IconCheck } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
-import dayjs from 'dayjs';
+import { formatDate, formatDateForInput, now } from '@/lib/dateUtils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -46,7 +46,7 @@ export function HealthTimeline({ petId }: { petId: string }) {
         resolver: zodResolver(recordSchema),
         defaultValues: {
             type: 'consultation',
-            appliedAt: dayjs().format('YYYY-MM-DD'),
+            appliedAt: formatDateForInput(now().toDate()),
         },
     });
 
@@ -99,7 +99,7 @@ export function HealthTimeline({ petId }: { petId: string }) {
                             <Badge size="xs" color={record.type === 'vaccine' ? 'blue' : record.type === 'deworming' ? 'green' : 'gray'}>
                                 {t(`types.${record.type}`)}
                             </Badge>
-                            <Text size="xs" c="dimmed">{dayjs(record.appliedAt).format('DD/MM/YYYY')}</Text>
+                            <Text size="xs" c="dimmed">{formatDate(record.appliedAt)}</Text>
                         </Group>
                     </Timeline.Item>
                 ))}

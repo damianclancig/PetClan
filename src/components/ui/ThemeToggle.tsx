@@ -2,21 +2,23 @@
 
 import { ActionIcon, useMantineColorScheme, useComputedColorScheme, Menu, Group } from '@mantine/core';
 import { useTranslations } from 'next-intl';
-// Importamos iconos unicode temporalmente si no tenemos tabler icons instalados, 
-// o usamos texto simple por ahora. 
-// Pero Mantine suele venir con soporte. Asumiremos texto/emojis por simplicidad MVP si fallan los imports.
-// Mejor usar emojis ☀️ 🌙 🖥️
+import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
     const { setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const t = useTranslations('Theme');
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
         <Menu shadow="md" width={200}>
             <Menu.Target>
                 <ActionIcon variant="default" size="lg" aria-label="Toggle color scheme">
-                    {computedColorScheme === 'dark' ? '🌙' : '☀️'}
+                    {!mounted ? '☀️' : (computedColorScheme === 'dark' ? '🌙' : '☀️')}
                 </ActionIcon>
             </Menu.Target>
 

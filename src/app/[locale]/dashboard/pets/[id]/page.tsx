@@ -6,7 +6,7 @@ import { usePet } from '@/hooks/usePets';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { SharePetModal } from '@/components/pets/SharePetModal';
-import dayjs from 'dayjs';
+import { formatDate, calculateAge } from '@/lib/dateUtils';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { IconPencil, IconShare } from '@tabler/icons-react';
@@ -15,6 +15,7 @@ import { calculateVaccineStatus } from '@/lib/healthUtils';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
+    console.log('Rendering PetDetailPage with id:', id);
     const { pet, isLoading, isError } = usePet(id);
     const { records } = useHealthRecords(id);
     const [opened, { open, close }] = useDisclosure(false);
@@ -96,7 +97,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         <Group justify="space-between" mt="xs">
                             <Text size="sm" c="dimmed">{t('birthDate')}</Text>
                             <Text size="sm" fw={500}>
-                                {dayjs(pet.birthDate).format('DD/MM/YYYY')} ({dayjs().diff(pet.birthDate, 'year')} años)
+                                {formatDate(pet.birthDate)} ({calculateAge(pet.birthDate)} años)
                             </Text>
                         </Group>
                     </Paper>

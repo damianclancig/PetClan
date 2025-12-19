@@ -1,5 +1,5 @@
 import { IHealthRecord } from '@/models/HealthRecord';
-import dayjs from 'dayjs';
+import { dayjs, now as nowFn } from './dateUtils';
 
 export type VaccineStatus = {
     isUpToDate: boolean;
@@ -19,7 +19,7 @@ interface SimpleHealthRecord {
 
 export function calculateVaccineStatus(records: SimpleHealthRecord[]): VaccineStatus {
     const vaccines = records.filter(r => r.type === 'vaccine');
-    const now = dayjs();
+    const now = nowFn();
 
     let overdueCount = 0;
     let hasRabies = false;

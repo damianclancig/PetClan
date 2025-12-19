@@ -153,18 +153,18 @@ export async function sendInvitationEmail(
     petName: string
 ) {
     const subject = `¡${inviterName} te invitó a unirte a PetClan! 🐾`;
-    const signupUrl = `${process.env.NEXTAUTH_URL}/register`; // Assuming register page or just login
+    const signupUrl = `${process.env.NEXTAUTH_URL}/login`; // Redirect to login for Google Auth
 
     const html = `
         <div style="font-family: sans-serif; color: #333;">
             <h2 style="color: #0d9488;">¡Has sido invitado a PetClan!</h2>
             <p>Hola,</p>
             <p><strong>${inviterName}</strong> quiere compartir contigo el cuidado de su mascota <strong>${petName}</strong> en PetClan.</p>
-            <p>Para poder acceder y gestionar la ficha de esta mascota, necesitas activar tu cuenta.</p>
+            <p>Para poder acceder y gestionar la ficha de esta mascota, necesitas ingresar con tu cuenta.</p>
             
             <div style="text-align: center; margin: 30px 0;">
                 <a href="${signupUrl}" style="background: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
-                    Crear mi cuenta en PetClan
+                    Iniciar Sesión en PetClan
                 </a>
             </div>
             
@@ -176,4 +176,43 @@ export async function sendInvitationEmail(
 
     // We don't have the user's name, so we use empty string or a placeholder
     return sendMailerooEmail(toEmail, 'Futuro Usuario', subject, html);
+}
+
+export async function sendHealthRecordEmail(
+    toEmail: string,
+    toName: string,
+    petName: string,
+    recordType: string,
+    recordTitle: string,
+    createdBy: string,
+    petId: string
+) {
+    const subject = `Nuevo registro médico para ${petName} 🩺`;
+    const dashboardUrl = `${process.env.NEXTAUTH_URL}/dashboard/pets/${petId}`;
+
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: #0d9488;">Nuevo Registro Médico</h2>
+            <p>Hola <strong>${toName}</strong>,</p>
+            <p><strong>${createdBy}</strong> ha agregado un nuevo registro a la historia clínica de <strong>${petName}</strong>.</p>
+            
+            <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; color: #666; font-size: 0.9em; text-transform: uppercase;">${recordType}</p>
+                <h3 style="margin: 5px 0 0 0; color: #111;">${recordTitle}</h3>
+            </div>
+
+            <p>Puedes ver los detalles completos en el perfil de la mascota.</p>
+            
+            <div style="margin: 25px 0;">
+                <a href="${dashboardUrl}" style="background: #0d9488; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                    Ver Historia Clínica
+                </a>
+            </div>
+            
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+
+    return sendMailerooEmail(toEmail, toName, subject, html);
 }

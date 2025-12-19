@@ -4,10 +4,7 @@ import HealthRecord from '@/models/HealthRecord';
 import Pet from '@/models/Pet'; // Ensure model is registered
 import User from '@/models/User'; // Ensure model is registered
 import { sendReminderEmail } from '@/lib/email';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
-dayjs.extend(utc);
+import { getTomorrowRange } from '@/lib/dateUtils';
 
 // Force dynamic needed strictly? Cron jobs are usually dynamic.
 export const dynamic = 'force-dynamic';
@@ -31,10 +28,8 @@ export async function GET(request: Request) {
         // Strategy: Get tomorrow's date string YYYY-MM-DD based on user intent (or server time), 
         // then define range as 00:00:00Z to 23:59:59Z of that date.
 
-        // Using UTC directly:
-        const tomorrow = dayjs().add(1, 'day').utc();
-        const startOfTomorrow = tomorrow.startOf('day').toDate();
-        const endOfTomorrow = tomorrow.endOf('day').toDate();
+        // Using centralized utility:
+        const { start: startOfTomorrow, end: endOfTomorrow } = getTomorrowRange();
 
         console.log(`[CRON] Server Time: ${new Date().toISOString()} `);
         console.log(`[CRON] Querying range: ${startOfTomorrow.toISOString()} - ${endOfTomorrow.toISOString()} `);

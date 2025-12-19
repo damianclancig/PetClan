@@ -51,6 +51,35 @@ export async function POST(req: Request) {
             createdBy: user._id,
         });
 
+        // Notificar a otros dueños
+        try {
+            const pet = await Pet.findById(body.petId).populate('owners');
+            if (pet && pet.owners && pet.owners.length > 1) {
+                const otherOwners = pet.owners.filter((owner: any) => owner._id.toString() !== user._id.toString());
+
+                otherOwners.forEach((owner: any) => {
+                    if (owner.email && owner.name) {
+                        // Import dinámico de la función de email si es necesario, o usar la importada arriba
+                        // Asumimos importada arriba. Si no, importarla aquí.
+                        import('@/lib/email').then(({ sendHealthRecordEmail }) => {
+                            sendHealthRecordEmail(
+                                owner.email,
+                                owner.name,
+                                pet.name,
+                                body.type, // 'vaccine', 'consultation', etc
+                                body.title || body.type, // Usar título o tipo como fallback
+                                user.name,
+                                pet._id.toString()
+                            ).catch(e => console.error('Failed to send record notification', e));
+                        });
+                    }
+                });
+            }
+        } catch (notifyError) {
+            console.error('Error notifying other owners:', notifyError);
+            // No fallar el request principal por error de notificación
+        }
+
         return NextResponse.json(record, { status: 201 });
     } catch (error: any) {
         console.error('Error creating health record:', error);
