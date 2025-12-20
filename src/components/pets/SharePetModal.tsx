@@ -17,57 +17,15 @@ interface SharePetModalProps {
 export function SharePetModal({ opened, onClose, petId, petName, owners }: SharePetModalProps) {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const [showInviteOption, setShowInviteOption] = useState(false); // State for invitation workflow
+    // Removed showInviteOption as we always invite now
     const queryClient = useQueryClient();
 
     const handleShare = async () => {
         if (!email) return;
         setLoading(true);
-        setShowInviteOption(false); // Reset invitation state
 
         try {
-            const res = await fetch(`/api/pets/${petId}/share`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                // Check if error is specifically about user not found
-                if (res.status === 400 && data.error && data.error.includes('not registered')) {
-                    setShowInviteOption(true);
-                    // Don't throw error yet, just return to let user decide
-                    return;
-                }
-                throw new Error(data.error || 'Error al compartir');
-            }
-
-            notifications.show({
-                title: 'Invitación enviada',
-                message: `Se ha compartido a ${petName} con ${email}`,
-                color: 'green',
-                icon: <IconCheck size={16} />,
-            });
-
-            setEmail('');
-            queryClient.invalidateQueries({ queryKey: ['pet', petId] }); // Refresh to show new owner
-        } catch (error: any) {
-            notifications.show({
-                title: 'Error',
-                message: error.message,
-                color: 'red',
-                icon: <IconAlertCircle size={16} />,
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleInvite = async () => {
-        setLoading(true);
-        try {
+            // Always use the invitations endpoint
             const res = await fetch('/api/invitations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -76,17 +34,21 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
 
             const data = await res.json();
 
-            if (!res.ok) throw new Error(data.error || 'Error al enviar invitación');
+            if (!res.ok) {
+                // Return error from API (e.g. "Already owner")
+                throw new Error(data.error || 'Error al enviar invitación');
+            }
 
             notifications.show({
-                title: 'Correo enviado',
-                message: `Se ha invitado a ${email} a unirse a PetClan`,
-                color: 'blue',
-                icon: <IconMail size={16} />,
+                title: 'Invitación enviada',
+                message: `Se ha invitado a ${email} a colaborar con ${petName}`,
+                color: 'green',
+                icon: <IconCheck size={16} />,
             });
 
-            setShowInviteOption(false);
             setEmail('');
+            // Optional: invalidate queries if we showed pending invitations
+            // queryClient.invalidateQueries({ queryKey: ['pet', petId] }); 
         } catch (error: any) {
             notifications.show({
                 title: 'Error',
@@ -100,7 +62,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
     };
 
     return (
-        <Modal opened={opened} onClose={() => { onClose(); setShowInviteOption(false); setEmail(''); }} title={`Compartir a ${petName}`} centered size="md">
+        <Modal opened={opened} onClose={() => { onClose(); setEmail(''); }} title={`Compartir a ${petName}`} centered size="md">
             <Tabs defaultValue="owners">
                 <Tabs.List grow>
                     <Tabs.Tab value="owners" leftSection={<IconUsers size={16} />}>
@@ -115,45 +77,26 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                     <Stack>
                         <Text size="sm" c="dimmed">
                             Agrega a otros usuarios para que puedan ver y gestionar a {petName}.
-                            Necesitan tener una cuenta en PetClan.
+                            Recibirán una invitación por correo electrónico.
                         </Text>
 
-                        {showInviteOption && (
-                            <Alert variant="light" color="blue" title="Usuario no registrado" icon={<IconAlertCircle size={16} />} withCloseButton onClose={() => setShowInviteOption(false)}>
-                                <Text size="sm" mb="xs">
-                                    El correo <strong>{email}</strong> no tiene cuenta en PetClan.
-                                    ¿Quieres enviarle una invitación para que se registre?
-                                </Text>
-                                <Group mt="sm">
-                                    <Button size="xs" onClick={handleInvite} loading={loading} leftSection={<IconMail size={14} />}>
-                                        Enviar invitación por email
-                                    </Button>
-                                    <Button size="xs" variant="default" onClick={() => setShowInviteOption(false)}>
-                                        Cancelar
-                                    </Button>
-                                </Group>
-                            </Alert>
-                        )}
-
-                        {!showInviteOption && (
-                            <Group align="flex-end">
-                                <TextInput
-                                    style={{ flex: 1 }}
-                                    label="Email del usuario"
-                                    placeholder="usuario@email.com"
-                                    leftSection={<IconMail size={16} />}
-                                    value={email}
-                                    onChange={(e) => setEmail(e.currentTarget.value)}
-                                    // Removed Enter key logic for simplicity with new flow, or verify it works
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') handleShare();
-                                    }}
-                                />
-                                <Button onClick={handleShare} loading={loading} disabled={!email}>
-                                    Invitar
-                                </Button>
-                            </Group>
-                        )}
+                        {/* Simplified UI: Just input and button */}
+                        <Group align="flex-end">
+                            <TextInput
+                                style={{ flex: 1 }}
+                                label="Email del usuario"
+                                placeholder="usuario@email.com"
+                                leftSection={<IconMail size={16} />}
+                                value={email}
+                                onChange={(e) => setEmail(e.currentTarget.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleShare();
+                                }}
+                            />
+                            <Button onClick={handleShare} loading={loading} disabled={!email}>
+                                Invitar
+                            </Button>
+                        </Group>
 
                         <Text fw={500} size="sm" mt="md">Dueños actuales:</Text>
                         <Stack gap="sm">
@@ -168,7 +111,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                             <Text size="xs" c="dimmed">{owner.email}</Text>
                                         </div>
                                     </Group>
-                                    {/* TODO: Add logic to remove owner (future feature) */}
+                                    {/* Action icons could go here */}
                                 </Group>
                             ))}
                         </Stack>

@@ -150,10 +150,13 @@ export async function sendPetUpdateEmail(
 export async function sendInvitationEmail(
     toEmail: string,
     inviterName: string,
-    petName: string
+    petName: string,
+    invitationUrl: string
 ) {
     const subject = `¡${inviterName} te invitó a unirte a PetClan! 🐾`;
-    const signupUrl = `${process.env.NEXTAUTH_URL}/login`; // Redirect to login for Google Auth
+
+    // Fallback if empty, though caller should provide it
+    const actionUrl = invitationUrl || `${process.env.NEXTAUTH_URL}/login`;
 
     const html = `
         <div style="font-family: sans-serif; color: #333;">
@@ -163,8 +166,8 @@ export async function sendInvitationEmail(
             <p>Para poder acceder y gestionar la ficha de esta mascota, necesitas ingresar con tu cuenta.</p>
             
             <div style="text-align: center; margin: 30px 0;">
-                <a href="${signupUrl}" style="background: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
-                    Iniciar Sesión en PetClan
+                <a href="${actionUrl}" style="background: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                    Ver Invitación
                 </a>
             </div>
             
@@ -215,4 +218,45 @@ export async function sendHealthRecordEmail(
     `;
 
     return sendMailerooEmail(toEmail, toName, subject, html);
+}
+
+export async function sendInvitationResultEmail(
+    inviterEmail: string,
+    inviterName: string,
+    inviteeName: string,
+    petName: string,
+    accepted: boolean
+) {
+    const subject = accepted
+        ? `¡${inviteeName} aceptó tu invitación! 🎉`
+        : `${inviteeName} rechazó tu invitación`;
+
+    const dashboardUrl = `${process.env.NEXTAUTH_URL}/dashboard`;
+
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: ${accepted ? '#0d9488' : '#e11d48'};">
+                Invitación ${accepted ? 'Aceptada' : 'Rechazada'}
+            </h2>
+            <p>Hola <strong>${inviterName}</strong>,</p>
+            <p>
+                <strong>${inviteeName}</strong> ha ${accepted ? 'aceptado' : 'rechazado'} 
+                la invitación para colaborar en el cuidado de <strong>${petName}</strong>.
+            </p>
+            
+            ${accepted ? `
+            <p>Ahora ambos tienen acceso al perfil y registros médicos de la mascota.</p>
+            <div style="margin: 25px 0;">
+                <a href="${dashboardUrl}" style="background: #0d9488; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                    Ir al Dashboard
+                </a>
+            </div>
+            ` : ''}
+
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+
+    return sendMailerooEmail(inviterEmail, inviterName, subject, html);
 }

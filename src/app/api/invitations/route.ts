@@ -4,7 +4,10 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
+// Force Invitation model registration
+import Invitation from '@/models/Invitation';
 import { sendInvitationEmail } from '@/lib/email';
+import crypto from 'crypto';
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
@@ -12,7 +15,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { email, petId } = await req.json();
+    const body = await req.json();
+    const email = body.email?.toLowerCase().trim();
+    const { petId } = body;
 
     if (!email || !petId) {
         return NextResponse.json({ error: 'Missing email or petId' }, { status: 400 });
@@ -24,7 +29,7 @@ export async function POST(req: Request) {
     const currentUser = await User.findOne({ email: session.user.email });
     if (!currentUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    // 2. Verify pet ownership
+    // 2. Verify pet ownership (Current User)
     const pet = await Pet.findById(petId);
     if (!pet) return NextResponse.json({ error: 'Pet not found' }, { status: 404 });
 
@@ -34,8 +39,37 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // 3. Send invitation
-    const success = await sendInvitationEmail(email, currentUser.name, pet.name);
+    // 2.5 Check if target email is ALREADY an owner
+    const targetUser = await User.findOne({ email });
+    if (targetUser) {
+        const isAlreadyOwner = pet.owners.some((owner: any) => owner.toString() === targetUser._id.toString());
+        if (isAlreadyOwner) {
+            return NextResponse.json({ error: 'This user is already an owner of this pet' }, { status: 400 });
+        }
+    }
+
+    // 3. Create persistent invitation
+    const token = crypto.randomBytes(32).toString('hex');
+
+    // Check if pending invitation exists? Optional. Let's just create new one for simplicity or update existing?
+    // Let's create new.
+    await Invitation.create({
+        token,
+        petId: pet._id,
+        inviterId: currentUser._id,
+        email,
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days expiration
+    });
+
+    // 4. Send invitation email with link
+    const invitationUrl = `${process.env.NEXTAUTH_URL}/invitations/${token}`;
+    const success = await sendInvitationEmail(
+        email,
+        currentUser.name,
+        pet.name,
+        invitationUrl
+    );
 
     if (!success) {
         return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });

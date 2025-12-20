@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import {
     Paper,
     TextInput,
@@ -14,13 +15,18 @@ import {
     Center,
     Box,
     rem,
+    Loader
 } from '@mantine/core';
+import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-// import { IconBrandGoogle } from '@tabler/icons-react'; // Iconos requeridos, asumir tabler o usar texto por ahora
+// import { IconBrandGoogle } from '@tabler/icons-react';
 
-export default function LoginPage() {
+function LoginContent() {
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+
     const handleGoogleLogin = () => {
-        signIn('google', { callbackUrl: '/dashboard' });
+        signIn('google', { callbackUrl });
     };
 
     return (
@@ -48,5 +54,13 @@ export default function LoginPage() {
                 </Text>
             </Paper>
         </Container>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<Center h="100vh"><Loader /></Center>}>
+            <LoginContent />
+        </Suspense>
     );
 }
