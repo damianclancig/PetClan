@@ -73,7 +73,7 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
                     onChange={setWeight}
                     min={0}
                     step={0.1}
-                    precision={2}
+                    decimalScale={2}
                     data-autofocus
                 />
 

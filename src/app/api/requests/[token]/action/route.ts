@@ -26,6 +26,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
 
         // Verify that the logged in user is the TARGET of the request (matching email)
         const currentUser = await User.findOne({ email: session.user.email });
+        if (!currentUser) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
         if (currentUser.email.toLowerCase() !== request.email.toLowerCase()) {
             return NextResponse.json({ error: 'This request is not for you' }, { status: 403 });
         }

@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
         // Notificar a otros dueños
         try {
-            const pet = await Pet.findById(body.petId).populate('owners');
+            const pet = await Pet.findById(body.petId).populate('owners') as any;
             if (pet && pet.owners && pet.owners.length > 1) {
                 const otherOwners = pet.owners.filter((owner: any) => owner._id.toString() !== user._id.toString());
 
