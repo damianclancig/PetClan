@@ -46,7 +46,7 @@ export async function GET(request: Request) {
                 // Email (Only if we want to span all owners, originally was just creator)
                 // Let's keep original behavior for Email (or upgrade? User asked for notification system updates).
                 // Let's send Email to ALL owners for robustness.
-                if (owner.email) {
+                if (owner.email && record.nextDueAt) {
                     await sendReminderEmail(
                         { email: owner.email, name: owner.name },
                         pet.name,
