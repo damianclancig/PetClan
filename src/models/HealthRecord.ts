@@ -5,7 +5,7 @@ export interface IHealthRecord {
     type: 'vaccine' | 'deworming' | 'consultation';
     vaccineType?: string;
     title: string;
-    description: string;
+    description?: string;
     appliedAt: Date;
     nextDueAt?: Date;
     vetName?: string;
@@ -25,7 +25,7 @@ const HealthRecordSchema = new Schema<IHealthRecord>({
     },
     vaccineType: { type: String }, // Opcional, solo si type === 'vaccine'
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     appliedAt: { type: Date, required: true },
     nextDueAt: { type: Date },
     vetName: { type: String },

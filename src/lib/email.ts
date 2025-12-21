@@ -260,3 +260,78 @@ export async function sendInvitationResultEmail(
 
     return sendMailerooEmail(inviterEmail, inviterName, subject, html);
 }
+
+export async function sendRemovalRequestEmail(
+    toEmail: string,
+    toName: string,
+    requesterName: string,
+    petName: string,
+    requestUrl: string
+) {
+    const subject = `Solicitud de baja para ${petName} ⚠️`;
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: #e11d48;">Solicitud de Baja</h2>
+            <p>Hola <strong>${toName}</strong>,</p>
+            <p><strong>${requesterName}</strong> ha solicitado que dejes de ser copropietario de <strong>${petName}</strong>.</p>
+            <p>Por favor, revisa la solicitud para aceptar o rechazar.</p>
+            
+            <div style="margin: 25px 0;">
+                <a href="${requestUrl}" style="background: #e11d48; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                    Revisar Solicitud
+                </a>
+            </div>
+            
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+    return sendMailerooEmail(toEmail, toName, subject, html);
+}
+
+export async function sendRemovalResultEmail(
+    toEmail: string,
+    toName: string,
+    responderName: string,
+    petName: string,
+    accepted: boolean
+) {
+    const subject = accepted
+        ? `Solicitud de baja ACEPTADA para ${petName} ✅`
+        : `Solicitud de baja RECHAZADA para ${petName} ❌`;
+
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: ${accepted ? '#0d9488' : '#e11d48'};">Solicitud ${accepted ? 'Aceptada' : 'Rechazada'}</h2>
+            <p>Hola <strong>${toName}</strong>,</p>
+            <p><strong>${responderName}</strong> ha ${accepted ? 'aceptado' : 'rechazado'} tu solicitud para dejar de ser dueño de <strong>${petName}</strong>.</p>
+            
+            ${accepted ? `<p>${responderName} ya no tiene acceso a la mascota.</p>` : `<p>${responderName} sigue siendo copropietario.</p>`}
+            
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+    return sendMailerooEmail(toEmail, toName, subject, html);
+}
+
+export async function sendOwnerLeftEmail(
+    toEmail: string,
+    toName: string,
+    leaverName: string,
+    petName: string
+) {
+    const subject = `${leaverName} dejó de compartir a ${petName} 🚶`;
+    const html = `
+        <div style="font-family: sans-serif; color: #333;">
+            <h2 style="color: #0d9488;">Cambio en Copropietarios</h2>
+            <p>Hola <strong>${toName}</strong>,</p>
+            <p>te informamos que <strong>${leaverName}</strong> ha dejado de compartir la mascota <strong>${petName}</strong> voluntariamente.</p>
+            <p>Tú sigues teniendo acceso normal.</p>
+            
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;" />
+            <small style="color: #666;">PetClan - Tus mascotas, conectadas.</small>
+        </div>
+    `;
+    return sendMailerooEmail(toEmail, toName, subject, html);
+}

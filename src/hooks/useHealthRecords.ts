@@ -14,7 +14,10 @@ async function createHealthRecord(newRecord: any) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newRecord),
     });
-    if (!res.ok) throw new Error('Error creating record');
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Error creating record');
+    }
     return res.json();
 }
 

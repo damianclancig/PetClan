@@ -68,6 +68,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
                 pet.name,
                 action === 'accept'
             );
+
+            // In-App Notification using dynamic import
+            const Notification = (await import('@/models/Notification')).default;
+            await Notification.create({
+                userId: inviter._id,
+                type: 'invitation',
+                title: action === 'accept' ? 'Invitación Aceptada' : 'Invitación Rechazada',
+                message: `${currentUser.name} ${action === 'accept' ? 'aceptó' : 'rechazó'} tu invitación para ${pet.name}.`,
+                link: action === 'accept' ? `/dashboard/pets/${pet._id}` : undefined
+            });
         }
 
         return NextResponse.json({ success: true, action });

@@ -57,23 +57,51 @@ export async function POST(req: Request) {
             if (pet && pet.owners && pet.owners.length > 1) {
                 const otherOwners = pet.owners.filter((owner: any) => owner._id.toString() !== user._id.toString());
 
-                otherOwners.forEach((owner: any) => {
-                    if (owner.email && owner.name) {
-                        // Import dinámico de la función de email si es necesario, o usar la importada arriba
-                        // Asumimos importada arriba. Si no, importarla aquí.
-                        import('@/lib/email').then(({ sendHealthRecordEmail }) => {
-                            sendHealthRecordEmail(
+                const { sendHealthRecordEmail } = await import('@/lib/email');
+                const Notification = (await import('@/models/Notification')).default;
+
+                for (const owner of otherOwners) {
+                    const recordTypeLabel = body.type === 'vaccine' ? 'Vacuna' :
+                        body.type === 'consultation' ? 'Consulta' :
+                            body.type === 'antiparasitic' ? 'Desparasitación' : 'Registro';
+
+                    const notificationTitle = `Nuevo Registro: ${pet.name}`;
+                    const notificationMessage = `${user.name} agregó "${body.title || recordTypeLabel}" al historial de ${pet.name}.`;
+
+                    // 1. Email
+                    const wantsEmail = owner.notificationPreferences?.email !== false;
+                    if (wantsEmail && owner.email && owner.name) {
+                        try {
+                            await sendHealthRecordEmail(
                                 owner.email,
                                 owner.name,
                                 pet.name,
-                                body.type, // 'vaccine', 'consultation', etc
-                                body.title || body.type, // Usar título o tipo como fallback
+                                body.type,
+                                body.title || body.type,
                                 user.name,
                                 pet._id.toString()
-                            ).catch(e => console.error('Failed to send record notification', e));
-                        });
+                            );
+                        } catch (e) {
+                            console.error('Failed to send record email', e);
+                        }
                     }
-                });
+
+                    // 2. In-App Notification
+                    const wantsInApp = owner.notificationPreferences?.inApp !== false;
+                    if (wantsInApp) {
+                        try {
+                            await Notification.create({
+                                userId: owner._id,
+                                type: 'social',
+                                title: notificationTitle,
+                                message: notificationMessage,
+                                link: `/dashboard/pets/${pet._id}`
+                            });
+                        } catch (e) {
+                            console.error('Failed to create notification', e);
+                        }
+                    }
+                }
             }
         } catch (notifyError) {
             console.error('Error notifying other owners:', notifyError);
@@ -83,6 +111,10 @@ export async function POST(req: Request) {
         return NextResponse.json(record, { status: 201 });
     } catch (error: any) {
         console.error('Error creating health record:', error);
+        if (error.name === 'ValidationError') {
+            console.error('Validation Error Details:', JSON.stringify(error.errors, null, 2));
+            return NextResponse.json({ error: 'Validation Error', details: error.errors }, { status: 400 });
+        }
         return NextResponse.json({ error: error.message || 'Error creating health record' }, { status: 500 });
     }
 }

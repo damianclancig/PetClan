@@ -64,12 +64,33 @@ export async function POST(req: Request) {
 
     // 4. Send invitation email with link
     const invitationUrl = `${process.env.NEXTAUTH_URL}/invitations/${token}`;
-    const success = await sendInvitationEmail(
-        email,
-        currentUser.name,
-        pet.name,
-        invitationUrl
-    );
+
+    let success = true;
+    const shouldSendEmail = !targetUser || targetUser.notificationPreferences?.email !== false;
+
+    if (shouldSendEmail) {
+        success = await sendInvitationEmail(
+            email,
+            currentUser.name,
+            pet.name,
+            invitationUrl
+        );
+    }
+
+    // 4.5 Create In-App Notification if user exists
+    if (targetUser) {
+        const wantsInApp = targetUser.notificationPreferences?.inApp !== false;
+        if (wantsInApp) {
+            const Notification = (await import('@/models/Notification')).default;
+            await Notification.create({
+                userId: targetUser._id,
+                type: 'invitation',
+                title: 'Nueva Invitación',
+                message: `${currentUser.name} te invitó a colaborar con ${pet.name}.`,
+                link: `/invitations/${token}`
+            });
+        }
+    }
 
     if (!success) {
         return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });

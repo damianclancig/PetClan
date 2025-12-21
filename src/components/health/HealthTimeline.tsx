@@ -17,7 +17,7 @@ type RecordFormValues = {
     type: 'vaccine' | 'deworming' | 'consultation';
     vaccineType?: string;
     title: string;
-    description: string;
+    description?: string;
     appliedAt: string;
     nextDueAt?: string;
     vetName?: string;
@@ -35,7 +35,7 @@ export function HealthTimeline({ petId }: { petId: string }) {
         type: z.enum(['vaccine', 'deworming', 'consultation']),
         vaccineType: z.string().optional(),
         title: z.string().min(2, tValidation('titleRequired')),
-        description: z.string().min(2, tValidation('descriptionRequired')),
+        description: z.string().optional(),
         appliedAt: z.string(),
         nextDueAt: z.string().optional(),
         vetName: z.string().optional(),

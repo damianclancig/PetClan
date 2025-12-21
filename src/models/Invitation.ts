@@ -4,6 +4,7 @@ export interface IInvitation extends Document {
     token: string;
     petId: mongoose.Types.ObjectId;
     inviterId: mongoose.Types.ObjectId;
+    type?: 'invitation' | 'removal';
     email: string;
     status: 'pending' | 'accepted' | 'rejected';
     createdAt: Date;
@@ -26,6 +27,11 @@ const InvitationSchema = new Schema<IInvitation>(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
+        },
+        type: {
+            type: String,
+            enum: ['invitation', 'removal'],
+            default: 'invitation',
         },
         email: {
             type: String,
