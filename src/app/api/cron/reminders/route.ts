@@ -134,12 +134,58 @@ export async function GET(request: Request) {
             }
         }
 
-        return NextResponse.json({
-            success: true,
-            emailsSent,
-            notificationsCreated: pNotificationsCreated,
-            message: 'Cron processed successfully'
-        });
+        // --- 4. Weight Control Reminders ---
+        // Fetch all active pets to check their weight schedule
+        const activePets = await Pet.find({ status: 'active' });
+
+        for (const pet of activePets) {
+            const birthDate = dayjs(pet.birthDate);
+            const ageMonths = dayjs().diff(birthDate, 'month');
+
+            // Determine Interval
+            let intervalDays = 180; // Adult (6 months)
+            let stageLabel = 'Adulto';
+
+            if (ageMonths < 6) {
+                intervalDays = 7; // Puppy (Weekly)
+                stageLabel = 'Cachorro';
+            } else if (ageMonths < 12) {
+                intervalDays = 30; // Junior (Monthly)
+                stageLabel = 'Junior';
+            } else if (ageMonths > 84) {
+                intervalDays = 90; // Senior (3 months)
+                stageLabel = 'Senior';
+            }
+
+            // Find last weight record
+            const lastWeight = await HealthRecord.findOne({
+                petId: pet._id,
+                type: 'weight'
+            }).sort({ appliedAt: -1 });
+
+            let lastDate = lastWeight ? dayjs(lastWeight.appliedAt) : birthDate;
+            const daysSince = dayjs().diff(lastDate, 'day');
+
+            // Logic: Notify if overdue AND (it's the exact due day OR weekly reminder thereafter)
+            if (daysSince >= intervalDays && (daysSince - intervalDays) % 7 === 0) {
+                const owners = await User.find({ _id: { $in: pet.owners } });
+
+                for (const owner of owners) {
+                    const wantsInApp = owner.notificationPreferences?.inApp !== false;
+
+                    if (wantsInApp) {
+                        await Notification.create({
+                            userId: owner._id,
+                            type: 'alert',
+                            title: `Control de Peso (${stageLabel})`,
+                            message: `Hace ${daysSince} días fue el último pesaje de ${pet.name}. Se recomienda control cada ${intervalDays} días.`,
+                            link: `/dashboard/pets/${pet._id}`
+                        });
+                        pNotificationsCreated++;
+                    }
+                }
+            }
+        }
 
     } catch (error) {
         console.error('[CRON] Error processing reminders:', error);

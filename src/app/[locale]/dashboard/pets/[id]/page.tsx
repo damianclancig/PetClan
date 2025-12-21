@@ -9,9 +9,11 @@ import { SharePetModal } from '@/components/pets/SharePetModal';
 import { formatDate, calculateAge } from '@/lib/dateUtils';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { IconPencil, IconShare } from '@tabler/icons-react';
+import { IconPencil, IconShare, IconPlus } from '@tabler/icons-react';
 import React from 'react';
 import { calculateVaccineStatus } from '@/lib/healthUtils';
+import { WeightControl } from '@/components/pets/WeightControl';
+import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
@@ -19,6 +21,10 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const { pet, isLoading, isError } = usePet(id);
     const { records } = useHealthRecords(id);
     const [opened, { open, close }] = useDisclosure(false);
+    const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
+
+    // Filter weight records
+    const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
 
     const t = useTranslations('PetDetail');
     const tCommon = useTranslations('Common');
@@ -59,48 +65,60 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
             <Grid>
                 <Grid.Col span={{ base: 12, md: 4 }}>
-                    <Paper withBorder p="xl" radius="md">
-                        <Group justify="center" mb="md">
-                            <Avatar size={120} radius={120} color="cyan" src={pet.photoUrl || null} alt={pet.name}>
-                                {pet.name.charAt(0)}
-                            </Avatar>
-                        </Group>
-                        <Title order={2} ta="center" mb="xs">{pet.name}</Title>
-                        <Group justify="center" mb="md">
-                            <Badge variant="light">{tCommon(`species.${pet.species}`)}</Badge>
-                            <Badge variant="light" color="gray">{tCommon(`sex.${pet.sex}`)}</Badge>
-                        </Group>
+                    <Stack>
+                        <Paper withBorder p="xl" radius="md">
+                            <Group justify="center" mb="md">
+                                <Avatar size={120} radius={120} color="cyan" src={pet.photoUrl || null} alt={pet.name}>
+                                    {pet.name.charAt(0)}
+                                </Avatar>
+                            </Group>
+                            <Title order={2} ta="center" mb="xs">{pet.name}</Title>
+                            <Group justify="center" mb="md">
+                                <Badge variant="light">{tCommon(`species.${pet.species}`)}</Badge>
+                                <Badge variant="light" color="gray">{tCommon(`sex.${pet.sex}`)}</Badge>
+                            </Group>
 
-                        <Stack align="center" gap="xs" mb="lg">
-                            {records && records.length > 0 && (
-                                <>
-                                    {isUpToDate ? (
-                                        <Badge color="green" size="md" variant="light">✅ Vacunas al día</Badge>
-                                    ) : (
-                                        <Badge color="orange" size="md" variant="light">⚠️ Vacunas vencidas ({overdueCount})</Badge>
-                                    )}
-                                    {hasRabies && (
-                                        <Badge color="blue" size="md" variant="light">💉 Antirábica Vigente</Badge>
-                                    )}
-                                </>
-                            )}
-                        </Stack>
+                            <Stack align="center" gap="xs" mb="lg">
+                                {records && records.length > 0 && (
+                                    <>
+                                        {isUpToDate ? (
+                                            <Badge color="green" size="md" variant="light">✅ Vacunas al día</Badge>
+                                        ) : (
+                                            <Badge color="orange" size="md" variant="light">⚠️ Vacunas vencidas ({overdueCount})</Badge>
+                                        )}
+                                        {hasRabies && (
+                                            <Badge color="blue" size="md" variant="light">💉 Antirábica Vigente</Badge>
+                                        )}
+                                    </>
+                                )}
+                            </Stack>
 
-                        <Group justify="space-between" mt="md">
-                            <Text size="sm" c="dimmed">{tPets('breed')}</Text>
-                            <Text size="sm" fw={500}>{pet.breed}</Text>
-                        </Group>
-                        <Group justify="space-between" mt="xs">
-                            <Text size="sm" c="dimmed">{tPets('weight')}</Text>
-                            <Text size="sm" fw={500}>{pet.weight} kg</Text>
-                        </Group>
-                        <Group justify="space-between" mt="xs">
-                            <Text size="sm" c="dimmed">{t('birthDate')}</Text>
-                            <Text size="sm" fw={500}>
-                                {formatDate(pet.birthDate)} ({calculateAge(pet.birthDate)} años)
-                            </Text>
-                        </Group>
-                    </Paper>
+                            <Group justify="space-between" mt="md">
+                                <Text size="sm" c="dimmed">{tPets('breed')}</Text>
+                                <Text size="sm" fw={500}>{pet.breed}</Text>
+                            </Group>
+                            <Group justify="space-between" mt="xs">
+                                <Text size="sm" c="dimmed">{tPets('weight')}</Text>
+                                <Group gap={5}>
+                                    <Text size="sm" fw={500}>{pet.weight} kg</Text>
+                                    <ActionIcon size="sm" variant="subtle" color="blue" onClick={openWeightModal}>
+                                        <IconPlus size={14} />
+                                    </ActionIcon>
+                                </Group>
+                            </Group>
+                            <Group justify="space-between" mt="xs">
+                                <Text size="sm" c="dimmed">{t('birthDate')}</Text>
+                                <Text size="sm" fw={500}>
+                                    {formatDate(pet.birthDate)} ({calculateAge(pet.birthDate)} años)
+                                </Text>
+                            </Group>
+                        </Paper>
+                        <WeightControl
+                            petId={pet._id as unknown as string}
+                            currentWeight={pet.weight}
+                            history={weightRecords}
+                        />
+                    </Stack>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, md: 8 }}>
@@ -117,6 +135,12 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 petId={pet._id as unknown as string}
                 petName={pet.name}
                 owners={pet.owners as any[]}
+            />
+            <WeightEntryModal
+                opened={weightModalOpened}
+                onClose={closeWeightModal}
+                petId={pet._id as unknown as string}
+                currentWeight={pet.weight}
             />
         </Container >
     );

@@ -2,7 +2,8 @@ import mongoose, { Schema, Model, Types } from 'mongoose';
 
 export interface IHealthRecord {
     petId: Types.ObjectId;
-    type: 'vaccine' | 'deworming' | 'consultation';
+    type: 'vaccine' | 'deworming' | 'consultation' | 'weight';
+    weightValue?: number;
     vaccineType?: string;
     title: string;
     description?: string;
@@ -20,9 +21,10 @@ const HealthRecordSchema = new Schema<IHealthRecord>({
     petId: { type: Schema.Types.ObjectId, ref: 'Pet', required: true },
     type: {
         type: String,
-        enum: ['vaccine', 'deworming', 'consultation'],
+        enum: ['vaccine', 'deworming', 'consultation', 'weight'],
         required: true
     },
+    weightValue: { type: Number },
     vaccineType: { type: String }, // Opcional, solo si type === 'vaccine'
     title: { type: String, required: true },
     description: { type: String },
