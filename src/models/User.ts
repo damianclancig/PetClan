@@ -5,6 +5,10 @@ export interface IUser {
     email: string;
     image?: string;
     role: 'OWNER' | 'VET' | 'ADMIN';
+    notificationPreferences: {
+        email: boolean;
+        inApp: boolean;
+    };
     createdAt: Date;
 }
 
@@ -16,6 +20,10 @@ const UserSchema = new Schema<IUser>({
         type: String,
         enum: ['OWNER', 'VET', 'ADMIN'],
         default: 'OWNER'
+    },
+    notificationPreferences: {
+        email: { type: Boolean, default: true },
+        inApp: { type: Boolean, default: true }
     },
     createdAt: { type: Date, default: Date.now },
 });

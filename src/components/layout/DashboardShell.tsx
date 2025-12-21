@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { signOut } from 'next-auth/react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import NotificationBell from '@/components/notifications/NotificationBell';
 // import { IconLogout, IconSettings, IconChevronDown } from '@tabler/icons-react'; // Asumiendo que no tenemos iconos instalados aún, usaremos texto o emojis
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
@@ -30,6 +31,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                     <Box style={{ flex: 1 }} />
 
                     <Group mr="md">
+                        <NotificationBell />
                         <ThemeToggle />
                     </Group>
 
@@ -57,6 +59,12 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                             <Menu.Label>Cuenta</Menu.Label>
                             <Menu.Item onClick={() => { }} disabled>
                                 👤 {t('profile')}
+                            </Menu.Item>
+                            <Menu.Item
+                                component={Link}
+                                href="/dashboard/settings/notifications"
+                            >
+                                🔔 Notificaciones
                             </Menu.Item>
                             <Menu.Divider />
                             <Menu.Item

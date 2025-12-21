@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // 3. Get email to share with
     const body = await req.json();
-    const { email } = body;
+    const email = body.email?.toLowerCase().trim();
 
     if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
 

@@ -83,7 +83,8 @@
         "types": {
             "vaccine": "Vacuna",
             "deworming": "Desparasitación",
-            "consultation": "Consulta"
+            "consultation": "Consulta",
+            "weight": "Peso"
         }
     },
     "Validation": {
