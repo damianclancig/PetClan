@@ -1,93 +1,165 @@
 'use client';
 
-import { AppShell, Burger, Group, Text, Avatar, UnstyledButton, rem, Box, Menu } from '@mantine/core';
+import { AppShell, Burger, Group, Text, Avatar, UnstyledButton, rem, Box, Menu, NavLink, ScrollArea, Divider, ThemeIcon } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { signOut } from 'next-auth/react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import NotificationBell from '@/components/notifications/NotificationBell';
-// import { IconLogout, IconSettings, IconChevronDown } from '@tabler/icons-react'; // Asumiendo que no tenemos iconos instalados aún, usaremos texto o emojis
+import { IconHome, IconPaw, IconLogout, IconSettings, IconUser, IconChevronRight } from '@tabler/icons-react';
+import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used for general layout, might be useful later
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
     const [opened, { toggle }] = useDisclosure();
     const t = useTranslations('Dashboard');
-    const tTheme = useTranslations('Theme');
+    const pathname = usePathname();
+
+    const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
+
+    const navItems = [
+        { label: t('home'), icon: IconHome, link: '/dashboard' },
+        { label: t('myPets'), icon: IconPaw, link: '/dashboard/pets' },
+    ];
 
     return (
         <AppShell
-            header={{ height: 60 }}
+            header={{ height: 64 }}
             navbar={{
-                width: 300,
+                width: 280,
                 breakpoint: 'sm',
                 collapsed: { mobile: !opened },
             }}
             padding="md"
         >
-            <AppShell.Header>
-                <Group h="100%" px="md">
-                    <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-                    <Text fw={700}> PetClan 🐶</Text>
-                    <Box style={{ flex: 1 }} />
+            <AppShell.Header
+                style={{
+                    borderBottom: '1px solid var(--mantine-color-gray-2)',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                }}
+            >
+                {/* Gradient Line at the bottom of header using pseudo-element or container */}
+                <Box
+                    style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '2px',
+                        background: 'linear-gradient(to right, var(--mantine-color-teal-5), var(--mantine-color-violet-5))',
+                        opacity: 0.2,
+                    }}
+                />
 
-                    <Group mr="md">
-                        <NotificationBell />
-                        <ThemeToggle />
+                <Group h="100%" px="md" justify="space-between">
+                    <Group>
+                        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+                        <Group gap="xs">
+                            <Text
+                                size="xl"
+                                fw={900}
+                                variant="gradient"
+                                gradient={{ from: 'teal', to: 'violet', deg: 45 }}
+                            >
+                                PetClan
+                            </Text>
+                        </Group>
                     </Group>
 
-                    <Menu shadow="md" width={200}>
-                        <Menu.Target>
-                            <UnstyledButton style={{ display: 'flex', alignItems: 'center' }}>
-                                <Group gap="xs">
-                                    <Box visibleFrom="sm" style={{ flex: 1 }}>
-                                        <Text size="sm" fw={500}>{t('greeting', { name: user?.name })}</Text>
-                                    </Box>
+                    <Group>
+                        <NotificationBell />
+                        <ThemeToggle />
+                        <Menu shadow="md" width={200} position="bottom-end">
+                            <Menu.Target>
+                                <UnstyledButton>
                                     <Avatar
                                         src={user?.image}
                                         alt={user?.name}
                                         radius="xl"
-                                        color="cyan"
-                                        imageProps={{ referrerPolicy: 'no-referrer' }}
+                                        color="teal"
                                     >
                                         {user?.name?.charAt(0).toUpperCase()}
                                     </Avatar>
-                                </Group>
-                            </UnstyledButton>
-                        </Menu.Target>
+                                </UnstyledButton>
+                            </Menu.Target>
 
-                        <Menu.Dropdown>
-                            <Menu.Label>Cuenta</Menu.Label>
-                            <Menu.Item onClick={() => { }} disabled>
-                                👤 {t('profile')}
-                            </Menu.Item>
-                            <Menu.Item
-                                component={Link}
-                                href="/dashboard/settings/notifications"
-                            >
-                                🔔 Notificaciones
-                            </Menu.Item>
-                            <Menu.Divider />
-                            <Menu.Item
-                                color="red"
-                                onClick={() => signOut({ callbackUrl: '/' })}
-                            >
-                                🚪 {t('logout')}
-                            </Menu.Item>
-                        </Menu.Dropdown>
-                    </Menu>
+                            <Menu.Dropdown>
+                                <Menu.Label>Cuenta</Menu.Label>
+                                <Menu.Item leftSection={<IconUser size={14} />} disabled>
+                                    {t('profile')}
+                                </Menu.Item>
+                                <Menu.Item
+                                    component={Link}
+                                    href="/dashboard/settings/notifications"
+                                    leftSection={<IconSettings size={14} />}
+                                >
+                                    Notificaciones
+                                </Menu.Item>
+                                <Menu.Divider />
+                                <Menu.Item
+                                    color="red"
+                                    leftSection={<IconLogout size={14} />}
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                >
+                                    {t('logout')}
+                                </Menu.Item>
+                            </Menu.Dropdown>
+                        </Menu>
+                    </Group>
                 </Group>
             </AppShell.Header>
 
-            <AppShell.Navbar p="md">
-                <Link href="/dashboard" style={{ textDecoration: 'none', color: 'inherit', display: 'block', padding: '10px 0' }}>
-                    <Text>🏠 {t('home')}</Text>
-                </Link>
-                <Link href="/dashboard/pets" style={{ textDecoration: 'none', color: 'inherit', display: 'block', padding: '10px 0' }}>
-                    <Text>🐾 {t('myPets')}</Text>
-                </Link>
+            <AppShell.Navbar p="md" bg="var(--bg-surface-muted)">
+                <ScrollArea className="flex-1">
+                    <Box>
+                        {navItems.map((item) => {
+                            const active = isActive(item.link) && (item.link !== '/dashboard' || pathname === '/dashboard');
+                            return (
+                                <UnstyledButton
+                                    key={item.link}
+                                    component={Link}
+                                    href={item.link}
+                                    onClick={() => { if (opened) toggle(); }}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        width: '100%',
+                                        padding: '10px 16px',
+                                        borderRadius: 'var(--mantine-radius-md)',
+                                        marginBottom: '4px',
+                                        backgroundColor: active ? 'var(--color-primary-soft)' : 'transparent',
+                                        color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
+                                        fontWeight: active ? 600 : 400,
+                                        borderLeft: active ? '4px solid var(--color-primary)' : '4px solid transparent',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <item.icon size={20} stroke={1.5} style={{ marginRight: '12px' }} />
+                                    <Text size="sm">{item.label}</Text>
+                                </UnstyledButton>
+                            );
+                        })}
+                    </Box>
+                </ScrollArea>
+
+                {/* Mini Card Contextual (Example) */}
+                <Divider my="sm" />
+                <Box p="xs" bg="white" style={{ borderRadius: 'var(--mantine-radius-md)', border: '1px solid var(--mantine-color-gray-2)' }}>
+                    <Group gap="xs">
+                        <ThemeIcon color="orange" variant="light" size="md" radius="xl">
+                            <IconPaw size={16} />
+                        </ThemeIcon>
+                        <Box>
+                            <Text size="xs" fw={700}>Tip del día</Text>
+                            <Text size="xs" c="dimmed" lineClamp={2}>
+                                Mantén las vacunas al día.
+                            </Text>
+                        </Box>
+                    </Group>
+                </Box>
             </AppShell.Navbar>
 
-            <AppShell.Main>
+            <AppShell.Main bg="var(--bg-background)">
                 {children}
             </AppShell.Main>
         </AppShell>
