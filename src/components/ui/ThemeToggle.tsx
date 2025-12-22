@@ -1,6 +1,7 @@
 'use client';
 
 import { ActionIcon, useMantineColorScheme, useComputedColorScheme, Menu, Group } from '@mantine/core';
+import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react';
@@ -23,7 +24,16 @@ export function ThemeToggle() {
         <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
                 <ActionIcon variant="default" size="lg" aria-label="Toggle color scheme">
-                    {computedColorScheme === 'dark' ? <IconMoon size={20} stroke={1.5} /> : <IconSun size={20} stroke={1.5} />}
+                    <motion.div
+                        key={computedColorScheme}
+                        initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                        exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        {computedColorScheme === 'dark' ? <IconMoon size={20} stroke={1.5} /> : <IconSun size={20} stroke={1.5} />}
+                    </motion.div>
                 </ActionIcon>
             </Menu.Target>
 

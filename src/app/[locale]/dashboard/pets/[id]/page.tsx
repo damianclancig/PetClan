@@ -2,6 +2,7 @@
 
 import { Container, Grid, Paper, Title, Text, Group, Badge, Avatar, Loader, Button, ActionIcon, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { ActionIconMotion } from '@/components/ui/MotionWrappers';
 import { usePet } from '@/hooks/usePets';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
@@ -67,9 +68,11 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                             <Paper withBorder p="md" radius="md">
                                 <Group justify="space-between" mb="xs">
                                     <Title order={4}>{tPets('weight')}</Title>
-                                    <ActionIcon variant="subtle" color="blue" onClick={openWeightModal}>
-                                        <IconPlus size={16} />
-                                    </ActionIcon>
+                                    <ActionIconMotion onClick={openWeightModal}>
+                                        <ActionIcon variant="subtle" color="blue">
+                                            <IconPlus size={16} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
                                 </Group>
                                 <Text size="xl" fw={700} ta="center">{pet.weight} kg</Text>
                             </Paper>

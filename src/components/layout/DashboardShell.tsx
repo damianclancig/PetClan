@@ -9,6 +9,8 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { IconHome, IconPaw, IconLogout, IconSettings, IconUser, IconChevronRight } from '@tabler/icons-react';
 import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used for general layout, might be useful later
+import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
+import { HoverScale } from '@/components/ui/MotionWrappers';
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
     const [opened, { toggle }] = useDisclosure();
@@ -110,57 +112,67 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
             </AppShell.Header>
 
             <AppShell.Navbar p="md" bg="var(--bg-surface-muted)">
-                <ScrollArea className="flex-1">
+                <AnimatedBackground />
+                <ScrollArea className="flex-1" style={{ position: 'relative', zIndex: 1 }}>
                     <Box>
                         {navItems.map((item) => {
                             const active = isActive(item.link) && (item.link !== '/dashboard' || pathname === '/dashboard');
                             return (
-                                <UnstyledButton
-                                    key={item.link}
-                                    component={Link}
-                                    href={item.link}
-                                    onClick={() => { if (opened) toggle(); }}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        width: '100%',
-                                        padding: '10px 16px',
-                                        borderRadius: 'var(--mantine-radius-md)',
-                                        marginBottom: '4px',
-                                        backgroundColor: active ? 'var(--color-primary-soft)' : 'transparent',
-                                        color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
-                                        fontWeight: active ? 600 : 400,
-                                        borderLeft: active ? '4px solid var(--color-primary)' : '4px solid transparent',
-                                        transition: 'all 0.2s ease',
-                                    }}
-                                >
-                                    <item.icon size={20} stroke={1.5} style={{ marginRight: '12px' }} />
-                                    <Text size="sm">{item.label}</Text>
-                                </UnstyledButton>
+                                <HoverScale key={item.link} style={{ width: '100%' }}>
+                                    <UnstyledButton
+                                        component={Link}
+                                        href={item.link}
+                                        onClick={() => { if (opened) toggle(); }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            width: '100%',
+                                            padding: '10px 16px',
+                                            borderRadius: 'var(--mantine-radius-md)',
+                                            marginBottom: '4px',
+                                            // Layering: Put solid base color UNDER the soft primary color to block the pattern
+                                            background: active
+                                                ? 'linear-gradient(0deg, var(--color-primary-soft), var(--color-primary-soft)), var(--bg-surface-muted)'
+                                                : 'var(--bg-surface-muted)',
+                                            color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
+                                            fontWeight: active ? 600 : 400,
+                                            borderLeft: active ? '4px solid var(--color-primary)' : '4px solid transparent',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                    >
+                                        <item.icon size={20} stroke={1.5} style={{ marginRight: '12px' }} />
+                                        <Text size="sm">{item.label}</Text>
+                                    </UnstyledButton>
+                                </HoverScale>
                             );
                         })}
                     </Box>
                 </ScrollArea>
 
                 {/* Mini Card Contextual (Example) */}
-                <Divider my="sm" />
-                <Box p="xs" bg="white" style={{ borderRadius: 'var(--mantine-radius-md)', border: '1px solid var(--mantine-color-gray-2)' }}>
-                    <Group gap="xs">
-                        <ThemeIcon color="orange" variant="light" size="md" radius="xl">
-                            <IconPaw size={16} />
-                        </ThemeIcon>
-                        <Box>
-                            <Text size="xs" fw={700}>Tip del día</Text>
-                            <Text size="xs" c="dimmed" lineClamp={2}>
-                                Mantén las vacunas al día.
-                            </Text>
-                        </Box>
-                    </Group>
+                <Box style={{ position: 'relative', zIndex: 1 }}>
+                    <Divider my="sm" />
+                    <Box p="xs" bg="var(--mantine-color-default)" style={{ borderRadius: 'var(--mantine-radius-md)', border: '1px solid var(--mantine-color-default-border)' }}>
+                        <Group gap="xs">
+                            <ThemeIcon color="orange" variant="light" size="md" radius="xl">
+                                <IconPaw size={16} />
+                            </ThemeIcon>
+                            <Box>
+                                <Text size="xs" fw={700}>Tip del día</Text>
+                                <Text size="xs" c="dimmed" lineClamp={2}>
+                                    Mantén las vacunas al día.
+                                </Text>
+                            </Box>
+                        </Group>
+                    </Box>
                 </Box>
             </AppShell.Navbar>
 
-            <AppShell.Main bg="var(--bg-background)">
-                {children}
+            <AppShell.Main bg="var(--bg-background)" style={{ position: 'relative' }}>
+                <AnimatedBackground style={{ zIndex: 0 }} />
+                <Box style={{ position: 'relative', zIndex: 1 }}>
+                    {children}
+                </Box>
             </AppShell.Main>
         </AppShell>
     );

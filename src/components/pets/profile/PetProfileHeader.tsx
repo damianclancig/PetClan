@@ -2,6 +2,7 @@
 
 import { Box, Container, Avatar, Title, Text, Group, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button } from '@mantine/core';
 import { getPetIdentityColor } from '@/utils/pet-identity';
+import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp } from '@tabler/icons-react';
@@ -50,41 +51,49 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                 </svg>
 
                 {/* Back Button Top Left */}
-                <Button
-                    component={Link}
-                    href="/dashboard/pets"
-                    variant="white"
-                    color={identityColor}
-                    radius="xl"
-                    leftSection={<IconArrowBackUp size={18} />}
-                    style={{ position: 'absolute', top: 16, left: 16, boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
-                >
-                    Volver
-                </Button>
+                {/* Back Button Top Left */}
+                <HoverScale className="absolute top-4 left-4" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
+                    <Button
+                        component={Link}
+                        href="/dashboard/pets"
+                        variant="white"
+                        color={identityColor}
+                        radius="xl"
+                        leftSection={<IconArrowBackUp size={18} />}
+                        style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+                    >
+                        Volver
+                    </Button>
+                </HoverScale>
 
                 {/* Actions Top Right */}
-                <Group style={{ position: 'absolute', top: 16, right: 16 }} gap="xs">
-                    <ActionIcon
-                        variant="white"
-                        color={identityColor}
-                        size="lg"
-                        radius="xl"
-                        onClick={onShare}
-                        aria-label="Compartir"
-                    >
-                        <IconShare size={18} />
-                    </ActionIcon>
-                    <ActionIcon
-                        component={Link}
-                        href={`/dashboard/pets/${pet._id}/edit`}
-                        variant="white"
-                        color={identityColor}
-                        size="lg"
-                        radius="xl"
-                        aria-label="Editar"
-                    >
-                        <IconPencil size={18} />
-                    </ActionIcon>
+                <Group style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }} gap="xs">
+                    <ActionIconMotion>
+                        <ActionIcon
+                            variant="white"
+                            color={identityColor}
+                            size="lg"
+                            radius="xl"
+                            onClick={onShare}
+                            aria-label="Compartir"
+                        >
+                            <IconShare size={18} />
+                        </ActionIcon>
+                    </ActionIconMotion>
+
+                    <ActionIconMotion>
+                        <ActionIcon
+                            component={Link}
+                            href={`/dashboard/pets/${pet._id}/edit`}
+                            variant="white"
+                            color={identityColor}
+                            size="lg"
+                            radius="xl"
+                            aria-label="Editar"
+                        >
+                            <IconPencil size={18} />
+                        </ActionIcon>
+                    </ActionIconMotion>
                 </Group>
             </Box>
 
@@ -125,9 +134,18 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                     color={identityColor}
                 >
                     <Tabs.List>
-                        <Tabs.Tab value="summary">Resumen</Tabs.Tab>
-                        <Tabs.Tab value="timeline">Línea de tiempo</Tabs.Tab>
-                        <Tabs.Tab value="health">Salud</Tabs.Tab>
+                        <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                            Resumen
+                            {activeTab === 'summary' && <MagicTabBackground />}
+                        </Tabs.Tab>
+                        <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                            Línea de tiempo
+                            {activeTab === 'timeline' && <MagicTabBackground />}
+                        </Tabs.Tab>
+                        <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                            Salud
+                            {activeTab === 'health' && <MagicTabBackground />}
+                        </Tabs.Tab>
                         {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
                     </Tabs.List>
                 </Tabs>
