@@ -59,6 +59,55 @@ export const ActionIconMotion = ({ children, onClick, className }: ActionIconMot
 };
 
 // ----------------------------------------------------------------------
+// 4. HoverShine: Efecto de brillo que cruza el elemento
+// ----------------------------------------------------------------------
+interface HoverShineProps {
+    children: ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+}
+
+export const HoverShine = ({ children, className, style }: HoverShineProps) => {
+    return (
+        <motion.div
+            className={className}
+            style={{
+                position: 'relative',
+                overflow: 'hidden', // Importante para que el brillo no salga
+                ...style
+            }}
+            whileHover="hover"
+            whileTap={{ scale: 0.98 }} // Pequeño feedback táctil
+        >
+            {children}
+
+            {/* Capa del brillo */}
+            <motion.div
+                variants={{
+                    hover: { left: '120%' }
+                }}
+                initial={{ left: '-100%' }}
+                transition={{
+                    type: 'tween',
+                    ease: 'easeInOut',
+                    duration: 0.5
+                }}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    width: '50%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent)',
+                    transform: 'skewX(-20deg)',
+                    zIndex: 2, // Por encima del contenido (o debajo si solo quieres fondo, pero shine suele ser encima)
+                    pointerEvents: 'none',
+                }}
+            />
+        </motion.div>
+    );
+};
+
+// ----------------------------------------------------------------------
 // 3. MagicTab: Fondo animado para pestañas (Layout Id)
 // ----------------------------------------------------------------------
 // Este componente se usa *detrás* del texto de la pestaña activa.

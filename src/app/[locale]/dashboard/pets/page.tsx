@@ -8,8 +8,20 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { PetCard } from '@/components/pets/PetCard';
 
+import { useRouter } from '@/i18n/routing';
+import { AnimatePresence } from 'framer-motion';
+
 export default function PetsPage() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<string | null>('active');
+    const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
+
+    const handlePetClick = (petId: string) => {
+        setSelectedPetId(petId);
+        setTimeout(() => {
+            router.push(`/dashboard/pets/${petId}`);
+        }, 500);
+    };
     // Si tab es 'active', enviamos undefined para traer (active+lost). Si es 'history', enviamos 'history' (deceased+archived).
     const { pets, isLoading, isError } = usePets(activeTab === 'active' ? undefined : 'history');
     const t = useTranslations('Pets');
@@ -40,9 +52,18 @@ export default function PetsPage() {
                 </Text>
             ) : (
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-                    {pets?.map((pet: any) => (
-                        <PetCard key={pet._id} pet={pet} />
-                    ))}
+                    <AnimatePresence mode="popLayout">
+                        {pets
+                            ?.filter((pet: any) => !selectedPetId || pet._id === selectedPetId)
+                            .map((pet: any) => (
+                                <PetCard
+                                    key={pet._id}
+                                    pet={pet}
+                                    layoutId={pet._id}
+                                    onClick={() => handlePetClick(pet._id)}
+                                />
+                            ))}
+                    </AnimatePresence>
                 </SimpleGrid>
             )}
         </Container>

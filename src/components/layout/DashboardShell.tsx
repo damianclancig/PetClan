@@ -10,7 +10,7 @@ import NotificationBell from '@/components/notifications/NotificationBell';
 import { IconHome, IconPaw, IconLogout, IconSettings, IconUser, IconChevronRight } from '@tabler/icons-react';
 import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used for general layout, might be useful later
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
-import { HoverScale } from '@/components/ui/MotionWrappers';
+import { HoverShine } from '@/components/ui/MotionWrappers';
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
     const [opened, { toggle }] = useDisclosure();
@@ -118,7 +118,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                         {navItems.map((item) => {
                             const active = isActive(item.link) && (item.link !== '/dashboard' || pathname === '/dashboard');
                             return (
-                                <HoverScale key={item.link} style={{ width: '100%' }}>
+                                <HoverShine key={item.link} style={{ width: '100%', borderRadius: 'var(--mantine-radius-md)' }}>
                                     <UnstyledButton
                                         component={Link}
                                         href={item.link}
@@ -143,7 +143,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                                         <item.icon size={20} stroke={1.5} style={{ marginRight: '12px' }} />
                                         <Text size="sm">{item.label}</Text>
                                     </UnstyledButton>
-                                </HoverScale>
+                                </HoverShine>
                             );
                         })}
                     </Box>
