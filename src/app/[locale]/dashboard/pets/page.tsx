@@ -31,15 +31,15 @@ export default function PetsPage() {
     if (isError) return <Container><Text c="red">Error al cargar las mascotas.</Text></Container>;
 
     return (
-        <Container size="lg">
-            <Group justify="space-between" mb="xs">
+        <Container size="lg" px={{ base: 5, xs: 'md' }}>
+            <Group justify="space-between" mb="xs" px={{ base: 'xs', xs: 0 }}>
                 <Title order={2}>{t('title')}</Title>
                 <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan">
                     {t('addPet')}
                 </Button>
             </Group>
 
-            <Tabs value={activeTab} onChange={setActiveTab} mb="xl">
+            <Tabs value={activeTab} onChange={setActiveTab} mb="xl" px={{ base: 'xs', xs: 0 }}>
                 <Tabs.List>
                     <Tabs.Tab value="active">Mis Mascotas</Tabs.Tab>
                     <Tabs.Tab value="history">Historial</Tabs.Tab>
@@ -51,7 +51,7 @@ export default function PetsPage() {
                     {activeTab === 'active' ? t('noPets') : 'No tienes mascotas en el historial.'}
                 </Text>
             ) : (
-                <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+                <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 10, sm: 'lg' }}>
                     <AnimatePresence mode="popLayout">
                         {pets
                             ?.filter((pet: any) => !selectedPetId || pet._id === selectedPetId)

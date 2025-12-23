@@ -25,7 +25,9 @@
         "share": "Compartir",
         "species": {
             "dog": "Perro 🐶",
+            "dog_female": "Perra 🐶",
             "cat": "Gato 🐱",
+            "cat_female": "Gata 🐱",
             "other": "Otro"
         },
         "sex": {
@@ -49,7 +51,11 @@
         "birthDate": "Fecha de Nacimiento",
         "sex": "Sexo",
         "weight": "Peso (kg)",
-        "chipId": "Nro de Chip (Opcional)",
+        "chipId": "Nro de Chip",
+        "characteristics": "Características",
+        "diseases": "Enfermedades Crónicas",
+        "treatments": "Tratamientos Activos",
+        "notes": "Notas Adicionales",
         "placeholders": {
             "name": "Firulais",
             "breed": "Mestizo",

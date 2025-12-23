@@ -32,7 +32,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                 breakpoint: 'sm',
                 collapsed: { mobile: !opened },
             }}
-            padding="md"
+            padding={{ base: 2, md: 'md' }}
         >
             <AppShell.Header
                 style={{
@@ -170,7 +170,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
             <AppShell.Main bg="var(--bg-background)" style={{ position: 'relative' }}>
                 <AnimatedBackground style={{ zIndex: 0 }} />
-                <Box style={{ position: 'relative', zIndex: 1 }}>
+                <Box pt={10} style={{ position: 'relative', zIndex: 1 }}>
                     {children}
                 </Box>
             </AppShell.Main>
