@@ -13,9 +13,10 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { IconPencil, IconShare, IconPlus } from '@tabler/icons-react';
 import React from 'react';
-import { calculateVaccineStatus } from '@/lib/healthUtils';
+import { getVaccinationStatus } from '@/utils/vaccinationLogic';
 import { WeightControl } from '@/components/pets/WeightControl';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
+import { VaccinationPlan } from '@/components/pets/VaccinationPlan';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
@@ -35,8 +36,17 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     if (isLoading) return <Container><Loader /></Container>;
     if (isError || !pet) return <Container><Text>{t('notFound')}</Text></Container>;
 
-    // Calculate status from client side records
-    const { isUpToDate, hasRabies, overdueCount } = calculateVaccineStatus(records || [] as any[]);
+    // Calculate status from client side records using unified logic
+    const schedule = getVaccinationStatus(pet as any, records || [] as any[]);
+    const overdueCount = schedule.filter(s => s.status === 'overdue').length;
+    const isUpToDate = overdueCount === 0;
+
+    // Rabies logic: "Vigente" implies we have a record and it is not overdue (or we just took it)
+    // Simply: Is the Rabies requirement overdue? If so, false. 
+    // If not overdue, do we have a record of it?
+    const rabiesRecordExists = records?.some((r: any) => r.vaccineType === 'antirrabica' || r.title.toLowerCase().includes('antirrábica') || r.title.toLowerCase().includes('antirrabica'));
+    const rabiesItem = schedule.find(s => s.vaccineId === 'antirrabica');
+    const hasRabies = rabiesRecordExists && rabiesItem?.status !== 'overdue';
 
     return (
         <Container size="lg" px={{ base: 5, xs: 'md' }}>
@@ -103,6 +113,9 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                             currentWeight={pet.weight}
                             history={weightRecords}
                         />
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                        <VaccinationPlan pet={pet as any} records={records || []} />
                     </Grid.Col>
                 </Grid>
             )}
