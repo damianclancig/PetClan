@@ -1,90 +1,116 @@
 # PetClan - Libreta Sanitaria Digital 🐾
 
-Aplicación web para gestionar el historial sanitario de mascotas, permitiendo a los dueños registrar vacunas, desparasitaciones y consultas.
+![PetClan Banner](https://placehold.co/1200x400/0ea5e9/ffffff?text=PetClan+Digital+Health+Record&font=montserrat)
 
-![PetClan Dashboard](https://placehold.co/1200x600/cyan/white?text=PetClan+Dashboard)
+> **PetClan** es una aplicación moderna y segura diseñada para simplificar la gestión de la salud de tus mascotas. Lleva un registro detallado de vacunas, peso, eventos médicos y más, todo en una interfaz fluida y amigable.
 
-## 🚀 Tecnologías
+## ✨ Características Principales
 
-### Frontend
-- **Next.js 14+ (App Router)**
-- **React 18**
-- **Mantine UI v7** (Componentes y Theming)
-- **Framer Motion** (Animaciones)
-- **TanStack Query** (Gestión de estado asíncrono)
-- **React Hook Form + Zod** (Formularios validados)
+- 🔐 **Autenticación Robusta**: Inicio de sesión seguro con Google (NextAuth.js).
+- 🐶 **Gestión de Mascotas**: Perfiles detallados con avatares generados automáticamente según el nombre.
+- 💉 **Línea de Tiempo de Salud**: Visualización cronológica de vacunas, desparasitaciones y consultas.
+- ⚖️ **Control de Peso**: Gráficos interactivos para monitorear la evolución del peso de tu mascota.
+- 🎨 **UI/UX Premium**:
+  - **Diseño Mobile-First** adaptable a cualquier dispositivo.
+  - **Modo Oscuro/Claro** totalmente integrado.
+  - **Micro-interacciones Mágicas** (Framer Motion) para una experiencia táctil y fluida.
+  - **Hero Selection**: Transiciones dramáticas al seleccionar mascotas.
+- 🌐 **Internacionalización**: Soporte multi-idioma (i18n ready).
 
-### Backend & Datos
-- **Next.js API Routes**
-- **MongoDB** con **Mongoose**
-- **NextAuth.js** (Autenticación con Google)
-- **TypeScript**
+## 🚀 Tecnologías (Tech Stack)
 
-## 🛠️ Instalación Local
+Este proyecto está construido sobre un stack moderno y eficiente:
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone <repo_url>
-    cd PetClan
-    ```
+### Core
+- **[Next.js 16](https://nextjs.org/)** (App Router) - Framework React de última generación.
+- **[React 19](https://react.dev/)** - Biblioteca para interfaces de usuario.
+- **[TypeScript](https://www.typescriptlang.org/)** - Tipado estático para código robusto.
 
-2.  **Instalar dependencias:**
-    ```bash
-    npm install
-    # Si falla por binarios faltantes:
-    npm rebuild
-    ```
+### UI & Animación
+- **[Mantine v8](https://mantine.dev/)** - Sistema de diseño y componentes accesibles.
+- **[Framer Motion](https://www.framer.com/motion/)** - Biblioteca de animación potente para React.
+- **[Tabler Icons](https://tabler-icons.io/)** - Iconografía consistente y limpia.
 
-3.  **Configurar entorno:**
-    Crea un archivo `.env.local` basado en `.env.example`:
-    ```env
-    MONGODB_URI=mongodb+srv://...
-    GOOGLE_CLIENT_ID=...
-    GOOGLE_CLIENT_SECRET=...
-    NEXTAUTH_SECRET=...
-    NEXTAUTH_URL=http://localhost:3000
-    ```
+### Datos & Estado
+- **[MongoDB](https://www.mongodb.com/)** + **[Mongoose v9](https://mongoosejs.com/)** - Base de datos NoSQL y modelado de objetos.
+- **[TanStack Query v5](https://tanstack.com/query/latest)** - Gestión de estado asíncrono y cacheo.
+- **[Zod](https://zod.dev/)** - Validación de esquemas y tipos.
 
-4.  **Iniciar servidor de desarrollo:**
-    ```bash
-    npm run dev
-    ```
-    Visita `http://localhost:3000`.
+### Auth & Extras
+- **[NextAuth.js](https://next-auth.js.org/)** - Sistema de autenticación flexible.
+- **[Next-Intl](https://next-intl-docs.vercel.app/)** - Rutas y traducciones internacionalizadas.
+
+## 🛠️ Instalación y Configuración
+
+Sigue estos pasos para correr el proyecto localmente:
+
+### 1. Prerrequisitos
+- Node.js 18+ (Recomendado LTS)
+- NPM o Yarn
+- Una base de datos MongoDB (Local o Atlas)
+
+### 2. Clonar el Repositorio
+```bash
+git clone <tu-repositorio-url>
+cd PetClan
+```
+
+### 3. Instalar Dependencias
+```bash
+npm install
+```
+
+### 4. Configurar Variables de Entorno
+Crea un archivo `.env.local` en la raíz del proyecto y completa las siguientes variables:
+
+```env
+# Base de Datos
+MONGODB_URI=mongodb+srv://<usuario>:<password>@cluster0.mongodb.net/petclan
+
+# Autenticación (Google OAuth)
+GOOGLE_CLIENT_ID=tuc-client-id-google
+GOOGLE_CLIENT_SECRET=tu-client-secret-google
+
+# Configuración NextAuth
+NEXTAUTH_SECRET=genera-un-string-seguro-aqui
+NEXTAUTH_URL=http://localhost:3000
+
+# App Config (SEO & Canonical)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 5. Iniciar Servidor de Desarrollo
+```bash
+npm run dev
+```
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ## 📁 Estructura del Proyecto
 
 ```txt
 src/
-├── app/                  # App Router (Páginas y API)
-│   ├── (auth)/           # Rutas públicas de auth
-│   ├── dashboard/        # Área privada protegida
-│   │   ├── pets/         # CRUD Mascotas
-│   │   └── page.tsx      # Dashboard Home
-│   ├── api/              # Endpoints Backend
-│   └── layout.tsx        # Root Layout con Providers
+├── app/                  # App Router
+│   ├── [locale]/         # Rutas internacionalizadas
+│   │   ├── (auth)/       # Rutas de login/registro
+│   │   └── dashboard/    # Área privada (Mascotas, Perfil)
+│   ├── api/              # API Routes (Backend)
+│   ├── robots.ts         # Configuración SEO
+│   └── sitemap.ts        # Mapa del sitio
 ├── components/
-│   ├── layout/           # Componentes estructurales (Shell)
-│   ├── health/           # Componentes específicos (Timeline)
-│   └── providers/        # Context Providers (Query, Auth, UI)
-├── hooks/                # Custom Hooks (usePets, useHealthRecords)
-├── lib/                  # Utilidades (dbConnect, authOptions)
-├── models/               # Schemas Mongoose (User, Pet, HealthRecord)
-└── styles/               # Configuración global de estilos
+│   ├── layout/           # Shell, Navbar, Headers
+│   ├── pets/             # Tarjetas, Formularios, Listas de Mascotas
+│   ├── ui/               # Componentes base y MotionWrappers
+│   └── providers/        # Contextos globales (Auth, Query, Mantine)
+├── hooks/                # Custom Hooks (Lógica de negocio reutilizable)
+├── lib/                  # Utilidades (DB connection, Auth options)
+├── models/               # Schemas de base de datos (Mongoose)
+└── styles/               # Tokens de diseño y fuentes
 ```
 
-## ✨ Funcionalidades (MVP)
+## 🤝 Contribución
 
-- [x] **Autenticación:** Login seguro con Google.
-- [x] **Gestión de Mascotas:** Registrar nuevas mascotas con fotos (avatar generado) y datos básicos.
-- [x] **Historia Clínica:** Timeline visual de vacunas, consultas y desparasitaciones.
-- [x] **Responsive:** Diseño optimizado para móviles con Mantine UI.
+¡Las contribuciones son bienvenidas! Por favor, abre un issue para discutir cambios mayores o envía un Pull Request directo para correcciones menores.
 
-## 🔮 Roadmap Futuro
+## 📄 Licencia
 
-- [ ] Rol Veterinario (Validación de firmas).
-- [ ] Recordatorios por Email (Maileroo).
-- [ ] Compartir Perfil (QR Público).
-- [ ] Soporte Multi-idioma.
-
----
-Desarrollado con ❤️ para las mascotas.
+Este proyecto está bajo la Licencia [ISC](LICENSE).
