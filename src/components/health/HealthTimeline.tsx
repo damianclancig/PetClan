@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslations } from 'next-intl';
+import { getPetIdentityColor } from '@/utils/pet-identity';
 
 // Types definition outside
 type RecordFormValues = {
@@ -74,35 +75,60 @@ export function HealthTimeline({ petId }: { petId: string }) {
         }
     };
 
+    const identityColor = getPetIdentityColor(petId);
+
+    // Sort records by date descending
+    const sortedRecords = records ? [...records].sort((a: any, b: any) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()) : [];
+
     if (isLoading) return <Text>{t('loading')}</Text>;
 
     return (
         <>
             <Group justify="space-between" mb="lg">
                 <Text size="lg" fw={500}>{t('title')}</Text>
-                <Button onClick={open} size="xs" variant="light">{t('addRecord')}</Button>
+                <Button onClick={open} size="xs" variant="light" color={identityColor}>{t('addRecord')}</Button>
             </Group>
 
             {(!records || records.length === 0) && <Text c="dimmed">{t('noRecords')}</Text>}
 
-            <Timeline active={-1} bulletSize={24} lineWidth={2}>
-                {records?.map((record: any) => (
-                    <Timeline.Item
-                        key={record._id}
-                        title={record.title}
-                        bullet={
-                            <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'currentColor' }} />
-                        }
-                    >
-                        <Text c="dimmed" size="sm">{record.description}</Text>
-                        <Group gap="xs" mt={4}>
-                            <Badge size="xs" color={record.type === 'vaccine' ? 'blue' : record.type === 'deworming' ? 'green' : 'gray'}>
-                                {t(`types.${record.type}`)}
-                            </Badge>
-                            <Text size="xs" c="dimmed">{formatDate(record.appliedAt)}</Text>
-                        </Group>
-                    </Timeline.Item>
-                ))}
+            <Timeline active={-1} bulletSize={32} lineWidth={2} color={identityColor}>
+                {sortedRecords.map((record: any) => {
+                    const isFuture = new Date(record.appliedAt) > new Date();
+                    return (
+                        <Timeline.Item
+                            key={record._id}
+                            title={
+                                <Text size="sm" fw={600} c={isFuture ? 'dimmed' : undefined}>
+                                    {record.title}
+                                </Text>
+                            }
+                            bullet={
+                                <div
+                                    style={{
+                                        width: 16,
+                                        height: 16,
+                                        borderRadius: '50%',
+                                        backgroundColor: isFuture ? 'var(--bg-surface)' : `var(--mantine-color-${identityColor}-6)`,
+                                        border: `2px solid var(--mantine-color-${identityColor}-6)`,
+                                    }}
+                                />
+                            }
+                            lineVariant={isFuture ? 'dashed' : 'solid'}
+                        >
+                            <Text c="dimmed" size="xs" mt={4}>{record.description}</Text>
+                            <Group gap="xs" mt={4}>
+                                <Badge
+                                    size="xs"
+                                    color={record.type === 'vaccine' ? 'blue' : record.type === 'deworming' ? 'green' : 'gray'}
+                                    variant="subtle"
+                                >
+                                    {t(`types.${record.type}`)}
+                                </Badge>
+                                <Text size="xs" c="dimmed">{formatDate(record.appliedAt)}</Text>
+                            </Group>
+                        </Timeline.Item>
+                    );
+                })}
             </Timeline>
 
             <Modal opened={opened} onClose={close} title={t('newRecordTitle')}>
@@ -167,10 +193,6 @@ export function HealthTimeline({ petId }: { petId: string }) {
                         />
                     )}
 
-                    {/* If vaccine type is selected and is NOT other, we render a hidden or read-only input just to verify user sees what's being saved, 
-                        or better yet, just show it as disabled input if we want clarity. 
-                        Let's stick to hiding the text input and letting the Select logic handle setValue('title'). 
-                    */}
                     {watch('type') === 'vaccine' && watch('vaccineType') && watch('vaccineType') !== 'other' && (
                         <TextInput
                             label={t('form.title')}

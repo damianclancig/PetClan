@@ -1,0 +1,151 @@
+import { ActionIcon, Badge, Box, Card, Group, Image, Stack, Text } from '@mantine/core';
+import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw } from '@tabler/icons-react';
+import { Link } from '@/i18n/routing';
+import { getPetIdentityColor } from '@/utils/pet-identity';
+import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+
+interface PetCardProps {
+    pet: any;
+    onClick?: () => void;
+    layoutId?: string;
+}
+
+export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
+    const t = useTranslations('Pets');
+    const tCommon = useTranslations('Common');
+    const identityColor = getPetIdentityColor(pet._id);
+
+    const getSpeciesIcon = (species: string) => {
+        if (species === 'dog') return <IconDog size={20} />;
+        if (species === 'cat') return <IconCat size={20} />;
+        return <IconPaw size={20} />;
+    };
+
+    const getGenderIcon = (gender: string) => {
+        if (gender === 'male') return <IconGenderMale size={14} />;
+        if (gender === 'female') return <IconGenderFemale size={14} />;
+        return null;
+    };
+
+    const vaccineStatus = pet.vaccineStatus || 'unknown';
+
+    return (
+        <motion.div
+            layout={layoutId ? true : undefined}
+            layoutId={layoutId}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+        >
+            <Card
+                padding="0"
+                radius="lg"
+                withBorder
+                component={onClick ? 'div' : (Link as any)}
+                href={onClick ? undefined : `/dashboard/pets/${pet._id}`}
+                onClick={onClick}
+                style={{
+                    cursor: 'pointer',
+                    borderColor: pet.status === 'lost' ? 'var(--mantine-color-red-5)' : undefined,
+                    overflow: 'hidden',
+                    backgroundColor: 'var(--bg-surface)'
+                }}
+                className="pet-card"
+            >
+                <Card.Section style={{ position: 'relative' }}>
+                    {pet.photoUrl ? (
+                        <Image
+                            src={pet.photoUrl}
+                            height={200}
+                            alt={pet.name}
+                            fit="cover"
+                        />
+                    ) : (
+                        <Box
+                            h={200}
+                            bg={`var(--mantine-color-${identityColor}-1)`}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                            <IconPaw size={64} style={{ opacity: 0.2, color: `var(--mantine-color-${identityColor}-6)` }} />
+                        </Box>
+                    )}
+
+                    {/* Overlay with Name */}
+                    <Box
+                        style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            padding: '16px',
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
+                        }}
+                    >
+                        <Group justify="space-between" align="flex-end">
+                            <Box>
+                                <Text size="lg" fw={700} c="white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                                    {pet.name}
+                                </Text>
+                                <Group gap={6}>
+                                    <Badge
+                                        size="sm"
+                                        color={identityColor}
+                                        variant="light"
+                                        bg="rgba(255,255,255,0.2)"
+                                        c="white"
+                                        style={{ backdropFilter: 'blur(4px)' }}
+                                    >
+                                        {tCommon(`species.${pet.species}`).split(' ')[0]}
+                                    </Badge>
+                                    {pet.birthDate && (
+                                        <Text size="xs" c="white" style={{ opacity: 0.9 }}>
+                                            {dayjs().diff(pet.birthDate, 'year')} años
+                                        </Text>
+                                    )}
+                                </Group>
+                            </Box>
+                            {getGenderIcon(pet.gender) && (
+                                <Box c="white" style={{ opacity: 0.8 }}>
+                                    {getGenderIcon(pet.gender)}
+                                </Box>
+                            )}
+                        </Group>
+                    </Box>
+
+                    {/* Status Badges - Absolute Top Right */}
+                    <Stack
+                        gap={4}
+                        style={{
+                            position: 'absolute',
+                            top: 12,
+                            right: 12,
+                        }}
+                    >
+                        {pet.status === 'lost' && (
+                            <Badge color="red" variant="filled">🚨 PERDIDO</Badge>
+                        )}
+                        {/* Simulated Vaccine Status */}
+                        {/* <Badge circle size="sm" color="green" title="Vacunas al día">✓</Badge> */}
+                    </Stack>
+                </Card.Section>
+
+                <Card.Section p="md">
+                    <Group justify="space-between" wrap="nowrap">
+                        <Box>
+                            <Text size="xs" c="dimmed" fw={500}>{t('breed')}</Text>
+                            <Text size="sm" fw={600} lineClamp={1} title={pet.breed}>{pet.breed}</Text>
+                        </Box>
+                        <Box style={{ textAlign: 'right' }}>
+                            <Text size="xs" c="dimmed" fw={500}>{t('weight')}</Text>
+                            <Text size="sm" fw={600}>{pet.weight ? `${pet.weight} kg` : '-'}</Text>
+                        </Box>
+                    </Group>
+                </Card.Section>
+            </Card>
+        </motion.div>
+    );
+}

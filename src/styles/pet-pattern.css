@@ -1,0 +1,20 @@
+/* Pet Pattern Theming CSS */
+
+.pet-pattern {
+    /* Base styles */
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Light Mode: User Image with Multiply */
+[data-mantine-color-scheme="light"] .pet-pattern {
+    /* opacity handled inline by component */
+    filter: none;
+    mix-blend-mode: multiply;
+}
+
+/* Dark Mode: User Image Inverted with Screen */
+[data-mantine-color-scheme="dark"] .pet-pattern {
+    /* opacity handled inline by component */
+    filter: invert(1);
+    mix-blend-mode: screen;
+}
