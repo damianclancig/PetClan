@@ -49,7 +49,11 @@
         "birthDate": "Date of Birth",
         "sex": "Sex",
         "weight": "Weight (kg)",
-        "chipId": "Chip No. (Optional)",
+        "chipId": "Chip No.",
+        "characteristics": "Characteristics",
+        "diseases": "Chronic Diseases",
+        "treatments": "Active Treatments",
+        "notes": "Notes",
         "placeholders": {
             "name": "Buddy",
             "breed": "Mixed",

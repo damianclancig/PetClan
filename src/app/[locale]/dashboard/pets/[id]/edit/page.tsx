@@ -96,10 +96,10 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
     const isArchived = pet.status === 'archived';
 
     return (
-        <Container size="sm" pb="xl">
+        <Container size="sm" px={{ base: 5, xs: 'md' }}>
             <Title order={2} mb="xl">{tCommon('edit')} {pet.name}</Title>
 
-            <Paper withBorder shadow="md" p={30} radius="md" mb="xl">
+            <Paper withBorder shadow="md" p={{ base: 10, xs: 30 }} radius="md" mb="xl">
                 <Stack mb="lg">
                     <Title order={4}>Estado de la Mascota</Title>
                     <Select

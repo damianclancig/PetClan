@@ -1,12 +1,13 @@
 'use client';
 
-import { TextInput, NumberInput, Select, Button, Group, FileButton, Avatar, Text, Stack } from '@mantine/core';
+import { TextInput, NumberInput, Select, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid } from '@mantine/core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useState, useRef } from 'react';
+import { IconTrash, IconGenderMale, IconGenderFemale } from '@tabler/icons-react';
 
 export type PetFormValues = {
     name: string;
@@ -17,6 +18,10 @@ export type PetFormValues = {
     weight: number;
     chipId?: string;
     photoUrl?: string;
+    characteristics?: string;
+    diseases?: string;
+    treatments?: string;
+    notes?: string;
 };
 
 interface PetFormProps {
@@ -45,9 +50,13 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         weight: z.number().min(0.1, tValidation('weightPositive')),
         chipId: z.string().optional(),
         photoUrl: z.string().optional(),
+        characteristics: z.string().optional(),
+        diseases: z.string().optional(),
+        treatments: z.string().optional(),
+        notes: z.string().optional(),
     });
 
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<PetFormValues>({
+    const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<PetFormValues>({
         resolver: zodResolver(petSchema),
         defaultValues: {
             species: 'dog',
@@ -101,26 +110,29 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                     {/* Fallback to Initials if no preview */}
                     {!preview && (initialValues?.name?.charAt(0) || '?')}
                 </Avatar>
-                <FileButton onChange={handleFileChange} accept="image/png,image/jpeg">
-                    {(props) => <Button {...props} size="xs" variant="light">
-                        {preview ? 'Cambiar Foto' : 'Subir Foto'}
-                    </Button>}
-                </FileButton>
-                {preview && (
-                    <Button
-                        color="red"
-                        variant="subtle"
-                        size="xs"
-                        onClick={() => {
-                            setFile(null);
-                            setPreview(null);
-                            setValue('photoUrl', '');
-                            resetRef.current?.();
-                        }}
-                    >
-                        Eliminar Foto
-                    </Button>
-                )}
+                <Group gap="xs">
+                    <FileButton onChange={handleFileChange} accept="image/png,image/jpeg">
+                        {(props) => <Button {...props} size="xs" variant="light">
+                            {preview ? 'Cambiar Foto' : 'Subir Foto'}
+                        </Button>}
+                    </FileButton>
+                    {preview && (
+                        <ActionIcon
+                            color="red"
+                            variant="light"
+                            size="md" // matches xs button height roughly
+                            onClick={() => {
+                                setFile(null);
+                                setPreview(null);
+                                setValue('photoUrl', '');
+                                resetRef.current?.();
+                            }}
+                            title="Eliminar Foto"
+                        >
+                            <IconTrash size={16} />
+                        </ActionIcon>
+                    )}
+                </Group>
             </Stack>
 
             <TextInput
@@ -128,10 +140,20 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                 placeholder={t('placeholders.name')}
                 {...register('name')}
                 error={errors.name?.message}
-                mb="md"
+                mb={{ base: 'xs', md: 'md' }}
+                withAsterisk
             />
 
-            <Group grow mb="md">
+            <TextInput
+                type="date"
+                label={t('birthDate')}
+                {...register('birthDate')}
+                error={errors.birthDate?.message}
+                mb={{ base: 'xs', md: 'md' }}
+                withAsterisk
+            />
+
+            <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>
                 <Select
                     label={t('species')}
                     data={[
@@ -142,22 +164,18 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                     defaultValue={initialValues?.species || 'dog'}
                     onChange={(val) => setValue('species', val as 'dog' | 'cat' | 'other')}
                     error={errors.species?.message}
+                    withAsterisk
                 />
                 <TextInput
                     label={t('breed')}
                     placeholder={t('placeholders.breed')}
                     {...register('breed')}
                     error={errors.breed?.message}
+                    withAsterisk
                 />
-            </Group>
+            </SimpleGrid>
 
-            <Group grow mb="md">
-                <TextInput
-                    type="date"
-                    label={t('birthDate')}
-                    {...register('birthDate')}
-                    error={errors.birthDate?.message}
-                />
+            <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>
                 <Select
                     label={t('sex')}
                     data={[
@@ -167,29 +185,82 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                     defaultValue={initialValues?.sex || 'male'}
                     onChange={(val) => setValue('sex', val as 'male' | 'female')}
                     error={errors.sex?.message}
+                    withAsterisk
+                    leftSection={
+                        watch('sex') === 'male'
+                            ? <IconGenderMale size={16} color="var(--mantine-color-blue-5)" />
+                            : <IconGenderFemale size={16} color="var(--mantine-color-pink-5)" />
+                    }
+                    renderOption={({ option }) => (
+                        <Group gap="xs">
+                            {option.value === 'male'
+                                ? <IconGenderMale size={16} color="var(--mantine-color-blue-5)" />
+                                : <IconGenderFemale size={16} color="var(--mantine-color-pink-5)" />
+                            }
+                            <Text fz="sm">{option.label}</Text>
+                        </Group>
+                    )}
                 />
-            </Group>
-
-            <NumberInput
-                label={t('weight')}
-                placeholder="5.5"
-                min={0}
-                step={0.1}
-                defaultValue={initialValues?.weight}
-                onChange={(val) => setValue('weight', Number(val))}
-                error={errors.weight?.message}
-                mb="md"
-            />
+                <NumberInput
+                    label={t('weight')}
+                    placeholder="5.5"
+                    min={0}
+                    step={0.1}
+                    defaultValue={initialValues?.weight}
+                    onChange={(val) => setValue('weight', Number(val))}
+                    error={errors.weight?.message}
+                    withAsterisk
+                />
+            </SimpleGrid>
 
             <TextInput
                 label={t('chipId')}
                 placeholder={t('placeholders.chipId')}
                 {...register('chipId')}
                 error={errors.chipId?.message}
-                mb="xl"
+                mb={{ base: 'xs', md: 'md' }}
             />
 
-            <Group justify="flex-end">
+            <Textarea
+                label={t('characteristics')}
+                {...register('characteristics')}
+                minRows={2}
+                mb={{ base: 'xs', md: 'md' }}
+            />
+
+            <Textarea
+                label={t('diseases')}
+                {...register('diseases')}
+                minRows={2}
+                mb={{ base: 'xs', md: 'md' }}
+            />
+
+            <Textarea
+                label={t('treatments')}
+                {...register('treatments')}
+                minRows={2}
+                mb={{ base: 'xs', md: 'md' }}
+            />
+
+            <Textarea
+                label={t('notes')}
+                {...register('notes')}
+                minRows={2}
+                mb={{ base: 'xs', md: 'md' }}
+            />
+
+            {/* Mobile Buttons: Full width, side by side */}
+            <Box hiddenFrom="xs" mt="xl">
+                <Group grow>
+                    <Button variant="default" component={Link} href="/dashboard/pets" size="md">{tCommon('cancel')}</Button>
+                    <Button type="submit" loading={isLoading} color="cyan" size="md">
+                        {submitLabel || t('submit')}
+                    </Button>
+                </Group>
+            </Box>
+
+            {/* Desktop Buttons: Right aligned */}
+            <Group visibleFrom="xs" justify="flex-end" mt="xl">
                 <Button variant="default" component={Link} href="/dashboard/pets">{tCommon('cancel')}</Button>
                 <Button type="submit" loading={isLoading} color="cyan">
                     {submitLabel || t('submit')}

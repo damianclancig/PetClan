@@ -39,7 +39,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const { isUpToDate, hasRabies, overdueCount } = calculateVaccineStatus(records || [] as any[]);
 
     return (
-        <Container size="lg">
+        <Container size="lg" px={{ base: 5, xs: 'md' }}>
             <PetProfileHeader
                 pet={pet}
                 activeTab={activeTab || 'summary'}

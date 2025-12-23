@@ -2,7 +2,9 @@
 
 import { Box, Container, Avatar, Title, Text, Group, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button } from '@mantine/core';
 import { getPetIdentityColor } from '@/utils/pet-identity';
+import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
+import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp } from '@tabler/icons-react';
@@ -24,7 +26,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
         <Paper radius="lg" withBorder mb="lg" style={{ overflow: 'hidden', backgroundColor: 'var(--bg-surface)' }}>
             {/* Organic Header Background */}
             <Box
-                h={200}
+                h={120}
                 style={{
                     background: `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-3))`,
                     position: 'relative',
@@ -51,49 +53,54 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                 </svg>
 
                 {/* Back Button Top Left */}
-                {/* Back Button Top Left */}
                 <HoverScale className="absolute top-4 left-4" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
-                    <Button
-                        component={Link}
-                        href="/dashboard/pets"
-                        variant="white"
-                        color={identityColor}
-                        radius="xl"
-                        leftSection={<IconArrowBackUp size={18} />}
-                        style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
-                    >
-                        Volver
-                    </Button>
+                    <MagicParticles color={`var(--mantine-color-${identityColor}-2)`}>
+                        <Button
+                            component={Link}
+                            href="/dashboard/pets"
+                            variant="white"
+                            color={identityColor}
+                            radius="xl"
+                            leftSection={<IconArrowBackUp size={18} />}
+                            style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+                        >
+                            Volver
+                        </Button>
+                    </MagicParticles>
                 </HoverScale>
 
                 {/* Actions Top Right */}
                 <Group style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }} gap="xs">
-                    <ActionIconMotion>
-                        <ActionIcon
-                            variant="white"
-                            color={identityColor}
-                            size="lg"
-                            radius="xl"
-                            onClick={onShare}
-                            aria-label="Compartir"
-                        >
-                            <IconShare size={18} />
-                        </ActionIcon>
-                    </ActionIconMotion>
+                    <MagicParticles onClick={onShare} color="white">
+                        <ActionIconMotion>
+                            <ActionIcon
+                                variant="white"
+                                color={identityColor}
+                                size="lg"
+                                radius="xl"
+                                aria-label="Compartir"
+                                style={{ pointerEvents: 'none' }} // Click handled by wrapper
+                            >
+                                <IconShare size={18} />
+                            </ActionIcon>
+                        </ActionIconMotion>
+                    </MagicParticles>
 
-                    <ActionIconMotion>
-                        <ActionIcon
-                            component={Link}
-                            href={`/dashboard/pets/${pet._id}/edit`}
-                            variant="white"
-                            color={identityColor}
-                            size="lg"
-                            radius="xl"
-                            aria-label="Editar"
-                        >
-                            <IconPencil size={18} />
-                        </ActionIcon>
-                    </ActionIconMotion>
+                    <MagicParticles color="white">
+                        <ActionIconMotion>
+                            <ActionIcon
+                                component={Link}
+                                href={`/dashboard/pets/${pet._id}/edit`}
+                                variant="white"
+                                color={identityColor}
+                                size="lg"
+                                radius="xl"
+                                aria-label="Editar"
+                            >
+                                <IconPencil size={18} />
+                            </ActionIcon>
+                        </ActionIconMotion>
+                    </MagicParticles>
                 </Group>
             </Box>
 
@@ -115,9 +122,12 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                     <Box style={{ flex: 1, paddingBottom: 10 }}>
                         <Title order={1} fw={800}>{pet.name}</Title>
                         <Group gap="xs" mt={4}>
-                            <Badge color={identityColor} variant="light" size="lg">
-                                {tCommon(`species.${pet.species}`)}
-                            </Badge>
+                            <PetSpeciesBadge
+                                species={pet.species}
+                                sex={pet.sex}
+                                color={identityColor}
+                                size="lg"
+                            />
                             <Text c="dimmed">
                                 {pet.breed} • {dayjs().diff(pet.birthDate, 'year')} años
                             </Text>

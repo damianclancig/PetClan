@@ -34,9 +34,9 @@ export default function NewPetPage() {
     };
 
     return (
-        <Container size="sm">
+        <Container size="sm" px={{ base: 5, xs: 'md' }}>
             <Title order={2} mb="xl">{t('title')}</Title>
-            <Paper withBorder shadow="md" p={30} radius="md">
+            <Paper withBorder shadow="md" p={{ base: 10, xs: 30 }} radius="md">
                 <PetForm onSubmit={onSubmit} isLoading={isCreating} />
             </Paper>
         </Container>

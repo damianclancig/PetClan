@@ -10,6 +10,10 @@ export interface IPet {
     weight: number;
     chipId?: string;
     photoUrl?: string; // Base64 optimised image
+    characteristics?: string;
+    diseases?: string;
+    treatments?: string;
+    notes?: string;
     status: 'active' | 'lost' | 'deceased' | 'archived';
     owners: Types.ObjectId[];
     createdAt: Date;
@@ -25,6 +29,10 @@ const PetSchema = new Schema<IPet>({
     weight: { type: Number, required: true },
     chipId: { type: String },
     photoUrl: { type: String },
+    characteristics: { type: String },
+    diseases: { type: String },
+    treatments: { type: String },
+    notes: { type: String },
     status: {
         type: String,
         enum: ['active', 'lost', 'deceased', 'archived'],
