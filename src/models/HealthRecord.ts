@@ -15,6 +15,7 @@ export interface IHealthRecord {
     version: number;
     createdAt: Date;
     updatedAt?: Date;
+    _id?: Types.ObjectId | string;
 }
 
 const HealthRecordSchema = new Schema<IHealthRecord>({
