@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { ColorSchemeScript } from '@mantine/core';
 import '@mantine/core/styles.css';
+import '@/styles/globals.css';
+import { inter, poppins } from '@/styles/fonts';
 import { Providers } from '@/components/providers/Providers';
 
 export default async function LocaleLayout({
@@ -26,7 +28,7 @@ export default async function LocaleLayout({
     const messages = await getMessages();
 
     return (
-        <html lang={locale} suppressHydrationWarning>
+        <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
             <head>
                 <ColorSchemeScript />
             </head>

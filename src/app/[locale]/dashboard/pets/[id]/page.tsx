@@ -2,9 +2,11 @@
 
 import { Container, Grid, Paper, Title, Text, Group, Badge, Avatar, Loader, Button, ActionIcon, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { ActionIconMotion } from '@/components/ui/MotionWrappers';
 import { usePet } from '@/hooks/usePets';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
+import { PetProfileHeader } from '@/components/pets/profile/PetProfileHeader';
 import { SharePetModal } from '@/components/pets/SharePetModal';
 import { formatDate, calculateAge } from '@/lib/dateUtils';
 import { Link } from '@/i18n/routing';
@@ -17,11 +19,11 @@ import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
-    console.log('Rendering PetDetailPage with id:', id);
     const { pet, isLoading, isError } = usePet(id);
     const { records } = useHealthRecords(id);
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
+    const [activeTab, setActiveTab] = React.useState<string | null>('summary');
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
@@ -38,96 +40,72 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
     return (
         <Container size="lg">
-            <Group justify="space-between" mb="md">
-                <Button component={Link} href="/dashboard/pets" variant="subtle" size="xs">
-                    ← {tCommon('back')}
-                </Button>
-                <Group gap="xs">
-                    <Button
-                        variant="light"
-                        color="grape"
-                        leftSection={<IconShare size={18} />}
-                        onClick={open}
-                    >
-                        {tCommon('share') || 'Compartir'}
-                    </Button>
-                    <Button
-                        component={Link}
-                        href={`/dashboard/pets/${id}/edit`}
-                        variant="light"
-                        color="cyan"
-                        leftSection={<IconPencil size={18} />}
-                    >
-                        {tCommon('edit')}
-                    </Button>
-                </Group>
-            </Group>
+            <PetProfileHeader
+                pet={pet}
+                activeTab={activeTab || 'summary'}
+                onTabChange={setActiveTab}
+                onShare={open}
+            />
 
-            <Grid>
-                <Grid.Col span={{ base: 12, md: 4 }}>
-                    <Stack>
-                        <Paper withBorder p="xl" radius="md">
-                            <Group justify="center" mb="md">
-                                <Avatar size={120} radius={120} color="cyan" src={pet.photoUrl || null} alt={pet.name}>
-                                    {pet.name.charAt(0)}
-                                </Avatar>
-                            </Group>
-                            <Title order={2} ta="center" mb="xs">{pet.name}</Title>
-                            <Group justify="center" mb="md">
-                                <Badge variant="light">{tCommon(`species.${pet.species}`)}</Badge>
-                                <Badge variant="light" color="gray">{tCommon(`sex.${pet.sex}`)}</Badge>
-                            </Group>
+            {activeTab === 'summary' && (
+                <Grid>
+                    <Grid.Col span={{ base: 12, md: 4 }}>
+                        <Stack>
+                            <Paper withBorder p="md" radius="md">
+                                <Title order={4} mb="md">Estado de Salud</Title>
+                                <Stack gap="xs">
+                                    {isUpToDate ? (
+                                        <Badge color="green" size="lg" variant="light" fullWidth>✅ Vacunas al día</Badge>
+                                    ) : (
+                                        <Badge color="orange" size="lg" variant="light" fullWidth>⚠️ Vacunas vencidas ({overdueCount})</Badge>
+                                    )}
+                                    {hasRabies && (
+                                        <Badge color="blue" size="lg" variant="light" fullWidth>💉 Antirábica Vigente</Badge>
+                                    )}
+                                </Stack>
+                            </Paper>
 
-                            <Stack align="center" gap="xs" mb="lg">
-                                {records && records.length > 0 && (
-                                    <>
-                                        {isUpToDate ? (
-                                            <Badge color="green" size="md" variant="light">✅ Vacunas al día</Badge>
-                                        ) : (
-                                            <Badge color="orange" size="md" variant="light">⚠️ Vacunas vencidas ({overdueCount})</Badge>
-                                        )}
-                                        {hasRabies && (
-                                            <Badge color="blue" size="md" variant="light">💉 Antirábica Vigente</Badge>
-                                        )}
-                                    </>
-                                )}
-                            </Stack>
-
-                            <Group justify="space-between" mt="md">
-                                <Text size="sm" c="dimmed">{tPets('breed')}</Text>
-                                <Text size="sm" fw={500}>{pet.breed}</Text>
-                            </Group>
-                            <Group justify="space-between" mt="xs">
-                                <Text size="sm" c="dimmed">{tPets('weight')}</Text>
-                                <Group gap={5}>
-                                    <Text size="sm" fw={500}>{pet.weight} kg</Text>
-                                    <ActionIcon size="sm" variant="subtle" color="blue" onClick={openWeightModal}>
-                                        <IconPlus size={14} />
-                                    </ActionIcon>
+                            <Paper withBorder p="md" radius="md">
+                                <Group justify="space-between" mb="xs">
+                                    <Title order={4}>{tPets('weight')}</Title>
+                                    <ActionIconMotion onClick={openWeightModal}>
+                                        <ActionIcon variant="subtle" color="blue">
+                                            <IconPlus size={16} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
                                 </Group>
-                            </Group>
-                            <Group justify="space-between" mt="xs">
-                                <Text size="sm" c="dimmed">{t('birthDate')}</Text>
-                                <Text size="sm" fw={500}>
-                                    {formatDate(pet.birthDate)} ({calculateAge(pet.birthDate)} años)
-                                </Text>
-                            </Group>
+                                <Text size="xl" fw={700} ta="center">{pet.weight} kg</Text>
+                            </Paper>
+                        </Stack>
+                    </Grid.Col>
+
+                    <Grid.Col span={{ base: 12, md: 8 }}>
+                        <Paper withBorder p="md" radius="md">
+                            <Title order={4} mb="md">Últimos Eventos</Title>
+                            {/* We could show a condensed timeline here or just reusable HealthTimeline */}
+                            <HealthTimeline petId={pet._id as unknown as string} />
                         </Paper>
+                    </Grid.Col>
+                </Grid>
+            )}
+
+            {activeTab === 'timeline' && (
+                <Paper withBorder p="md" radius="md">
+                    <HealthTimeline petId={pet._id as unknown as string} />
+                </Paper>
+            )}
+
+            {activeTab === 'health' && (
+                <Grid>
+                    <Grid.Col span={12}>
                         <WeightControl
                             petId={pet._id as unknown as string}
                             currentWeight={pet.weight}
                             history={weightRecords}
                         />
-                    </Stack>
-                </Grid.Col>
-
-                <Grid.Col span={{ base: 12, md: 8 }}>
-                    <Paper withBorder p="md" radius="md">
-                        <HealthTimeline petId={pet._id as unknown as string} />
-                    </Paper>
-                </Grid.Col>
-            </Grid>
-
+                    </Grid.Col>
+                </Grid>
+            )}
 
             <SharePetModal
                 opened={opened}
