@@ -7,6 +7,24 @@ import '@mantine/core/styles.css';
 import '@/styles/globals.css';
 import { inter, poppins } from '@/styles/fonts';
 import { Providers } from '@/components/providers/Providers';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: {
+        template: '%s | PetClan',
+        default: 'PetClan - Libreta Sanitaria Digital',
+    },
+    description: 'Gestiona la salud de tus mascotas de forma fácil y segura. Historial de vacunas, recordatorios y más.',
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://petclan.vercel.app'),
+    openGraph: {
+        title: 'PetClan',
+        description: 'Libreta Sanitaria Digital para tus mascotas.',
+        url: '/',
+        siteName: 'PetClan',
+        locale: 'es_AR',
+        type: 'website',
+    },
+};
 
 export default async function LocaleLayout({
     children,
