@@ -7,10 +7,16 @@ import { formatDate } from '@/lib/dateUtils';
 import { useTranslations } from 'next-intl';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { sortHealthRecords } from '@/utils/recordUtils';
-import { HealthRecordForm } from './HealthRecordForm';
+import { SmartHealthRecordModal } from './SmartHealthRecordModal';
 import { IHealthRecord } from '@/models/HealthRecord';
 
-export function HealthTimeline({ petId }: { petId: string }) {
+interface HealthTimelineProps {
+    petId: string;
+    petSpecies?: string;
+    petBirthDate?: Date;
+}
+
+export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimelineProps) {
     const { records, isLoading, createRecord, isCreating } = useHealthRecords(petId);
     const [opened, { open, close }] = useDisclosure(false);
     const t = useTranslations('Health');
@@ -68,14 +74,16 @@ export function HealthTimeline({ petId }: { petId: string }) {
                 })}
             </Timeline>
 
-            <Modal opened={opened} onClose={close} title={t('newRecordTitle')}>
-                <HealthRecordForm
-                    petId={petId}
-                    createRecord={createRecord}
-                    isCreating={isCreating}
-                    onSubmitSuccess={close}
-                />
-            </Modal>
+            <SmartHealthRecordModal
+                opened={opened}
+                onClose={close}
+                petId={petId}
+                petSpecies={petSpecies || 'dog'} // Fallback
+                petBirthDate={petBirthDate || new Date()}
+                existingRecords={records as IHealthRecord[] || []}
+                createRecord={createRecord}
+                isCreating={isCreating}
+            />
         </>
     );
 }

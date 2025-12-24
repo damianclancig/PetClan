@@ -111,13 +111,17 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                         src={pet.photoUrl}
                         size={120}
                         radius={120}
-                        color={identityColor}
+                        // Remove color prop to avoid conflict with custom background
                         style={{
                             border: '4px solid var(--bg-surface)',
-                            boxShadow: 'var(--mantine-shadow-md)'
+                            boxShadow: 'var(--mantine-shadow-md)',
+                            background: !pet.photoUrl ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-9))` : undefined,
+                            color: 'white',
+                            fontSize: '3rem',
+                            fontWeight: 700
                         }}
                     >
-                        {pet.name.charAt(0)}
+                        {pet.name.charAt(0).toUpperCase()}
                     </Avatar>
 
                     <Box style={{ flex: 1, paddingBottom: 10 }}>
