@@ -213,7 +213,8 @@ export function SmartHealthRecordModal({
                                 <NumberInput
                                     label="Peso (kg)"
                                     placeholder="0.00"
-                                    precision={2}
+                                    decimalScale={2}
+                                    fixedDecimalScale
                                     min={0}
                                     step={0.1}
                                     required
