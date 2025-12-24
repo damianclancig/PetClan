@@ -37,7 +37,7 @@ export function PetSpeciesBadge({ species, sex, ...props }: PetSpeciesBadgeProps
 
     return (
         <Badge
-            variant="light"
+            variant="filled"
             leftSection={getSpeciesIcon()}
             rightSection={getGenderIcon()}
             {...props}

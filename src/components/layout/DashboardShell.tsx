@@ -26,8 +26,20 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
         { label: t('myPets'), icon: IconPaw, link: '/dashboard/pets' },
     ];
 
+    const handleLogout = async () => {
+        // 1. Clear Local/Session Storage if used for any persistent client state
+        if (typeof window !== 'undefined') {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+        }
+
+        // 2. Sign Out
+        await signOut({ callbackUrl: '/' });
+    };
+
     return (
         <AppShell
+            // ... (rest of AppShell props)
             header={{ height: 64 }}
             navbar={{
                 width: 280,
@@ -110,7 +122,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                                 <Menu.Item
                                     color="red"
                                     leftSection={<IconLogout size={14} />}
-                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    onClick={handleLogout}
                                 >
                                     {t('logout')}
                                 </Menu.Item>

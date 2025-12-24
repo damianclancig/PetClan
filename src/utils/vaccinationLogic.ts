@@ -18,8 +18,8 @@ export function getVaccinationStatus(pet: IPet, healthRecords: IHealthRecord[]) 
     // 1. Fixed "Puppy" milestones (relevant for historical record or if pet is still young/unvaccinated).
     // 2. Dynamic "Next Booster" (calculated from Last Dose).
 
-    const birthDate = dayjs(pet.birthDate);
-    const today = dayjs();
+    const birthDate = dayjs(pet.birthDate).startOf('day');
+    const today = dayjs().startOf('day');
     const species = pet.species as 'dog' | 'cat';
     if (!VACCINATION_SCHEDULE[species]) return [];
 
@@ -78,25 +78,28 @@ export function getVaccinationStatus(pet: IPet, healthRecords: IHealthRecord[]) 
             status = 'applied';
         } else {
             // Not applied (by count).
+
             // Is it overdue?
-            if (dueDate.isBefore(today.subtract(14, 'day'))) {
-                // It is overdue.
-                // BUT, if the pet is now an Adult (> 1 year) and has at least ONE valid dose (the adult one), 
-                // we consider these old puppy milestones as "superseded" or hidden?
-                // The user requirement: "If gave at 2 years, it supersedes first schemes".
-                // So if (count > 0) but (count < doseNumber) -> e.g. applied 1 dose at 2 years.
-                // Dose #1 (45d) is APPLIED (by count rules). 
-                // Dose #2 (60d) is PENDING. But since pet is 2 years old, Dose #2 is irrelevant if we moved to Annual scheme.
-                // Logic: If pet is Adult (>1y) and we are creating the schedule, we generally SKIP listing missing puppy doses 
-                // IF there is a more recent "Adult" recommendation due.
+            // BUT, if the pet is now an Adult (> 1 year) and has at least ONE valid dose (the adult one), 
+            // we consider these old puppy milestones as "superseded" or hidden?
+            // The user requirement: "If gave at 2 years, it supersedes first schemes".
+            // So if (count > 0) but (count < doseNumber) -> e.g. applied 1 dose at 2 years.
+            // Dose #1 (45d) is APPLIED (by count rules). 
+            // Dose #2 (60d) is PENDING. But since pet is 2 years old, Dose #2 is irrelevant if we moved to Annual scheme.
+            // Logic: If pet is Adult (>1y) and we are creating the schedule, we generally SKIP listing missing puppy doses 
+            // IF there is a more recent "Adult" recommendation due.
 
-                // Simplified approach for UI:
-                // Show puppy items ONLY if (status === 'applied') OR (pet < 1 year old).
-                // If pet > 1 year and status != applied, we HIDE it (don't push to array) because we will generate a "Booster" item instead.
+            // Simplified approach for UI:
+            // Show puppy items ONLY if (status === 'applied') OR (pet < 1 year old).
+            // If pet > 1 year and status != applied, we HIDE it (don't push to array) because we will generate a "Booster" item instead.
+
+            // Check details
+            if (dayjs(dueDate).isBefore(today.subtract(7, 'day'))) {
+                status = 'overdue';
+            } else if (dueDate.diff(today, 'day') <= 30) {
+                // Logic for Upcoming: Within 30 days from now (future or recent past but not overdue yet)
+                status = 'upcoming';
             }
-
-            // Standard overdue logic
-            if (dayjs(dueDate).isBefore(today.subtract(7, 'day'))) status = 'overdue';
         }
 
         // Add to schedule ONLY if relevant

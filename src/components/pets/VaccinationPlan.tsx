@@ -53,7 +53,7 @@ export function VaccinationPlan({ pet, records, isLoading }: VaccinationPlanProp
                             }
                         >
                             <Text c="dimmed" size="sm">
-                                {dayjs(item.dueDate).format('DD/MM/YYYY')} - {isApplied ? 'Aplicada' : (isOverdue ? 'Vencida' : 'Pendiente')}
+                                {dayjs(item.dueDate).format('DD/MM/YYYY')} - {isApplied ? 'Aplicada' : (isOverdue ? 'Vencida' : (isUpcoming ? 'Próxima' : 'Pendiente'))}
                             </Text>
                             {item.description && <Text size="xs" mt={4}>{item.description}</Text>}
                         </Timeline.Item>

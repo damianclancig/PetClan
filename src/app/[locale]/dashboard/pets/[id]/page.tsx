@@ -39,6 +39,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     // Calculate status from client side records using unified logic
     const schedule = getVaccinationStatus(pet as any, records || [] as any[]);
     const overdueCount = schedule.filter(s => s.status === 'overdue').length;
+    const upcomingCount = schedule.filter(s => s.status === 'upcoming').length;
     const isUpToDate = overdueCount === 0;
 
     // Rabies logic: "Vigente" implies we have a record and it is not overdue (or we just took it)
@@ -64,10 +65,14 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                             <Paper withBorder p="md" radius="md">
                                 <Title order={4} mb="md">Estado de Salud</Title>
                                 <Stack gap="xs">
-                                    {isUpToDate ? (
+                                    {overdueCount > 0 && (
+                                        <Badge color="red" size="lg" variant="filled" fullWidth>⚠️ Atención: Vacunas vencidas ({overdueCount})</Badge>
+                                    )}
+                                    {upcomingCount > 0 && (
+                                        <Badge color="yellow" size="lg" variant="light" fullWidth>⏳ Próximas vacunas ({upcomingCount})</Badge>
+                                    )}
+                                    {isUpToDate && (
                                         <Badge color="green" size="lg" variant="light" fullWidth>✅ Vacunas al día</Badge>
-                                    ) : (
-                                        <Badge color="orange" size="lg" variant="light" fullWidth>⚠️ Vacunas vencidas ({overdueCount})</Badge>
                                     )}
                                     {hasRabies && (
                                         <Badge color="blue" size="lg" variant="light" fullWidth>💉 Antirábica Vigente</Badge>

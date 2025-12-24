@@ -3,6 +3,7 @@ import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw } from '@ta
 import { Link } from '@/i18n/routing';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { MagicTap } from '@/components/ui/MagicWrappers';
+import { formatAge } from '@/lib/dateUtils';
 import { PetSpeciesBadge } from './PetSpeciesBadge';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
@@ -105,11 +106,9 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                             c="white"
                                             style={{ backdropFilter: 'blur(4px)' }}
                                         />
-                                        {pet.birthDate && (
-                                            <Text size="xs" c="white" style={{ opacity: 0.9 }}>
-                                                {dayjs().diff(pet.birthDate, 'year')} años
-                                            </Text>
-                                        )}
+                                        <Text size="xs" c="white" style={{ opacity: 0.9 }}>
+                                            {formatAge(pet.birthDate)}
+                                        </Text>
                                     </Group>
                                 </Box>
                                 {getGenderIcon(pet.gender) && (

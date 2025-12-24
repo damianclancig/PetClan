@@ -7,6 +7,7 @@ import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/u
 import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
+import { formatAge } from '@/lib/dateUtils';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
 
@@ -129,7 +130,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                                 size="lg"
                             />
                             <Text c="dimmed">
-                                {pet.breed} • {dayjs().diff(pet.birthDate, 'year')} años
+                                {pet.breed} • {formatAge(pet.birthDate)}
                             </Text>
                         </Group>
                     </Box>
