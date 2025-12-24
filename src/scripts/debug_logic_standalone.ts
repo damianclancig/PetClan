@@ -20,7 +20,7 @@ const VACCINATION_SCHEDULE = {
 
 // --- LOGIC UNDER TEST ---
 
-function getVaccinationStatus(pet, healthRecords) {
+function getVaccinationStatus(pet: any, healthRecords: any[]) {
     const birthDate = dayjs(pet.birthDate);
     const today = dayjs();
     const species = pet.species;
