@@ -53,6 +53,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const body = await req.json();
+
+    // If weight is being updated, automatically set lastWeightUpdate
+    if (body.weight !== undefined) {
+        body.lastWeightUpdate = new Date();
+    }
+
     const updatedPet = await Pet.findByIdAndUpdate(id, body, { new: true });
 
     if (!updatedPet) {

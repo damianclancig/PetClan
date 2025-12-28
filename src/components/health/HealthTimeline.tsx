@@ -23,6 +23,22 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimeli
 
     // Sort records using centralized logic (DRY)
     const sortedRecords = sortHealthRecords(records as IHealthRecord[] || []);
+
+    // Inject "Birth" event at the end (oldest)
+    if (petBirthDate) {
+        sortedRecords.push({
+            _id: 'birth-event',
+            type: 'birth_event' as any, // Cast to avoid TS issues if strict
+            title: 'Nacimiento 🎉',
+            description: '¡Bienvenido al mundo!',
+            appliedAt: petBirthDate,
+            petId: petId as any,
+            createdBy: 'system' as any,
+            createdAt: petBirthDate,
+            version: 1
+        });
+    }
+
     const identityColor = getPetIdentityColor(petId);
 
     if (isLoading) return <Text>{t('loading')}</Text>;
@@ -37,7 +53,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimeli
             {(!sortedRecords || sortedRecords.length === 0) && <Text c="dimmed">{t('noRecords')}</Text>}
 
             <Timeline active={-1} bulletSize={32} lineWidth={2} color={identityColor}>
-                {sortedRecords.map((record) => {
+                {sortedRecords.map((record: any) => {
                     const isFuture = new Date(record.appliedAt) > new Date();
                     const typeColor = record.type === 'vaccine' ? 'blue' : record.type === 'deworming' ? 'green' : 'gray';
 
@@ -50,22 +66,26 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimeli
                                 </Text>
                             }
                             bullet={
-                                <div
-                                    style={{
-                                        width: 16,
-                                        height: 16,
-                                        borderRadius: '50%',
-                                        backgroundColor: isFuture ? 'var(--bg-surface)' : `var(--mantine-color-${identityColor}-6)`,
-                                        border: `2px solid var(--mantine-color-${identityColor}-6)`,
-                                    }}
-                                />
+                                record.type === 'birth_event' ? (
+                                    <div style={{ fontSize: 16 }}>🎂</div>
+                                ) : (
+                                    <div
+                                        style={{
+                                            width: 16,
+                                            height: 16,
+                                            borderRadius: '50%',
+                                            backgroundColor: isFuture ? 'var(--bg-surface)' : `var(--mantine-color-${identityColor}-6)`,
+                                            border: `2px solid var(--mantine-color-${identityColor}-6)`,
+                                        }}
+                                    />
+                                )
                             }
                             lineVariant={isFuture ? 'dashed' : 'solid'}
                         >
                             <Text c="dimmed" size="xs" mt={4}>{record.description}</Text>
                             <Group gap="xs" mt={4}>
                                 <Badge size="xs" color={typeColor} variant="subtle">
-                                    {t(`types.${record.type}`)}
+                                    {record.type === 'birth_event' ? 'Hito' : t(`types.${record.type}`)}
                                 </Badge>
                                 <Text size="xs" c="dimmed">{formatDate(record.appliedAt)}</Text>
                             </Group>

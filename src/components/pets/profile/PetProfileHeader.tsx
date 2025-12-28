@@ -8,8 +8,10 @@ import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { formatAge } from '@/lib/dateUtils';
-import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp } from '@tabler/icons-react';
+import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
+import { useState } from 'react';
+import { TimeTravelModal } from '@/components/debug/TimeTravelModal';
 
 interface PetProfileHeaderProps {
     pet: any;
@@ -22,6 +24,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
     const t = useTranslations('PetDetail');
     const tCommon = useTranslations('Common');
     const identityColor = getPetIdentityColor(pet._id);
+    const [showTimeTravel, setShowTimeTravel] = useState(false);
 
     return (
         <Paper radius="lg" withBorder mb="lg" style={{ overflow: 'hidden', backgroundColor: 'var(--bg-surface)' }}>
@@ -102,11 +105,31 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                             </ActionIcon>
                         </ActionIconMotion>
                     </MagicParticles>
+                    <MagicParticles color="white">
+                        <ActionIconMotion>
+                            <ActionIcon
+                                variant="white"
+                                color={identityColor}
+                                size="lg"
+                                radius="xl"
+                                aria-label="Simular Tiempo"
+                                onClick={() => setShowTimeTravel(true)}
+                            >
+                                <IconHistory size={18} />
+                            </ActionIcon>
+                        </ActionIconMotion>
+                    </MagicParticles>
                 </Group>
             </Box>
 
+            <TimeTravelModal
+                opened={showTimeTravel}
+                onClose={() => setShowTimeTravel(false)}
+                petId={pet._id}
+            />
+
             <Container size="lg" style={{ marginTop: -60, paddingBottom: 16, position: 'relative' }}>
-                <Group align="flex-end" wrap="wrap">
+                <Group align="stretch" wrap="wrap">
                     <Avatar
                         src={pet.photoUrl}
                         size={120}
@@ -124,8 +147,8 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                         {pet.name.charAt(0).toUpperCase()}
                     </Avatar>
 
-                    <Box style={{ flex: 1, paddingBottom: 10 }}>
-                        <Title order={1} fw={800}>{pet.name}</Title>
+                    <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 10, paddingTop: 10 }}>
+                        <Title order={1} fw={800} c="white" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>{pet.name}</Title>
                         <Group gap="xs" mt={4}>
                             <PetSpeciesBadge
                                 species={pet.species}

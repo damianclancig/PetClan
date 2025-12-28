@@ -16,6 +16,7 @@ import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 import { VaccinationCalendar } from '@/components/pets/VaccinationCalendar';
 import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } from '@/utils/vaccinationUtils';
 import { IHealthRecord } from '@/models/HealthRecord';
+import DewormingCard from '@/components/health/DewormingCard';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
@@ -37,12 +38,41 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const healthRecords = records as IHealthRecord[] || [];
     const schedule = pet ? getVaccinationSchedule(pet.species) : DOG_VACCINATION_SCHEDULE;
 
-    const scheduleStatuses = schedule.map(slot =>
-        getVaccineStatus(slot, pet.birthDate, healthRecords)
-    );
+    const scheduleStatuses = schedule.map(slot => ({
+        slot,
+        ...getVaccineStatus(slot, pet.birthDate, healthRecords)
+    }));
 
-    const overdueCount = scheduleStatuses.filter(s => s.status === 'overdue').length;
-    const dueSoonCount = scheduleStatuses.filter(s => s.status === 'due_soon').length;
+    // --- Unified filtering logic (duplicated from Calendar, ideally moved to utils later) ---
+    const getSlotFamily = (id: string) => {
+        if (id.includes('deworm')) return 'deworm';
+        if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
+        if (id.includes('rabies')) return 'rabies';
+        return 'other';
+    };
+
+    const visibleSlotIds = new Set<string>();
+    const families = ['deworm', 'poly', 'rabies', 'other'];
+
+    families.forEach(family => {
+        const familySlots = scheduleStatuses.filter(s => getSlotFamily(s.slot.id) === family);
+        let foundFirstPending = false;
+        familySlots.forEach(s => {
+            if (s.status === 'completed' || s.status === 'missed_replaced') {
+                // Counts as history, but irrelevant for "Upcoming" badge logic
+            } else {
+                if (!foundFirstPending) {
+                    visibleSlotIds.add(s.slot.id);
+                    foundFirstPending = true;
+                }
+            }
+        });
+    });
+
+    const visibleStatuses = scheduleStatuses.filter(s => visibleSlotIds.has(s.slot.id));
+
+    const overdueCount = visibleStatuses.filter(s => s.status === 'overdue').length;
+    const dueSoonCount = visibleStatuses.filter(s => s.status === 'due_soon' || s.status === 'current_due').length;
     const isUpToDate = overdueCount === 0;
 
     // Rabies logic
@@ -54,17 +84,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     );
     const hasRabies = !hasOverdueRabies && hasCompletedRabies;
 
-    // Deworming logic
-    const hasOverdueDeworming = scheduleStatuses.some((s, idx) =>
-        schedule[idx].vaccineType.includes('desparasitacion') && s.status === 'overdue'
-    );
-    // For deworming to be "active", we generally look if the latest required one is done and no overdue
-    // Or simpler: if no overdue deworming, and at least one is completed recently?
-    // Let's stick to: No overdue deworming AND at least one relevant performed?
-    const hasCompletedDeworming = scheduleStatuses.some((s, idx) =>
-        schedule[idx].vaccineType.includes('desparasitacion') && s.status === 'completed'
-    );
-    const isDewormed = !hasOverdueDeworming && hasCompletedDeworming;
+
 
     return (
         <Container size="lg" px={{ base: 5, xs: 'md' }}>
@@ -94,14 +114,14 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                     {hasRabies && (
                                         <Badge color="blue" size="lg" variant="light" fullWidth>💉 Antirábica Vigente</Badge>
                                     )}
-                                    {hasOverdueDeworming && (
-                                        <Badge color="orange" size="lg" variant="filled" fullWidth>🐛 Falta Desparasitar</Badge>
-                                    )}
-                                    {isDewormed && (
-                                        <Badge color="teal" size="lg" variant="light" fullWidth>🛡️ Desparasitado</Badge>
-                                    )}
                                 </Stack>
                             </Paper>
+
+                            <DewormingCard
+                                pet={pet}
+                                records={healthRecords}
+                                onUpdateWeight={openWeightModal}
+                            />
 
                             <Paper withBorder p="md" radius="md">
                                 <Group justify="space-between" mb="xs">

@@ -42,14 +42,59 @@ export function VaccinationCalendar({ petId, birthDate, species }: VaccinationCa
 
     const healthRecords = records as IHealthRecord[] || [];
 
-    // Defined rows based on the schedule's unique ageLabels
-    const ageLabels = Array.from(new Set(schedule.map(s => s.ageLabel)));
+    // --- Logic to hide future pending vaccinations ---
+    // We group slots by "family" to determine sequential dependency.
+    // Heuristic: Group by partial ID similarity or ID prefix.
+    const getSlotFamily = (id: string) => {
+        if (id.includes('deworm')) return 'deworm';
+        if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
+        if (id.includes('rabies')) return 'rabies';
+        return 'other';
+    };
 
-    // We can define columns as: "Multi/Core" and "Rabies"
-    // Filtering slots for each cell.
+    // Calculate status for ALL slots first
+    const slotsWithStatus = schedule.map(slot => ({
+        slot,
+        ...getVaccineStatus(slot, birthDate, healthRecords)
+    }));
 
-    const renderSlot = (slot: VaccineSlot) => {
-        const { status, matchRecord } = getVaccineStatus(slot, birthDate, healthRecords);
+    // Identify which slots should be visible
+    const visibleSlotIds = new Set<string>();
+
+    const families = ['deworm', 'poly', 'rabies', 'other'];
+
+    families.forEach(family => {
+        const familySlots = slotsWithStatus.filter(s => getSlotFamily(s.slot.id) === family);
+
+        let foundFirstPending = false;
+
+        familySlots.forEach(s => {
+            if (s.status === 'completed' || s.status === 'missed_replaced') {
+                // Always show completed history
+                visibleSlotIds.add(s.slot.id);
+            } else {
+                // This is a future/pending/overdue slot
+                if (!foundFirstPending) {
+                    // Show ONLY the first one encountered (the next immediate step)
+                    visibleSlotIds.add(s.slot.id);
+                    foundFirstPending = true;
+                } else {
+                    // Hide subsequent future slots for this family to avoid clutter
+                    // UNLESS it's 'overdue' (urgent), then we might want to show it?
+                    // But if strict sequential, we only show one.
+                    // User request: "uno por cada vacuna... una vez cumplido recién ahí mostrar el segundo"
+                }
+            }
+        });
+    });
+
+    // Update ageLabels to only include those that have at least one visible slot
+    const visibleSlots = slotsWithStatus.filter(s => visibleSlotIds.has(s.slot.id));
+    const visibleAgeLabels = Array.from(new Set(visibleSlots.map(s => s.slot.ageLabel)));
+
+    // Re-function for render to use the pre-calculated object
+    const renderSlotItem = (item: typeof slotsWithStatus[0]) => {
+        const { slot, status, matchRecord } = item;
 
         let color = 'gray';
         let icon = <IconClock size={16} />;
@@ -171,13 +216,11 @@ export function VaccinationCalendar({ petId, birthDate, species }: VaccinationCa
             </Group>
 
             <Grid gutter="md">
-                {/* Header Row could be implemented if we want strict table columns,
-                    but a responsive grid might be better for mobile.
-                    Let's try to group by Age Label primarily.
-                */}
+                {visibleAgeLabels.map((ageLabel) => {
+                    // Only show slots for this age label that are marked as visible
+                    const itemsInRow = visibleSlots.filter(s => s.slot.ageLabel === ageLabel);
 
-                {ageLabels.map((ageLabel) => {
-                    const slotsInRow = schedule.filter(s => s.ageLabel === ageLabel);
+                    if (itemsInRow.length === 0) return null;
 
                     return (
                         <Grid.Col span={12} key={ageLabel}>
@@ -195,9 +238,9 @@ export function VaccinationCalendar({ petId, birthDate, species }: VaccinationCa
                                     </Grid.Col>
                                     <Grid.Col span={{ base: 12, sm: 9 }}>
                                         <Grid>
-                                            {slotsInRow.map(slot => (
-                                                <Grid.Col span={{ base: 12, md: 6 }} key={slot.id}>
-                                                    {renderSlot(slot)}
+                                            {itemsInRow.map(item => (
+                                                <Grid.Col span={{ base: 12, md: 6 }} key={item.slot.id}>
+                                                    {renderSlotItem(item)}
                                                 </Grid.Col>
                                             ))}
                                         </Grid>

@@ -5,6 +5,7 @@ export interface IHealthRecord {
     type: 'vaccine' | 'deworming' | 'consultation' | 'weight';
     weightValue?: number;
     vaccineType?: string;
+    dewormingType?: 'internal' | 'external';
     title: string;
     description?: string;
     appliedAt: Date;
@@ -27,6 +28,7 @@ const HealthRecordSchema = new Schema<IHealthRecord>({
     },
     weightValue: { type: Number },
     vaccineType: { type: String }, // Opcional, solo si type === 'vaccine'
+    dewormingType: { type: String, enum: ['internal', 'external'] }, // Opcional, solo si type === 'deworming'
     title: { type: String, required: true },
     description: { type: String },
     appliedAt: { type: Date, required: true },

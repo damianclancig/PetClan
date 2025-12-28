@@ -14,6 +14,9 @@ export interface IPet {
     diseases?: string;
     treatments?: string;
     notes?: string;
+    lastWeightUpdate?: Date;
+    environment: 'indoor' | 'outdoor' | 'mixed';
+    riskLevel: 'low' | 'medium' | 'high';
     status: 'active' | 'lost' | 'deceased' | 'archived';
     owners: Types.ObjectId[];
     createdAt: Date;
@@ -27,6 +30,17 @@ const PetSchema = new Schema<IPet>({
     birthDate: { type: Date, required: true },
     sex: { type: String, enum: ['male', 'female'], required: true },
     weight: { type: Number, required: true },
+    lastWeightUpdate: { type: Date },
+    environment: {
+        type: String,
+        enum: ['indoor', 'outdoor', 'mixed'],
+        default: 'indoor'
+    },
+    riskLevel: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        default: 'low'
+    },
     chipId: { type: String },
     photoUrl: { type: String },
     characteristics: { type: String },

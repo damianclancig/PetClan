@@ -45,6 +45,51 @@ export const CAT_VACCINATION_SCHEDULE: VaccineSlot[] = [
         isCore: true
     },
     {
+        id: 'cat_deworm_2m',
+        label: 'Desparasitación 2 Meses',
+        ageLabel: '8-9 Semanas',
+        minAgeWeeks: 8,
+        maxAgeWeeks: 9,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'cat_deworm_3m',
+        label: 'Desparasitación 3 Meses',
+        ageLabel: '3 Meses',
+        minAgeWeeks: 12,
+        maxAgeWeeks: 13,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'cat_deworm_4m',
+        label: 'Desparasitación 4 Meses',
+        ageLabel: '4 Meses',
+        minAgeWeeks: 16,
+        maxAgeWeeks: 17,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'cat_deworm_5m',
+        label: 'Desparasitación 5 Meses',
+        ageLabel: '5 Meses',
+        minAgeWeeks: 20,
+        maxAgeWeeks: 21,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'cat_deworm_6m',
+        label: 'Desparasitación 6 Meses',
+        ageLabel: '6 Meses',
+        minAgeWeeks: 24,
+        maxAgeWeeks: 25,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
         id: 'cat_triple_1',
         label: 'Triple Felina 1º Dosis',
         ageLabel: '8 Semanas',
@@ -140,6 +185,51 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         isCore: true
     },
     {
+        id: 'pup_deworm_2m',
+        label: 'Desparasitación 2 Meses',
+        ageLabel: '8-9 Semanas',
+        minAgeWeeks: 8,
+        maxAgeWeeks: 9,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'pup_deworm_3m',
+        label: 'Desparasitación 3 Meses',
+        ageLabel: '3 Meses',
+        minAgeWeeks: 12,
+        maxAgeWeeks: 13,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'pup_deworm_4m',
+        label: 'Desparasitación 4 Meses',
+        ageLabel: '4 Meses',
+        minAgeWeeks: 16,
+        maxAgeWeeks: 17,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'pup_deworm_5m',
+        label: 'Desparasitación 5 Meses',
+        ageLabel: '5 Meses',
+        minAgeWeeks: 20,
+        maxAgeWeeks: 21,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
+        id: 'pup_deworm_6m',
+        label: 'Desparasitación 6 Meses',
+        ageLabel: '6 Meses',
+        minAgeWeeks: 24,
+        maxAgeWeeks: 25,
+        vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
+        isCore: true
+    },
+    {
         id: 'pup_poly_1',
         label: 'Polivalente 1º Dosis',
         ageLabel: '6-8 Semanas',
@@ -219,15 +309,18 @@ export function getVaccineStatus(
     // Find matching record
     // Look for records that match the vaccine type and are within a reasonable window OR strictly after the min age
 
+    const isDeworming = slot.vaccineType.some(t => t.includes('desparasitacion') || t.includes('deworming'));
+    const bufferWeeks = isDeworming ? 0.5 : 1;
+
     const relevantRecords = records.filter(r =>
         (r.type === 'vaccine' || r.type === 'deworming') &&
         slot.vaccineType.some(t => r.title.toLowerCase().includes(t) || r.vaccineType === t) &&
-        dayjs(r.appliedAt).isAfter(birthDate.add(slot.minAgeWeeks - 2, 'week')) // Allow 2 weeks early buffer
+        dayjs(r.appliedAt).isAfter(birthDate.add(slot.minAgeWeeks - bufferWeeks, 'week'))
     );
 
     // Simplification for now: If we find a record in the approximate window.
-    const windowStart = birthDate.add(slot.minAgeWeeks - 2, 'week');
-    const windowEnd = birthDate.add(slot.maxAgeWeeks + 2, 'week'); // 2 weeks late buffer
+    const windowStart = birthDate.add(slot.minAgeWeeks - bufferWeeks, 'week');
+    const windowEnd = birthDate.add(slot.maxAgeWeeks + bufferWeeks, 'week'); // 2 weeks late buffer
 
     const match = relevantRecords.find(r => {
         const d = dayjs(r.appliedAt);
@@ -268,14 +361,20 @@ export function getVaccineStatus(
         return { status: 'current_due' };
     }
 
-    // Upcoming: within 30 days of the start
-    if (dueStart.diff(today, 'day') <= 30 && dueStart.diff(today, 'day') >= 0) {
+    // Upcoming determination
+    // For deworming (short cycles), anticipation should be short (e.g. 7 days) to avoid overlap (showing 15d, 30d, 45d all at once).
+    // For annual vaccines, 30 days is fine.
+
+    // isDeworming is already calculated above
+    const anticipationDays = isDeworming ? 7 : 21;
+
+    if (dueStart.diff(today, 'day') <= anticipationDays && dueStart.diff(today, 'day') >= 0) {
         return { status: 'due_soon' };
     }
 
     // It's effectively pending or upcoming
     if (today.isBefore(dueStart)) {
-        if (dueStart.diff(today, 'day') <= 30) return { status: 'due_soon' };
+        if (dueStart.diff(today, 'day') <= anticipationDays) return { status: 'due_soon' };
         return { status: 'pending' };
     }
 

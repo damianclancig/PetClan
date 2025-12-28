@@ -53,7 +53,10 @@ export async function POST(req: Request) {
 
         // Update Pet Weight if type is weight
         if (body.type === 'weight' && typeof body.weightValue === 'number') {
-            await Pet.findByIdAndUpdate(body.petId, { weight: body.weightValue });
+            await Pet.findByIdAndUpdate(body.petId, {
+                weight: body.weightValue,
+                lastWeightUpdate: new Date()
+            });
         }
 
         // Notificar a otros dueños
