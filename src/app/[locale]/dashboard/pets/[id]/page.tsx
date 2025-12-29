@@ -13,6 +13,7 @@ import { IconPlus } from '@tabler/icons-react';
 import React from 'react';
 import { WeightControl } from '@/components/pets/WeightControl';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
+import { SmartHealthRecordModal } from '@/components/health/SmartHealthRecordModal';
 import { VaccinationCalendar } from '@/components/pets/VaccinationCalendar';
 import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } from '@/utils/vaccinationUtils';
 import { IHealthRecord } from '@/models/HealthRecord';
@@ -21,9 +22,10 @@ import DewormingCard from '@/components/health/DewormingCard';
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
     const { pet, isLoading, isError } = usePet(id);
-    const { records } = useHealthRecords(id);
+    const { records, createRecord, isCreating } = useHealthRecords(id);
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
+    const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
     const [activeTab, setActiveTab] = React.useState<string | null>('summary');
 
     // Filter weight records
@@ -174,6 +176,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                             petId={pet._id as unknown as string}
                             birthDate={pet.birthDate}
                             species={pet.species}
+                            onAddRecord={openQuickAddModal}
                         />
                     </Grid.Col>
                 </Grid>
@@ -191,6 +194,16 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 onClose={closeWeightModal}
                 petId={pet._id as unknown as string}
                 currentWeight={pet.weight}
+            />
+            <SmartHealthRecordModal
+                opened={quickAddModalOpened}
+                onClose={closeQuickAddModal}
+                petId={pet._id as unknown as string}
+                petSpecies={pet.species}
+                petBirthDate={pet.birthDate}
+                existingRecords={records as IHealthRecord[] || []}
+                createRecord={createRecord}
+                isCreating={isCreating}
             />
         </Container >
     );

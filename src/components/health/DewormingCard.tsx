@@ -165,16 +165,15 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
     );
 };
 
-// Simple helper for nice messages
 const AlertIconMessage = ({ icon, title, message, color }: any) => (
-    <Paper withBorder p="xs" bg={`var(--mantine-color-${color}-0)`} style={{ borderColor: `var(--mantine-color-${color}-2)` }}>
+    <Paper withBorder p="xs" bg={`var(--mantine-color-${color}-light)`} style={{ borderColor: `var(--mantine-color-${color}-light-color)` }}>
         <Group gap="xs" align="flex-start">
-            <ThemeIcon color={color} variant="transparent" size="sm" mt={2}>
+            <ThemeIcon c={`var(--mantine-color-${color}-light-color)`} bg="transparent" size="sm" mt={2}>
                 {icon}
             </ThemeIcon>
             <Box style={{ flex: 1 }}>
-                {/* <Text size="xs" fw={700} c={`${color}.8`}>{title}</Text> */}
-                <Text size="xs" c={`${color}.8`} lh={1.4}>
+                {/* <Text size="xs" fw={700} c={`var(--mantine-color-${color}-light-color)`}>{title}</Text> */}
+                <Text size="xs" c={`var(--mantine-color-${color}-light-color)`} lh={1.4}>
                     {message}
                 </Text>
             </Box>

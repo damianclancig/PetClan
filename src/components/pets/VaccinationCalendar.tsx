@@ -1,7 +1,7 @@
 'use client';
 
 import { Paper, Title, Grid, Card, Text, Group, ThemeIcon, Badge, Tooltip, Alert, Container, Button } from '@mantine/core';
-import { IconCheck, IconAlertTriangle, IconClock, IconVaccine, IconCalendarEvent, IconInfoCircle, IconPill } from '@tabler/icons-react';
+import { IconCheck, IconAlertTriangle, IconClock, IconVaccine, IconCalendarEvent, IconInfoCircle, IconPill, IconPlus } from '@tabler/icons-react';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { IHealthRecord } from '@/models/HealthRecord';
 import { getVaccinationSchedule, getVaccineStatus, VaccineSlot, VaccineStatus } from '@/utils/vaccinationUtils';
@@ -11,9 +11,10 @@ interface VaccinationCalendarProps {
     petId: string;
     birthDate: Date;
     species: string;
+    onAddRecord?: () => void;
 }
 
-export function VaccinationCalendar({ petId, birthDate, species }: VaccinationCalendarProps) {
+export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: VaccinationCalendarProps) {
     const { records, isLoading } = useHealthRecords(petId);
     const t = useTranslations('PuppyCalendar');
 
@@ -210,9 +211,21 @@ export function VaccinationCalendar({ petId, birthDate, species }: VaccinationCa
 
     return (
         <Paper p="md" radius="lg" withBorder bg="var(--mantine-color-body)">
-            <Group mb="md">
-                <IconVaccine size={24} />
-                <Title order={3}>Calendario de Vacunación</Title>
+            <Group mb="md" justify="space-between">
+                <Group>
+                    <IconVaccine size={24} />
+                    <Title order={3}>Calendario de Vacunación</Title>
+                </Group>
+                {onAddRecord && (
+                    <Button
+                        variant="light"
+                        size="xs"
+                        leftSection={<IconPlus size={14} />}
+                        onClick={onAddRecord}
+                    >
+                        Agregar
+                    </Button>
+                )}
             </Group>
 
             <Grid gutter="md">
