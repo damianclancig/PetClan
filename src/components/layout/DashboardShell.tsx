@@ -1,7 +1,7 @@
 'use client';
 
 import { AppShell, Burger, Group, Text, Avatar, UnstyledButton, rem, Box, Menu, NavLink, ScrollArea, Divider, ThemeIcon } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Link, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { signOut } from 'next-auth/react';
@@ -11,11 +11,13 @@ import { IconHome, IconPaw, IconLogout, IconSettings, IconUser, IconChevronRight
 import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used for general layout, might be useful later
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { HoverShine } from '@/components/ui/MotionWrappers';
+import { Footer } from '@/components/layout/Footer';
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
     const [opened, { toggle }] = useDisclosure();
     const t = useTranslations('Dashboard');
     const pathname = usePathname();
+    const isMobile = useMediaQuery('(max-width: 768px)'); // Matches Mantine 'sm' breakpoint approx
 
     const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
@@ -24,16 +26,35 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
         { label: t('myPets'), icon: IconPaw, link: '/dashboard/pets' },
     ];
 
+    const handleLogout = async () => {
+        // 1. Clear Local/Session Storage if used for any persistent client state
+        if (typeof window !== 'undefined') {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+        }
+
+        // 2. Sign Out
+        await signOut({ callbackUrl: '/' });
+    };
+
     return (
         <AppShell
+            // ... (rest of AppShell props)
             header={{ height: 64 }}
             navbar={{
                 width: 280,
                 breakpoint: 'sm',
                 collapsed: { mobile: !opened },
             }}
-            padding="md"
+            footer={{
+                height: 60,
+                collapsed: isMobile || false,
+            }}
+            padding={{ base: 2, md: 'md' }}
         >
+            {/* ... Header and Navbar code ... */}
+            {/* Header and Navbar are managed by replacement below for scope */}
+
             <AppShell.Header
                 style={{
                     borderBottom: '1px solid var(--mantine-color-gray-2)',
@@ -101,7 +122,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                                 <Menu.Item
                                     color="red"
                                     leftSection={<IconLogout size={14} />}
-                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    onClick={handleLogout}
                                 >
                                     {t('logout')}
                                 </Menu.Item>
@@ -170,10 +191,19 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
             <AppShell.Main bg="var(--bg-background)" style={{ position: 'relative' }}>
                 <AnimatedBackground style={{ zIndex: 0 }} />
-                <Box style={{ position: 'relative', zIndex: 1 }}>
+                <Box pt={10} style={{ position: 'relative', zIndex: 1, flex: 1 }}>
                     {children}
                 </Box>
+
+                {/* Mobile Footer (Scrollable) */}
+                <Box hiddenFrom="sm" py="xl" pb={100} style={{ position: 'relative', zIndex: 1 }}>
+                    <Footer />
+                </Box>
             </AppShell.Main>
+
+            <AppShell.Footer p="md" zIndex={100} style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+                <Footer />
+            </AppShell.Footer>
         </AppShell>
     );
 }

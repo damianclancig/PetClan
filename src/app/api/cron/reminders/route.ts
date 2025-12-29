@@ -7,6 +7,7 @@ import Notification from '@/models/Notification';
 import { sendReminderEmail } from '@/lib/email';
 import { getTomorrowRange, now } from '@/lib/dateUtils';
 import dayjs from 'dayjs';
+import { getVaccinationStatus } from '@/utils/vaccinationLogic';
 
 // Force dynamic needed strictly? Cron jobs are usually dynamic.
 export const dynamic = 'force-dynamic';
@@ -138,7 +139,61 @@ export async function GET(request: Request) {
         // Fetch all active pets to check their weight schedule
         const activePets = await Pet.find({ status: 'active' });
 
+        // Pre-fetch all health records for these pets to minimize queries inside the loop? 
+        // Or just query per pet (easier code, maybe slower if 1000s of pets). 
+        // For now, per pet is fine for MVP.
+
         for (const pet of activePets) {
+            // --- A. Vaccination Checks (Upcoming & Overdue Dynamic) ---
+            const petHealthRecords = await HealthRecord.find({ petId: pet._id });
+
+            // We need to recast pet to any or IPet compatibility if strict typing issues arise, 
+            // but usually Mongoose docs work if interfaces align.
+            // getVaccinationStatus expects IPet and IHealthRecord[]
+            // We might need to map or cast.
+            const statusSchedule = getVaccinationStatus(pet as any, petHealthRecords as any[]);
+
+            const upcomingVaccines = statusSchedule.filter(s => s.status === 'upcoming');
+
+            if (upcomingVaccines.length > 0) {
+                const owners = await User.find({ _id: { $in: pet.owners } });
+
+                for (const vaccine of upcomingVaccines) {
+                    // Anti-spam: Check if we notified about this specific vaccine recently (e.g. last 7 days)
+                    // We can check Notification collection.
+                    // Title usually: "Vacuna Próxima" or similar.
+
+                    const notificationTitle = 'Vacuna Próxima';
+                    const diffDays = dayjs(vaccine.dueDate).diff(dayjs(), 'day');
+                    const msg = `La vacuna ${vaccine.vaccineName} para ${pet.name} vence en ${diffDays} días.`;
+
+                    for (const owner of owners) {
+                        const wantsInApp = owner.notificationPreferences?.inApp !== false;
+                        if (!wantsInApp) continue;
+
+                        const alreadyNotified = await Notification.findOne({
+                            userId: owner._id,
+                            title: notificationTitle,
+                            message: { $regex: vaccine.vaccineName }, // Weak check but likely sufficient
+                            createdAt: { $gte: dayjs().subtract(7, 'day').toDate() }
+                        });
+
+                        if (!alreadyNotified) {
+                            await Notification.create({
+                                userId: owner._id,
+                                type: 'health',
+                                title: notificationTitle,
+                                message: msg,
+                                link: `/dashboard/pets/${pet._id}`
+                            });
+                            pNotificationsCreated++;
+                        }
+                    }
+                }
+            }
+
+
+            // --- B. Weight Checks ---
             const birthDate = dayjs(pet.birthDate);
             const ageMonths = dayjs().diff(birthDate, 'month');
 
@@ -158,10 +213,10 @@ export async function GET(request: Request) {
             }
 
             // Find last weight record
-            const lastWeight = await HealthRecord.findOne({
-                petId: pet._id,
-                type: 'weight'
-            }).sort({ appliedAt: -1 });
+            // We already fetched records, let's filter in memory to save DB call
+            const lastWeight = petHealthRecords
+                .filter((r: any) => r.type === 'weight')
+                .sort((a: any, b: any) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime())[0];
 
             let lastDate = lastWeight ? dayjs(lastWeight.appliedAt) : birthDate;
             const daysSince = dayjs().diff(lastDate, 'day');
@@ -174,14 +229,24 @@ export async function GET(request: Request) {
                     const wantsInApp = owner.notificationPreferences?.inApp !== false;
 
                     if (wantsInApp) {
-                        await Notification.create({
+                        // Check for duplicate weight notification today
+                        const alreadyNotified = await Notification.exists({
                             userId: owner._id,
                             type: 'alert',
                             title: `Control de Peso (${stageLabel})`,
-                            message: `Hace ${daysSince} días fue el último pesaje de ${pet.name}. Se recomienda control cada ${intervalDays} días.`,
-                            link: `/dashboard/pets/${pet._id}`
+                            createdAt: { $gte: dayjs().startOf('day').toDate() }
                         });
-                        pNotificationsCreated++;
+
+                        if (!alreadyNotified) {
+                            await Notification.create({
+                                userId: owner._id,
+                                type: 'alert',
+                                title: `Control de Peso (${stageLabel})`,
+                                message: `Hace ${daysSince} días fue el último pesaje de ${pet.name}. Se recomienda control cada ${intervalDays} días.`,
+                                link: `/dashboard/pets/${pet._id}`
+                            });
+                            pNotificationsCreated++;
+                        }
                     }
                 }
             }

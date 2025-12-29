@@ -45,11 +45,34 @@ export function formatDateForInput(date: string | Date | undefined | null) {
     return dayjs(date).utc().format(DATE_FORMAT_INPUT);
 }
 
-/**
- * Calculates age in years from a birthdate.
- */
 export function calculateAge(birthDate: string | Date) {
     return dayjs().diff(birthDate, 'year');
+}
+
+/**
+ * Formats age dynamically:
+ * - >= 1 year: "X años"
+ * - >= 2 months & < 1 year: "X meses"
+ * - < 2 months: "X días"
+ */
+export function formatAge(birthDate: string | Date | undefined) {
+    if (!birthDate) return '';
+
+    const now = dayjs();
+    const birth = dayjs(birthDate);
+    const years = now.diff(birth, 'year');
+
+    if (years >= 1) {
+        return years === 1 ? '1 año' : `${years} años`;
+    }
+
+    const months = now.diff(birth, 'month');
+    if (months >= 2) {
+        return `${months} meses`;
+    }
+
+    const days = now.diff(birth, 'day');
+    return days === 1 ? '1 día' : `${days} días`;
 }
 
 /**

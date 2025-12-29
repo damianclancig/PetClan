@@ -2,11 +2,16 @@
 
 import { Box, Container, Avatar, Title, Text, Group, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button } from '@mantine/core';
 import { getPetIdentityColor } from '@/utils/pet-identity';
+import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
+import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
-import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp } from '@tabler/icons-react';
+import { formatAge } from '@/lib/dateUtils';
+import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
+import { useState } from 'react';
+import { TimeTravelModal } from '@/components/debug/TimeTravelModal';
 
 interface PetProfileHeaderProps {
     pet: any;
@@ -19,12 +24,13 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
     const t = useTranslations('PetDetail');
     const tCommon = useTranslations('Common');
     const identityColor = getPetIdentityColor(pet._id);
+    const [showTimeTravel, setShowTimeTravel] = useState(false);
 
     return (
         <Paper radius="lg" withBorder mb="lg" style={{ overflow: 'hidden', backgroundColor: 'var(--bg-surface)' }}>
             {/* Organic Header Background */}
             <Box
-                h={200}
+                h={120}
                 style={{
                     background: `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-3))`,
                     position: 'relative',
@@ -51,75 +57,107 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare }: PetPr
                 </svg>
 
                 {/* Back Button Top Left */}
-                {/* Back Button Top Left */}
                 <HoverScale className="absolute top-4 left-4" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
-                    <Button
-                        component={Link}
-                        href="/dashboard/pets"
-                        variant="white"
-                        color={identityColor}
-                        radius="xl"
-                        leftSection={<IconArrowBackUp size={18} />}
-                        style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
-                    >
-                        Volver
-                    </Button>
+                    <MagicParticles color={`var(--mantine-color-${identityColor}-2)`}>
+                        <Button
+                            component={Link}
+                            href="/dashboard/pets"
+                            variant="white"
+                            color={identityColor}
+                            radius="xl"
+                            leftSection={<IconArrowBackUp size={18} />}
+                            style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+                        >
+                            Volver
+                        </Button>
+                    </MagicParticles>
                 </HoverScale>
 
                 {/* Actions Top Right */}
                 <Group style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }} gap="xs">
-                    <ActionIconMotion>
-                        <ActionIcon
-                            variant="white"
-                            color={identityColor}
-                            size="lg"
-                            radius="xl"
-                            onClick={onShare}
-                            aria-label="Compartir"
-                        >
-                            <IconShare size={18} />
-                        </ActionIcon>
-                    </ActionIconMotion>
+                    <MagicParticles onClick={onShare} color="white">
+                        <ActionIconMotion>
+                            <ActionIcon
+                                variant="white"
+                                color={identityColor}
+                                size="lg"
+                                radius="xl"
+                                aria-label="Compartir"
+                                style={{ pointerEvents: 'none' }} // Click handled by wrapper
+                            >
+                                <IconShare size={18} />
+                            </ActionIcon>
+                        </ActionIconMotion>
+                    </MagicParticles>
 
-                    <ActionIconMotion>
-                        <ActionIcon
-                            component={Link}
-                            href={`/dashboard/pets/${pet._id}/edit`}
-                            variant="white"
-                            color={identityColor}
-                            size="lg"
-                            radius="xl"
-                            aria-label="Editar"
-                        >
-                            <IconPencil size={18} />
-                        </ActionIcon>
-                    </ActionIconMotion>
+                    <MagicParticles color="white">
+                        <ActionIconMotion>
+                            <ActionIcon
+                                component={Link}
+                                href={`/dashboard/pets/${pet._id}/edit`}
+                                variant="white"
+                                color={identityColor}
+                                size="lg"
+                                radius="xl"
+                                aria-label="Editar"
+                            >
+                                <IconPencil size={18} />
+                            </ActionIcon>
+                        </ActionIconMotion>
+                    </MagicParticles>
+                    <MagicParticles color="white">
+                        <ActionIconMotion>
+                            <ActionIcon
+                                variant="white"
+                                color={identityColor}
+                                size="lg"
+                                radius="xl"
+                                aria-label="Simular Tiempo"
+                                onClick={() => setShowTimeTravel(true)}
+                            >
+                                <IconHistory size={18} />
+                            </ActionIcon>
+                        </ActionIconMotion>
+                    </MagicParticles>
                 </Group>
             </Box>
 
+            <TimeTravelModal
+                opened={showTimeTravel}
+                onClose={() => setShowTimeTravel(false)}
+                petId={pet._id}
+            />
+
             <Container size="lg" style={{ marginTop: -60, paddingBottom: 16, position: 'relative' }}>
-                <Group align="flex-end" wrap="wrap">
+                <Group align="stretch" wrap="wrap">
                     <Avatar
                         src={pet.photoUrl}
                         size={120}
                         radius={120}
-                        color={identityColor}
+                        // Remove color prop to avoid conflict with custom background
                         style={{
                             border: '4px solid var(--bg-surface)',
-                            boxShadow: 'var(--mantine-shadow-md)'
+                            boxShadow: 'var(--mantine-shadow-md)',
+                            background: !pet.photoUrl ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-9))` : undefined,
+                            color: 'white',
+                            fontSize: '3rem',
+                            fontWeight: 700
                         }}
                     >
-                        {pet.name.charAt(0)}
+                        {pet.name.charAt(0).toUpperCase()}
                     </Avatar>
 
-                    <Box style={{ flex: 1, paddingBottom: 10 }}>
-                        <Title order={1} fw={800}>{pet.name}</Title>
+                    <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 10, paddingTop: 10 }}>
+                        <Title order={1} fw={800} c="white" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>{pet.name}</Title>
                         <Group gap="xs" mt={4}>
-                            <Badge color={identityColor} variant="light" size="lg">
-                                {tCommon(`species.${pet.species}`)}
-                            </Badge>
+                            <PetSpeciesBadge
+                                species={pet.species}
+                                sex={pet.sex}
+                                color={identityColor}
+                                size="lg"
+                            />
                             <Text c="dimmed">
-                                {pet.breed} • {dayjs().diff(pet.birthDate, 'year')} años
+                                {pet.breed} • {formatAge(pet.birthDate)}
                             </Text>
                         </Group>
                     </Box>

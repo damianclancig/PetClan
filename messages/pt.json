@@ -49,7 +49,11 @@
         "birthDate": "Data de Nascimento",
         "sex": "Sexo",
         "weight": "Peso (kg)",
-        "chipId": "Nº do Chip (Opcional)",
+        "chipId": "Nº do Chip",
+        "characteristics": "Características",
+        "diseases": "Doenças Crônicas",
+        "treatments": "Tratamentos Ativos",
+        "notes": "Notas",
         "placeholders": {
             "name": "Rex",
             "breed": "Mestiço",
