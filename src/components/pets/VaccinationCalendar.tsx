@@ -47,6 +47,7 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
     // We group slots by "family" to determine sequential dependency.
     // Heuristic: Group by partial ID similarity or ID prefix.
     const getSlotFamily = (id: string) => {
+        if (id.includes('external') || id.includes('pulgas')) return 'external';
         if (id.includes('deworm')) return 'deworm';
         if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
         if (id.includes('rabies')) return 'rabies';
@@ -62,31 +63,29 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
     // Identify which slots should be visible
     const visibleSlotIds = new Set<string>();
 
-    const families = ['deworm', 'poly', 'rabies', 'other'];
+    const families = ['deworm', 'external', 'poly', 'rabies', 'other'];
 
     families.forEach(family => {
         const familySlots = slotsWithStatus.filter(s => getSlotFamily(s.slot.id) === family);
 
-        let foundFirstPending = false;
+        // Find last completed
+        const completedSlots = familySlots.filter(s => s.status === 'completed' || s.status === 'missed_replaced');
+        const lastCompleted = completedSlots[completedSlots.length - 1];
 
-        familySlots.forEach(s => {
-            if (s.status === 'completed' || s.status === 'missed_replaced') {
-                // Always show completed history
-                visibleSlotIds.add(s.slot.id);
-            } else {
-                // This is a future/pending/overdue slot
-                if (!foundFirstPending) {
-                    // Show ONLY the first one encountered (the next immediate step)
-                    visibleSlotIds.add(s.slot.id);
-                    foundFirstPending = true;
-                } else {
-                    // Hide subsequent future slots for this family to avoid clutter
-                    // UNLESS it's 'overdue' (urgent), then we might want to show it?
-                    // But if strict sequential, we only show one.
-                    // User request: "uno por cada vacuna... una vez cumplido recién ahí mostrar el segundo"
-                }
-            }
-        });
+        // Find first future/pending
+        const pendingSlots = familySlots.filter(s => s.status !== 'completed' && s.status !== 'missed_replaced');
+        const firstPending = pendingSlots[0];
+
+        if (lastCompleted) {
+            visibleSlotIds.add(lastCompleted.slot.id);
+        }
+
+        if (firstPending) {
+            visibleSlotIds.add(firstPending.slot.id);
+        }
+
+        // Special case: If NO completed history, user should see at least the first one (already covered by firstPending)
+        // Special case: If everything is completed, user sees just the last one (covered by lastCompleted)
     });
 
     // Update ageLabels to only include those that have at least one visible slot
@@ -107,7 +106,9 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
                 color = 'green';
                 icon = <IconCheck size={16} />;
                 statusText = 'Completada';
-                subText = matchRecord ? new Date(matchRecord.appliedAt).toLocaleDateString() : '';
+                subText = matchRecord
+                    ? `${matchRecord.title} - ${new Date(matchRecord.appliedAt).toLocaleDateString()}`
+                    : '';
                 break;
             case 'overdue':
                 color = 'red';

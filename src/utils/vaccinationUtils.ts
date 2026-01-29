@@ -153,6 +153,15 @@ export const CAT_VACCINATION_SCHEDULE: VaccineSlot[] = [
         maxAgeWeeks: 1000,
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
+    },
+    {
+        id: 'cat_external',
+        label: 'Control Pulgas/Garrapatas',
+        ageLabel: 'Mensual / Según Producto',
+        minAgeWeeks: 8,
+        maxAgeWeeks: 1000,
+        vaccineType: ['pipeta', 'pulgas', 'garrapatas', 'bravecto', 'nexgard', 'simparica', 'external', 'externa'],
+        isCore: false
     }
 ];
 
@@ -293,6 +302,15 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         maxAgeWeeks: 1000,
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
+    },
+    {
+        id: 'pup_external',
+        label: 'Control Pulgas/Garrapatas',
+        ageLabel: 'Mensual / Según Producto',
+        minAgeWeeks: 8,
+        maxAgeWeeks: 1000,
+        vaccineType: ['pipeta', 'pulgas', 'garrapatas', 'bravecto', 'nexgard', 'simparica', 'external', 'externa'],
+        isCore: false
     }
 ];
 
@@ -318,6 +336,40 @@ export function getVaccineStatus(
         dayjs(r.appliedAt).isAfter(birthDate.add(slot.minAgeWeeks - bufferWeeks, 'week'))
     );
 
+    // Updated Logic for External Parasites (Smart Duration)
+    const isExternal = slot.vaccineType.some(t => t === 'external' || t === 'pulgas' || t === 'garrapatas' || t.includes('pipeta'));
+
+    if (isExternal) {
+        const externalRecords = records.filter(r =>
+            (r.type === 'deworming' && r.dewormingType === 'external') ||
+            (r.type === 'vaccine' && slot.vaccineType.some(t => r.title.toLowerCase().includes(t))) || // Support vaccine type just in case user misclassified
+            (r.type === 'deworming' && !r.dewormingType && slot.vaccineType.some(t => r.title.toLowerCase().includes(t)))
+        ).sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
+
+        const lastRecord = externalRecords[0];
+
+        if (!lastRecord) return { status: 'pending' };
+
+        // Determine validity duration based on product name
+        const titleLower = lastRecord.title.toLowerCase();
+        let durationDays = 30; // Default (pipettes)
+
+        if (titleLower.includes('bravecto') || titleLower.includes('90 dias') || titleLower.includes('90 días') || titleLower.includes('3 meses') || titleLower.includes('trimestral') || titleLower.includes('12 semanas')) durationDays = 90; // 3 months
+        else if (titleLower.includes('simparica')) durationDays = 35; // 5 weeks
+        else if (titleLower.includes('nexgard')) durationDays = 30;
+        else if (titleLower.includes('seresto')) durationDays = 240; // 8 months collar
+
+        const nextDueDate = dayjs(lastRecord.appliedAt).add(durationDays, 'days');
+        const daysUntilDue = nextDueDate.diff(today, 'days');
+
+        if (daysUntilDue < 0) return { status: 'overdue', matchRecord: lastRecord };
+        if (daysUntilDue <= 7) return { status: 'due_soon', matchRecord: lastRecord };
+
+        // If plenty of time left, it's considered effectively completed/current
+        return { status: 'completed', matchRecord: lastRecord };
+    }
+
+    // Standard Logic for Vaccines/Internal Deworming
     // Simplification for now: If we find a record in the approximate window.
     const windowStart = birthDate.add(slot.minAgeWeeks - bufferWeeks, 'week');
     const windowEnd = birthDate.add(slot.maxAgeWeeks + bufferWeeks, 'week'); // 2 weeks late buffer

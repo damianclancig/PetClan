@@ -16,6 +16,7 @@
   - **Micro-interacciones Mágicas** (Framer Motion) para una experiencia táctil y fluida.
   - **Hero Selection**: Transiciones dramáticas al seleccionar mascotas.
 - 🌐 **Internacionalización**: Soporte multi-idioma (i18n ready).
+- 🤝 **Comunidad y Soporte**: Modal de colaboración integrado y páginas legales (Términos y Condiciones).
 
 ## 🚀 Tecnologías (Tech Stack)
 
@@ -77,6 +78,16 @@ NEXTAUTH_URL=http://localhost:3000
 
 # App Config (SEO & Canonical)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Enlaces de Soporte y Donaciones
+NEXT_PUBLIC_CAFECITO_USER="tu-usuario-cafecito"
+NEXT_PUBLIC_PAYPAL_URL="https://paypal.me/tuuser"
+NEXT_PUBLIC_PORTFOLIO_URL="https://tuportfolio.com"
+NEXT_PUBLIC_GITHUB_REPO_URL="https://github.com/tu-repo"
+
+# Configuración de Correo (Maileroo)
+MAILEROO_API_KEY=your_maileroo_api_key
+MAILEROO_FROM_EMAIL=no-reply@libretasanitaria.app
 ```
 
 ### 5. Iniciar Servidor de Desarrollo

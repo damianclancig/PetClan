@@ -47,6 +47,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
     // --- Unified filtering logic (duplicated from Calendar, ideally moved to utils later) ---
     const getSlotFamily = (id: string) => {
+        if (id.includes('external') || id.includes('pulgas')) return 'external';
         if (id.includes('deworm')) return 'deworm';
         if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
         if (id.includes('rabies')) return 'rabies';
@@ -54,7 +55,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     };
 
     const visibleSlotIds = new Set<string>();
-    const families = ['deworm', 'poly', 'rabies', 'other'];
+    const families = ['deworm', 'external', 'poly', 'rabies', 'other'];
 
     families.forEach(family => {
         const familySlots = scheduleStatuses.filter(s => getSlotFamily(s.slot.id) === family);
@@ -146,6 +147,8 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                 petId={pet._id as unknown as string}
                                 petSpecies={pet.species}
                                 petBirthDate={pet.birthDate}
+                                limit={10}
+                                onViewAll={() => setActiveTab('timeline')}
                             />
                         </Paper>
                     </Grid.Col>

@@ -14,9 +14,11 @@ interface HealthTimelineProps {
     petId: string;
     petSpecies?: string;
     petBirthDate?: Date;
+    limit?: number;
+    onViewAll?: () => void;
 }
 
-export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimelineProps) {
+export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewAll }: HealthTimelineProps) {
     const { records, isLoading, createRecord, isCreating } = useHealthRecords(petId);
     const [opened, { open, close }] = useDisclosure(false);
     const t = useTranslations('Health');
@@ -53,7 +55,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimeli
             {(!sortedRecords || sortedRecords.length === 0) && <Text c="dimmed">{t('noRecords')}</Text>}
 
             <Timeline active={-1} bulletSize={32} lineWidth={2} color={identityColor}>
-                {sortedRecords.map((record: any) => {
+                {(limit ? sortedRecords.slice(0, limit) : sortedRecords).map((record: any) => {
                     const isFuture = new Date(record.appliedAt) > new Date();
                     const typeColor = record.type === 'vaccine' ? 'blue' : record.type === 'deworming' ? 'green' : 'gray';
 
@@ -93,6 +95,18 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate }: HealthTimeli
                     );
                 })}
             </Timeline>
+
+            {limit && sortedRecords.length > limit && onViewAll && (
+                <Button
+                    variant="subtle"
+                    size="sm"
+                    fullWidth
+                    mt="md"
+                    onClick={onViewAll}
+                >
+                    Ver historial completo ({sortedRecords.length})
+                </Button>
+            )}
 
             <SmartHealthRecordModal
                 opened={opened}
