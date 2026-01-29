@@ -1,10 +1,11 @@
 'use client';
 
-import { Flex, Text, Anchor, ActionIcon, Modal, Box, rem } from '@mantine/core';
+import { Flex, Text, Anchor, ActionIcon, Modal, Box, rem, Stack } from '@mantine/core';
 import { IconHeart } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
+import { SupportProjectModal } from './SupportProjectModal';
 
 export function Footer() {
     const [opened, { open, close }] = useDisclosure(false);
@@ -32,10 +33,18 @@ export function Footer() {
                     </Text>
                 </Box>
 
-                {/* Column 2: Terms Link */}
-                <Anchor component={Link} href="/terms" size="sm" c="dimmed">
-                    Términos y Condiciones
-                </Anchor>
+                {/* Column 2: Legal Disclaimer */}
+                <Stack gap={0} align="center" visibleFrom="xs">
+                    <Text size="xs" c="dimmed">
+                        Al navegar por el sitio aceptas nuestros
+                    </Text>
+                    <Anchor component={Link} href="/terms" size="xs" c="dimmed" td="underline">
+                        Términos y Condiciones
+                    </Anchor>
+                </Stack>
+                {/* Mobile version for Legal Disclaimer (hidden on desktop to avoid clutter or handled via responsive props) 
+                    For now, following user request on "center". 
+                */}
 
                 {/* Column 3: Beating Heart Modal */}
                 <motion.div
@@ -62,9 +71,7 @@ export function Footer() {
 
             </Flex>
 
-            <Modal opened={opened} onClose={close} title="Hecho con amor" centered>
-                {/* Empty modal for now as requested */}
-            </Modal>
+            <SupportProjectModal opened={opened} onClose={close} />
         </Box>
     );
 }
