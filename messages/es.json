@@ -4,6 +4,53 @@
         "subtitle": "Gestiona la salud de tus mascotas, recordatorios de vacunas y más.",
         "start": "Empezar Ahora"
     },
+    "Landing": {
+        "Hero": {
+            "title": "El cuidado que tu mascota merece",
+            "subtitle": "PetClan es la libreta sanitaria digital completa para llevar el control de vacunas, peso, desparasitaciones y más. Todo en un solo lugar.",
+            "cta": "Empezar Gratis",
+            "secondaryCta": "Saber más"
+        },
+        "Features": {
+            "title": "Todo lo que necesitas",
+            "vaccines": {
+                "title": "Calendario de Vacunas",
+                "description": "Lleva el control de las vacunas aplicadas y recibe alertas de los próximos vencimientos."
+            },
+            "weight": {
+                "title": "Control de Peso",
+                "description": "Gráficos históricos para monitorear la evolución del peso de tu mascota."
+            },
+            "deworming": {
+                "title": "Desparasitaciones",
+                "description": "Registra y programa las desparasitaciones internas y externas."
+            },
+            "records": {
+                "title": "Historia Clínica",
+                "description": "Guarda consultas, diagnósticos y tratamientos en el perfil digital."
+            }
+        },
+        "Benefits": {
+            "title": "¿Por qué PetClan?",
+            "access": {
+                "title": "Acceso Universal",
+                "description": "Accede desde cualquier dispositivo, en cualquier momento."
+            },
+            "security": {
+                "title": "Datos Seguros",
+                "description": "La información de tus mascotas está respaldada y segura."
+            },
+            "reminders": {
+                "title": "Recordatorios Inteligentes",
+                "description": "Nunca más olvides una fecha importante con nuestras notificaciones."
+            }
+        },
+        "CTA": {
+            "title": "¿Listo para cuidar mejor a tu mejor amigo?",
+            "subtitle": "Únete a cientos de dueños responsables que ya usan PetClan.",
+            "button": "Registrarme Ahora"
+        }
+    },
     "Dashboard": {
         "home": "Inicio",
         "myPets": "Mis Mascotas",

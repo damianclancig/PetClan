@@ -57,6 +57,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
             <AppShell.Header
                 style={{
+                    backgroundColor: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))',
                     borderBottom: '1px solid var(--mantine-color-gray-2)',
                     boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
                 }}
@@ -78,14 +79,13 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                     <Group>
                         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
                         <Group gap="xs">
-                            <Text
-                                size="xl"
-                                fw={900}
-                                variant="gradient"
-                                gradient={{ from: 'teal', to: 'violet', deg: 45 }}
-                            >
-                                PetClan
-                            </Text>
+                            <Box w={160} h={55} style={{ position: 'relative' }}>
+                                <img
+                                    src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
+                                    alt="PetClan"
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                />
+                            </Box>
                         </Group>
                     </Group>
 
