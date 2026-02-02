@@ -6,7 +6,9 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react';
 
-export function ThemeToggle() {
+interface ThemeToggleProps extends React.ComponentPropsWithoutRef<typeof ActionIcon> { }
+
+export function ThemeToggle(props: ThemeToggleProps) {
     const { setColorScheme } = useMantineColorScheme();
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
     const t = useTranslations('Theme');
@@ -17,13 +19,13 @@ export function ThemeToggle() {
     }, []);
 
     if (!mounted) {
-        return <ActionIcon variant="default" size="lg" aria-label="Toggle color scheme"><IconSun size={20} stroke={1.5} /></ActionIcon>;
+        return <ActionIcon variant="default" size="lg" {...props} aria-label="Toggle color scheme"><IconSun size={20} stroke={1.5} /></ActionIcon>;
     }
 
     return (
         <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-                <ActionIcon variant="default" size="lg" aria-label="Toggle color scheme">
+                <ActionIcon variant="default" size="lg" {...props} aria-label="Toggle color scheme">
                     <motion.div
                         key={computedColorScheme}
                         initial={{ opacity: 0, scale: 0.5, rotate: -90 }}

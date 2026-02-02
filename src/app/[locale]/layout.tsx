@@ -48,7 +48,7 @@ export default async function LocaleLayout({
     return (
         <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${poppins.variable}`}>
             <head>
-                <ColorSchemeScript />
+                <ColorSchemeScript defaultColorScheme="auto" />
             </head>
             <body>
                 <NextIntlClientProvider messages={messages}>

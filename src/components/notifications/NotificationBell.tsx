@@ -7,7 +7,9 @@ import { IconBell, IconCheck } from '@tabler/icons-react';
 import NotificationItem from './NotificationItem';
 import { useRouter } from 'next/navigation';
 
-export default function NotificationBell() {
+interface NotificationBellProps extends React.ComponentPropsWithoutRef<typeof ActionIcon> { }
+
+export default function NotificationBell(props: NotificationBellProps) {
     const [opened, setOpened] = useState(false);
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -47,6 +49,7 @@ export default function NotificationBell() {
                         variant="subtle"
                         color="gray"
                         size="lg"
+                        {...props}
                         onClick={() => setOpened((o) => !o)}
                         aria-label="Notificaciones"
                     >
