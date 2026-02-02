@@ -4,6 +4,53 @@
         "subtitle": "Manage your pets' health, vaccine reminders, and more.",
         "start": "Start Now"
     },
+    "Landing": {
+        "Hero": {
+            "title": "The care your pet deserves",
+            "subtitle": "PetClan is the complete digital health record to track vaccines, weight, deworming, and more. All in one place.",
+            "cta": "Start for Free",
+            "secondaryCta": "Learn More"
+        },
+        "Features": {
+            "title": "Everything you need",
+            "vaccines": {
+                "title": "Vaccination Calendar",
+                "description": "Track applied vaccines and get alerts for upcoming due dates."
+            },
+            "weight": {
+                "title": "Weight Control",
+                "description": "Historical charts to monitor your pet's weight evolution."
+            },
+            "deworming": {
+                "title": "Deworming",
+                "description": "Register and schedule internal and external deworming."
+            },
+            "records": {
+                "title": "Health History",
+                "description": "Save consultations, diagnoses, and treatments in the digital profile."
+            }
+        },
+        "Benefits": {
+            "title": "Why PetClan?",
+            "access": {
+                "title": "Universal Access",
+                "description": "Access from any device, at any time."
+            },
+            "security": {
+                "title": "Secure Data",
+                "description": "Your pets' information is backed up and secure."
+            },
+            "reminders": {
+                "title": "Smart Reminders",
+                "description": "Never forget an important date again with our notifications."
+            }
+        },
+        "CTA": {
+            "title": "Ready to take better care of your best friend?",
+            "subtitle": "Join hundreds of responsible owners who already use PetClan.",
+            "button": "Register Now"
+        }
+    },
     "Dashboard": {
         "home": "Home",
         "myPets": "My Pets",
