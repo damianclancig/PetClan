@@ -36,7 +36,14 @@ export function FeaturesSection() {
     ];
 
     return (
-        <Box component="section" id="features" py={rem(80)} bg="var(--mantine-color-gray-0)">
+        <Box
+            component="section"
+            id="features"
+            py={rem(80)}
+            style={{
+                backgroundColor: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))'
+            }}
+        >
             <Container size="lg">
                 <Title order={2} ta="center" mb={50}>
                     {t('title')}
