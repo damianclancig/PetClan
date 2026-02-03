@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Grid, Paper, Title, Text, Group, Badge, Loader, ActionIcon, Stack } from '@mantine/core';
+import { Container, Grid, Paper, Title, Text, Group, Badge, Loader, ActionIcon, Stack, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIconMotion } from '@/components/ui/MotionWrappers';
 import { usePet } from '@/hooks/usePets';
@@ -135,7 +135,15 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                         </ActionIcon>
                                     </ActionIconMotion>
                                 </Group>
-                                <Text size="xl" fw={700} ta="center">{pet.weight} kg</Text>
+                                <Text size="xl" fw={700} ta="center" mb="xs">{pet.weight} kg</Text>
+                                <Button
+                                    variant="light"
+                                    size="xs"
+                                    fullWidth
+                                    onClick={() => setActiveTab('health')}
+                                >
+                                    Ver gráfico e historial
+                                </Button>
                             </Paper>
                         </Stack>
                     </Grid.Col>
