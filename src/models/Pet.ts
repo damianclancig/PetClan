@@ -58,6 +58,13 @@ const PetSchema = new Schema<IPet>({
     updatedAt: { type: Date, default: Date.now },
 });
 
+// Prevent Mongoose overwrite warning in development
+if (process.env.NODE_ENV === 'development') {
+    if (mongoose.models.Pet) {
+        delete mongoose.models.Pet;
+    }
+}
+
 const Pet: Model<IPet> = mongoose.models.Pet || mongoose.model<IPet>('Pet', PetSchema);
 
 export default Pet;

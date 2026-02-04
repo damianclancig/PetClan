@@ -8,6 +8,7 @@ import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { PetProfileHeader } from '@/components/pets/profile/PetProfileHeader';
 import { SharePetModal } from '@/components/pets/SharePetModal';
+import { PetExtraInfoCard } from '@/components/pets/profile/PetExtraInfoCard';
 import { useTranslations } from 'next-intl';
 import { IconPlus } from '@tabler/icons-react';
 import React from 'react';
@@ -185,16 +186,19 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                     </Grid.Col>
 
                     <Grid.Col span={{ base: 12, md: 8 }}>
-                        <Paper withBorder p="md" radius="md">
-                            <Title order={4} mb="md">Últimos Eventos</Title>
-                            <HealthTimeline
-                                petId={pet._id as unknown as string}
-                                petSpecies={pet.species}
-                                petBirthDate={pet.birthDate}
-                                limit={10}
-                                onViewAll={() => setActiveTab('timeline')}
-                            />
-                        </Paper>
+                        <Stack>
+                            <PetExtraInfoCard pet={pet as any} />
+                            <Paper withBorder p="md" radius="md">
+                                <Title order={4} mb="md">Últimos Eventos</Title>
+                                <HealthTimeline
+                                    petId={pet._id as unknown as string}
+                                    petSpecies={pet.species}
+                                    petBirthDate={pet.birthDate}
+                                    limit={10}
+                                    onViewAll={() => setActiveTab('timeline')}
+                                />
+                            </Paper>
+                        </Stack>
                     </Grid.Col>
                 </Grid>
             )}

@@ -33,7 +33,7 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
     if (isLoading) return <Container><Loader /></Container>;
     if (isError || !pet) return <Container><Text>Error loading pet</Text></Container>;
 
-    const initialValues: Partial<PetFormValues> = {
+    const initialValues: Partial<PetFormValues> = React.useMemo(() => ({
         name: pet.name,
         species: pet.species,
         breed: pet.breed,
@@ -42,7 +42,11 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
         weight: pet.weight,
         chipId: pet.chipId,
         photoUrl: pet.photoUrl,
-    };
+        characteristics: pet.characteristics,
+        diseases: pet.diseases,
+        treatments: pet.treatments,
+        notes: pet.notes,
+    }), [pet]);
 
     const onSubmit = async (data: PetFormValues) => {
         try {

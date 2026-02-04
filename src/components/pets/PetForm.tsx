@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { IconTrash, IconGenderMale, IconGenderFemale } from '@tabler/icons-react';
 import 'dayjs/locale/es';
 
@@ -58,7 +58,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         notes: z.string().optional(),
     });
 
-    const { register, handleSubmit, formState: { errors }, setValue, watch, control } = useForm<PetFormValues>({
+    const { register, handleSubmit, formState: { errors }, setValue, watch, control, reset } = useForm<PetFormValues>({
         resolver: zodResolver(petSchema),
         defaultValues: {
             species: 'dog',
@@ -66,6 +66,17 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
             ...initialValues,
         },
     });
+
+    // Validar que se actualicen los valores si initialValues cambia (ej: carga asíncrona)
+    useEffect(() => {
+        if (initialValues) {
+            reset({
+                species: 'dog',
+                sex: 'male',
+                ...initialValues,
+            });
+        }
+    }, [initialValues, reset]);
 
     const processImage = (file: File) => {
         const reader = new FileReader();
