@@ -1,7 +1,9 @@
 import { IPet } from '@/models/Pet';
 import { IHealthRecord } from '@/models/HealthRecord';
-import { differenceInDays, differenceInCalendarDays } from 'date-fns';
-import { VeterinaryRules } from '@/utils/veterinaryRules';
+import { differenceInCalendarDays } from 'date-fns';
+import { VeterinaryRules, VET_RULES } from '@/utils/veterinaryRules';
+import { getPetAge } from '@/lib/dateUtils';
+import { VeterinaryStatusService, CategoryStatus } from './VeterinaryStatusService';
 
 export interface HealthAlert {
     id: string; // Unique virtual ID for this alert
@@ -25,8 +27,8 @@ export class HealthAnalysisService {
         const weightAlert = this.checkWeightStatus(pet);
         if (weightAlert) alerts.push(weightAlert);
 
-        // 2. Analyze Vaccines & Deworming
-        const medicalAlerts = this.checkMedicalRecords(pet, records);
+        // 2. Analyze Vaccines & Deworming via Status Service
+        const medicalAlerts = this.checkMedicalStatuses(pet, records);
         alerts.push(...medicalAlerts);
 
         return alerts;
@@ -36,146 +38,112 @@ export class HealthAnalysisService {
      * Checks if weight update is overdue based on age.
      */
     private static checkWeightStatus(pet: IPet): HealthAlert | null {
-        if (!pet.lastWeightUpdate) return null;
+        // If never weighed (or no date), alert immediately
+        if (!pet.lastWeightUpdate) {
+            return {
+                id: `weight-${pet._id}-missing`,
+                type: 'health',
+                title: `Actualización de Peso: ${pet.name}`,
+                message: `No tenemos registrado cuándo fue el último control de peso de ${pet.name}. Mantenlo actualizado.`,
+                link: `/dashboard/pets/${pet._id}?tab=health`,
+                severity: 'warning',
+                date: new Date()
+            };
+        }
 
         const today = new Date();
         const lastUpdate = new Date(pet.lastWeightUpdate);
+
+        // Ensure accurate puppy detection
         const birthDate = new Date(pet.birthDate);
-
+        const { months: ageInMonths } = getPetAge(pet.birthDate);
         const isPuppy = VeterinaryRules.isPuppy(birthDate);
-        const daysThreshold = isPuppy ? 15 : 30; // 15 days puppy, 30 adult
 
-        const daysSinceLastUpdate = differenceInDays(today, lastUpdate);
+        let daysThreshold = VET_RULES.WEIGHT.ADULT_DAYS;
+        if (isPuppy) {
+            daysThreshold = ageInMonths < 2
+                ? VET_RULES.WEIGHT.VERY_YOUNG_PUPPY_DAYS
+                : VET_RULES.WEIGHT.PUPPY_DAYS;
+        }
 
-        if (daysSinceLastUpdate > daysThreshold) {
+        const daysSinceLastUpdate = differenceInCalendarDays(today, lastUpdate);
+        const daysRemaining = daysThreshold - daysSinceLastUpdate;
+
+        // 1. Overdue (Due today or past due)
+        if (daysSinceLastUpdate >= daysThreshold) {
             return {
-                id: `weight-${pet._id}`,
+                id: `weight-${pet._id}-overdue`,
                 type: 'health',
-                title: `Actualización de Peso: ${pet.name}`,
-                message: `Hace ${daysSinceLastUpdate} días que no registras el peso de ${pet.name}. ` +
-                    `Para su edad (${isPuppy ? 'Cachorro' : 'Adulto'}), recomendamos control cada ${daysThreshold} días.`,
+                title: `¡Es hora de pesar a ${pet.name}!`,
+                message: `Hace ${daysSinceLastUpdate} días fue su último control. ` +
+                    `Como es ${isPuppy ? 'cachorro' : 'adulto'}, recomendamos pesarlo cada ${daysThreshold} días.`,
+                link: `/dashboard/pets/${pet._id}?tab=health`,
+                severity: 'warning', // Could be critical if very late, but warning is fine
+                date: today
+            };
+        }
+
+        // 2. Upcoming (3 days before)
+        if (daysRemaining <= 3 && daysRemaining > 0) {
+            return {
+                id: `weight-${pet._id}-upcoming`,
+                type: 'health',
+                title: `Próximo Control de Peso`,
+                message: `En ${daysRemaining} días le toca control de peso a ${pet.name}.`,
                 link: `/dashboard/pets/${pet._id}?tab=health`,
                 severity: 'warning',
                 date: today
             };
         }
+
         return null;
     }
 
     /**
-     * Checks vaccines and deworming for overdue status.
-     * Uses "Lifeline" logic: Groups by vaccine line (e.g. Rabies) and checks if the LINE is valid.
+     * Delegates checks to VeterinaryStatusService.
      */
-    private static checkMedicalRecords(pet: IPet, records: IHealthRecord[]): HealthAlert[] {
+    private static checkMedicalStatuses(pet: IPet, records: IHealthRecord[]): HealthAlert[] {
         const alerts: HealthAlert[] = [];
-        const today = new Date();
+        const categories: CategoryStatus['category'][] = [
+            'deworming_internal',
+            'deworming_external',
+            'vaccine_poly',
+            'vaccine_rabies'
+        ];
 
-        // 1. Filter relevant records
-        const medicalRecords = records.filter(r => r.type === 'vaccine' || r.type === 'deworming');
+        for (const cat of categories) {
+            const status = VeterinaryStatusService.getCategoryStatus(cat, pet, records);
 
-        // 2. Group by Normalized Category (The "Line" of treatment)
-        // e.g. "Rabies" bucket, "Polyvalent" bucket.
-        const healthLines = new Map<string, IHealthRecord[]>();
+            if (status.status !== 'ok' && status.details) {
+                // Map UnifiedStatus to HealthAlert
 
-        for (const record of medicalRecords) {
-            const key = this.getGroupKey(record);
-            if (!healthLines.has(key)) {
-                healthLines.set(key, []);
-            }
-            healthLines.get(key)?.push(record);
-        }
+                let title = '';
+                let message = status.message; // Start with the default message from status
 
-        // 3. Evaluate each Line
-        for (const [key, lineRecords] of healthLines.entries()) {
-            // Sort by appliedAt DESC (Newest first)
-            const sortedLine = lineRecords.sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
-            const latestRecord = sortedLine[0];
+                if (status.action === 'update_weight') {
+                    title = `Acción Requerida: Pesar a ${pet.name}`;
+                    if (status.details.reason === 'Peso desactualizado') {
+                        message = `Toca ${status.details.slot.label}, pero necesitamos peso actualizado.`;
+                    }
+                } else {
+                    // If not 'update_weight' action, then use the standard title logic
+                    title = status.status === 'critical'
+                        ? `¡Atención! ${status.details.slot.label} Vencida`
+                        : `Recordatorio: ${status.details.slot.label}`;
+                }
 
-            if (!latestRecord) continue;
-
-            // DETERMINE DUE DATE
-            // Priority 1: Manual nextDueAt
-            // Priority 2: Calculated via VetRules
-            let effectiveDueDate: Date;
-
-            if (latestRecord.nextDueAt) {
-                effectiveDueDate = new Date(latestRecord.nextDueAt);
-            } else {
-                // Auto-calculate logic
-                effectiveDueDate = VeterinaryRules.calculateNextDueDate(
-                    latestRecord.type as 'vaccine' | 'deworming',
-                    this.getSubtype(latestRecord),
-                    new Date(latestRecord.appliedAt),
-                    new Date(pet.birthDate)
-                );
-            }
-
-            const daysUntilDue = differenceInCalendarDays(effectiveDueDate, today);
-
-            // ANALYZE STATUS
-            // If daysUntilDue > 7, it's valid. No alert.
-            // If daysUntilDue < 0, it's overdue.
-            // If 0 <= daysUntilDue <= 7, it's upcoming.
-
-            // CRITICAL CHECK: "Lifeline" validity
-            // If the *latest* record seems expired by manual date, check if Biological Rule says otherwise?
-            // (e.g. User put due date 1 month ago, but vet rule says 1 year).
-            // For now, we trust the manual date if present, OR our calc if not.
-
-            if (daysUntilDue < 0) {
-                // OVERDUE
-                const daysOverdue = Math.abs(daysUntilDue);
                 alerts.push({
-                    id: `med-overdue-${latestRecord._id}`,
+                    id: `health-alert-${cat}-${pet._id}`,
                     type: 'health',
-                    title: `¡Atención! ${latestRecord.title} vencida`,
-                    message: `${pet.name} tiene ${latestRecord.title} vencida hace ${daysOverdue} días. Por favor actualiza su historial.`,
+                    title: title,
+                    message: message,
                     link: `/dashboard/pets/${pet._id}?tab=health`,
-                    severity: 'critical',
-                    date: effectiveDueDate
-                });
-            } else if (daysUntilDue <= 7) {
-                // UPCOMING
-                alerts.push({
-                    id: `med-upcoming-${latestRecord._id}`,
-                    type: 'health',
-                    title: `Recordatorio: ${latestRecord.title}`,
-                    message: `${latestRecord.title} para ${pet.name} vence en ${daysUntilDue === 0 ? 'hoy' : daysUntilDue + ' días'}.`,
-                    link: `/dashboard/pets/${pet._id}?tab=health`,
-                    severity: 'warning',
-                    date: effectiveDueDate
+                    severity: status.status, // 'critical' | 'warning' maps directly
+                    date: status.details.dueDate
                 });
             }
         }
 
         return alerts;
-    }
-
-    /**
-     * Generates a grouping key based on biological type.
-     */
-    private static getGroupKey(record: IHealthRecord): string {
-        if (record.type === 'vaccine') {
-            const raw = record.vaccineType || record.title;
-            const normalized = VeterinaryRules.normalizeVaccineType(raw);
-            // If 'other', use name to avoid grouping distinct 'other' vaccines together?
-            // Better to group by name if 'other'.
-            if (normalized === 'other') return this.cleanString(record.title);
-            return normalized;
-        } else {
-            // Deworming
-            const type = record.dewormingType || (record.title.toLowerCase().includes('interna') ? 'internal' : 'external');
-            return `deworming-${type}`;
-        }
-    }
-
-    private static getSubtype(record: IHealthRecord): string {
-        if (record.type === 'vaccine') return record.vaccineType || record.title;
-        return record.dewormingType || (record.title.toLowerCase().includes('interna') ? 'internal' : 'external');
-    }
-
-    private static cleanString(str: string): string {
-        if (!str) return 'unknown';
-        return str.toLowerCase().trim();
     }
 }

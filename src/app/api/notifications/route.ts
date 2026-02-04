@@ -51,7 +51,8 @@ export async function GET(req: Request) {
                 link: alert.link,
                 isRead: false, // Computed alerts are always "active/unread"
                 createdAt: alert.date, // Use effective date
-                isVirtual: true // Flag for frontend if needed
+                isVirtual: true, // Flag for frontend if needed
+                severity: alert.severity
             }));
 
             healthAlerts.push(...mappedAlerts);

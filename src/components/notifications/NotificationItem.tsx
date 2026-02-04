@@ -20,6 +20,7 @@ interface NotificationItemProps {
         link?: string;
         isRead: boolean;
         createdAt: string;
+        severity?: 'warning' | 'critical';
     };
     onClose: () => void;
 }
@@ -48,7 +49,8 @@ export default function NotificationItem({ notification, onClose }: Notification
 
     const getColor = () => {
         switch (notification.type) {
-            case 'health': return 'red';
+            case 'health':
+                return notification.severity === 'warning' ? 'orange' : 'red';
             case 'invitation': return 'blue';
             case 'social': return 'cyan'; // Cyan for birthday/social
             default: return 'gray';
@@ -64,7 +66,7 @@ export default function NotificationItem({ notification, onClose }: Notification
                 padding: '12px 16px',
                 // Use 'light' variant variables which adapt transparently in dark mode
                 backgroundColor: notification.type === 'health'
-                    ? 'var(--mantine-color-red-light)'
+                    ? (notification.severity === 'warning' ? 'var(--mantine-color-orange-light)' : 'var(--mantine-color-red-light)')
                     : 'var(--mantine-color-blue-light)',
                 borderBottom: '1px solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6))',
                 '&:hover': {
@@ -88,7 +90,7 @@ export default function NotificationItem({ notification, onClose }: Notification
                     <Text size="sm" fw={notification.isRead ? 500 : 700} lh={1.3}>
                         {notification.title}
                     </Text>
-                    <Text size="xs" c="dimmed" mt={2} lineClamp={2}>
+                    <Text size="xs" c="dimmed" mt={2}>
                         {notification.message}
                     </Text>
                     <Text size="xs" c="dimmed" mt={4} style={{ fontSize: '10px' }}>

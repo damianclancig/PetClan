@@ -58,21 +58,34 @@ export function calculateAge(birthDate: string | Date) {
 export function formatAge(birthDate: string | Date | undefined) {
     if (!birthDate) return '';
 
-    const now = dayjs();
-    const birth = dayjs(birthDate);
-    const years = now.diff(birth, 'year');
+    const { days, months, years } = getPetAge(birthDate);
 
     if (years >= 1) {
         return years === 1 ? '1 año' : `${years} años`;
     }
 
-    const months = now.diff(birth, 'month');
     if (months >= 2) {
         return `${months} meses`;
     }
 
-    const days = now.diff(birth, 'day');
     return days === 1 ? '1 día' : `${days} días`;
+}
+
+/**
+ * Calculates pet age in multiple units using Calendar Day logic (Start of Day).
+ * This ensures consistency: If born yesterday at 11PM and now is today 1AM, it is "1 day old".
+ */
+export function getPetAge(birthDate: string | Date) {
+    const now = dayjs();
+    const birth = dayjs(birthDate);
+
+    // Calendar differences (ignoring time)
+    const days = now.startOf('day').diff(birth.startOf('day'), 'days');
+    const weeks = now.diff(birth, 'weeks');
+    const months = now.diff(birth, 'months');
+    const years = now.diff(birth, 'years');
+
+    return { days, weeks, months, years };
 }
 
 /**
