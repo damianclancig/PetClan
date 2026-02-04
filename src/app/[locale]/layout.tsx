@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { ColorSchemeScript } from '@mantine/core';
 import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 import '@/styles/globals.css';
 import { inter, poppins } from '@/styles/fonts';
 import { Providers } from '@/components/providers/Providers';

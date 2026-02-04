@@ -1,13 +1,15 @@
 'use client';
 
 import { TextInput, NumberInput, Select, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid } from '@mantine/core';
-import { useForm } from 'react-hook-form';
+import { DateInput } from '@mantine/dates';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useState, useRef } from 'react';
 import { IconTrash, IconGenderMale, IconGenderFemale } from '@tabler/icons-react';
+import 'dayjs/locale/es';
 
 export type PetFormValues = {
     name: string;
@@ -56,7 +58,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         notes: z.string().optional(),
     });
 
-    const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<PetFormValues>({
+    const { register, handleSubmit, formState: { errors }, setValue, watch, control } = useForm<PetFormValues>({
         resolver: zodResolver(petSchema),
         defaultValues: {
             species: 'dog',
@@ -144,13 +146,25 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                 withAsterisk
             />
 
-            <TextInput
-                type="date"
-                label={t('birthDate')}
-                {...register('birthDate')}
-                error={errors.birthDate?.message}
-                mb={{ base: 'xs', md: 'md' }}
-                withAsterisk
+            <Controller
+                name="birthDate"
+                control={control}
+                render={({ field }) => (
+                    <DateInput
+                        label={t('birthDate')}
+                        placeholder="DD/MM/AAAA"
+                        error={errors.birthDate?.message}
+                        mb={{ base: 'xs', md: 'md' }}
+                        withAsterisk
+                        value={field.value ? new Date(field.value) : null}
+                        onChange={(date: any) => field.onChange(date ? date.toISOString() : '')}
+                        valueFormat="DD/MM/YYYY"
+                        clearable
+                        locale="es"
+                        maxDate={new Date()}
+                        popoverProps={{ withinPortal: true, zIndex: 10000 }}
+                    />
+                )}
             />
 
             <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>

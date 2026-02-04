@@ -85,6 +85,11 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
                             lineVariant={isFuture ? 'dashed' : 'solid'}
                         >
                             <Text c="dimmed" size="xs" mt={4}>{record.description}</Text>
+                            {record.type === 'weight' && record.weightValue && (
+                                <Text size="xs" fw={600} c={identityColor}>
+                                    {record.weightValue} kg
+                                </Text>
+                            )}
                             <Group gap="xs" mt={4}>
                                 <Badge size="xs" color={typeColor} variant="subtle">
                                     {record.type === 'birth_event' ? 'Hito' : t(`types.${record.type}`)}

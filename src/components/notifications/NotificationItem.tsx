@@ -28,19 +28,7 @@ export default function NotificationItem({ notification, onClose }: Notification
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    const markRead = useMutation({
-        mutationFn: async () => {
-            await fetch(`/api/notifications/${notification._id}/read`, { method: 'PATCH' });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        },
-    });
-
     const handleClick = () => {
-        if (!notification.isRead) {
-            markRead.mutate();
-        }
         if (notification.link) {
             router.push(notification.link);
             onClose();
@@ -74,10 +62,13 @@ export default function NotificationItem({ notification, onClose }: Notification
                 display: 'block',
                 width: '100%',
                 padding: '12px 16px',
-                backgroundColor: notification.isRead ? 'transparent' : 'var(--mantine-color-blue-light)',
-                borderBottom: '1px solid var(--mantine-color-gray-1)',
+                // Use 'light' variant variables which adapt transparently in dark mode
+                backgroundColor: notification.type === 'health'
+                    ? 'var(--mantine-color-red-light)'
+                    : 'var(--mantine-color-blue-light)',
+                borderBottom: '1px solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6))',
                 '&:hover': {
-                    backgroundColor: 'var(--mantine-color-gray-0)',
+                    backgroundColor: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5))',
                 },
                 transition: 'background-color 0.2s ease',
             })}

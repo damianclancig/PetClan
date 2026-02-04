@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
+import HealthRecord from '@/models/HealthRecord';
 
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
@@ -57,10 +58,30 @@ export async function POST(req: Request) {
         const body = await req.json();
         // Aquí se debería validar con Zod, lo haremos en breve
 
-        const pet = await Pet.create({
+        const petData: any = {
             ...body,
             owners: [user._id],
-        });
+        };
+
+        // If weight provides, set lastWeightUpdate
+        if (body.weight) {
+            petData.lastWeightUpdate = new Date();
+        }
+
+        const pet = await Pet.create(petData) as any;
+
+        // If weight provided, create initial HealthRecord
+        if (body.weight && body.weight > 0) {
+            await HealthRecord.create({
+                petId: pet._id,
+                type: 'weight',
+                title: 'Peso Inicial',
+                appliedAt: new Date(),
+                weightValue: body.weight,
+                description: 'Registrado al crear la mascota',
+                createdBy: user._id
+            });
+        }
 
         return NextResponse.json(pet, { status: 201 });
     } catch (error) {

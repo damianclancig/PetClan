@@ -106,16 +106,52 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                 <Title order={4} mb="md">Estado de Salud</Title>
                                 <Stack gap="xs">
                                     {overdueCount > 0 && (
-                                        <Badge color="red" size="lg" variant="filled" fullWidth>⚠️ Atención: Vacunas vencidas ({overdueCount})</Badge>
+                                        <Badge
+                                            color="red"
+                                            size="lg"
+                                            variant="filled"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ⚠️ Atención: Vacunas vencidas ({overdueCount})
+                                        </Badge>
                                     )}
                                     {dueSoonCount > 0 && (
-                                        <Badge color="yellow" size="lg" variant="light" fullWidth>⏳ Próximas vacunas ({dueSoonCount})</Badge>
+                                        <Badge
+                                            color="yellow"
+                                            size="lg"
+                                            variant="light"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ⏳ Próximas vacunas ({dueSoonCount})
+                                        </Badge>
                                     )}
                                     {isUpToDate && overdueCount === 0 && (
-                                        <Badge color="green" size="lg" variant="light" fullWidth>✅ Vacunas al día</Badge>
+                                        <Badge
+                                            color="green"
+                                            size="lg"
+                                            variant="light"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ✅ Vacunas al día
+                                        </Badge>
                                     )}
                                     {hasRabies && (
-                                        <Badge color="blue" size="lg" variant="light" fullWidth>💉 Antirábica Vigente</Badge>
+                                        <Badge
+                                            color="blue"
+                                            size="lg"
+                                            variant="light"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            💉 Antirábica Vigente
+                                        </Badge>
                                     )}
                                 </Stack>
                             </Paper>

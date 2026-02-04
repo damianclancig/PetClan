@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ActionIcon, Indicator, Popover, Text, Stack, ScrollArea, Group, Button, Loader, Box } from '@mantine/core';
-import { IconBell, IconCheck } from '@tabler/icons-react';
+import { IconBell } from '@tabler/icons-react';
 import NotificationItem from './NotificationItem';
 import { useRouter } from 'next/navigation';
 
@@ -25,21 +25,8 @@ export default function NotificationBell(props: NotificationBellProps) {
         refetchInterval: 60000,
     });
 
-    const markAllRead = useMutation({
-        mutationFn: async () => {
-            await fetch('/api/notifications', { method: 'PATCH' });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        },
-    });
-
     const notifications = data?.notifications || [];
     const unreadCount = data?.unreadCount || 0;
-
-    const handleMarkAllRead = () => {
-        markAllRead.mutate();
-    };
 
     return (
         <Popover opened={opened} onChange={setOpened} width={360} position="bottom-end" shadow="md" withArrow>
@@ -59,19 +46,14 @@ export default function NotificationBell(props: NotificationBellProps) {
             </Popover.Target>
 
             <Popover.Dropdown p={0}>
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid #f1f3f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text fw={600} size="sm">Notificaciones</Text>
-                    {unreadCount > 0 && (
-                        <Button
-                            variant="subtle"
-                            size="compact-xs"
-                            onClick={handleMarkAllRead}
-                            leftSection={<IconCheck size={12} />}
-                            disabled={markAllRead.isPending}
-                        >
-                            Marcar leídas
-                        </Button>
-                    )}
+                <div style={{
+                    padding: '12px 16px',
+                    borderBottom: '1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4))',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Text fw={600} size="sm">Alertas de Salud</Text>
                 </div>
 
                 <ScrollArea.Autosize mah={400} type="scroll">
