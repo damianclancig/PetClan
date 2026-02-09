@@ -76,8 +76,9 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const visibleStatuses = scheduleStatuses.filter(s => visibleSlotIds.has(s.slot.id));
 
     const overdueCount = visibleStatuses.filter(s => s.status === 'overdue').length;
-    const dueSoonCount = visibleStatuses.filter(s => s.status === 'due_soon' || s.status === 'current_due').length;
-    const isUpToDate = overdueCount === 0;
+    const dueNowCount = visibleStatuses.filter(s => s.status === 'current_due').length;
+    const upcomingCount = visibleStatuses.filter(s => s.status === 'due_soon').length;
+    const isUpToDate = overdueCount === 0 && dueNowCount === 0;
 
     // Rabies logic
     const hasOverdueRabies = scheduleStatuses.some((s, idx) =>
@@ -118,7 +119,19 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             ⚠️ Atención: Vacunas vencidas ({overdueCount})
                                         </Badge>
                                     )}
-                                    {dueSoonCount > 0 && (
+                                    {dueNowCount > 0 && (
+                                        <Badge
+                                            color="green"
+                                            size="lg"
+                                            variant="filled"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ✅ Es el momento ideal ({dueNowCount})
+                                        </Badge>
+                                    )}
+                                    {upcomingCount > 0 && (
                                         <Badge
                                             color="yellow"
                                             size="lg"
@@ -127,19 +140,19 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ⏳ Próximas vacunas ({dueSoonCount})
+                                            ⏳ Próximas vacunas ({upcomingCount})
                                         </Badge>
                                     )}
-                                    {isUpToDate && overdueCount === 0 && (
+                                    {isUpToDate && (
                                         <Badge
-                                            color="green"
+                                            color="blue"
                                             size="lg"
                                             variant="light"
                                             fullWidth
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ✅ Vacunas al día
+                                            ✨ Vacunas al día
                                         </Badge>
                                     )}
                                     {hasRabies && (

@@ -11,7 +11,7 @@ export interface HealthAlert {
     title: string;
     message: string;
     link: string;
-    severity: 'warning' | 'critical'; // warning (upcoming), critical (overdue)
+    severity: 'warning' | 'critical' | 'success'; // warning (upcoming), critical (overdue), success (due now)
     date: Date; // Effective date (dueDate or today)
 }
 
@@ -31,7 +31,19 @@ export class HealthAnalysisService {
         const medicalAlerts = this.checkMedicalStatuses(pet, records);
         alerts.push(...medicalAlerts);
 
-        return alerts;
+        // 3. Sort Alerts by Priority
+        // Red (Critical) > Green (Success/Due Now) > Yellow (Warning/Upcoming)
+        const priorityMap: Record<string, number> = {
+            'critical': 0,
+            'success': 1,
+            'warning': 2
+        };
+
+        return alerts.sort((a, b) => {
+            const priorityA = priorityMap[a.severity] ?? 99;
+            const priorityB = priorityMap[b.severity] ?? 99;
+            return priorityA - priorityB;
+        });
     }
 
     /**
@@ -120,16 +132,26 @@ export class HealthAnalysisService {
                 let title = '';
                 let message = status.message; // Start with the default message from status
 
+                // Map status to severity
+                let severity: HealthAlert['severity'] = 'warning';
+                if (status.status === 'critical') severity = 'critical';
+                if (status.status === 'due_now') severity = 'success'; // Green for "Due Now"
+                if (status.status === 'upcoming') severity = 'warning';
+
                 if (status.action === 'update_weight') {
                     title = `Acción Requerida: Pesar a ${pet.name}`;
                     if (status.details.reason === 'Peso desactualizado') {
                         message = `Toca ${status.details.slot.label}, pero necesitamos peso actualizado.`;
                     }
                 } else {
-                    // If not 'update_weight' action, then use the standard title logic
-                    title = status.status === 'critical'
-                        ? `¡Atención! ${status.details.slot.label} Vencida`
-                        : `Recordatorio: ${status.details.slot.label}`;
+                    // Standard title logic
+                    if (severity === 'critical') {
+                        title = `¡Atención! ${status.details.slot.label} Vencida`;
+                    } else if (severity === 'success') {
+                        title = `¡Es hoy! ${status.details.slot.label}`;
+                    } else {
+                        title = `Próximamente: ${status.details.slot.label}`;
+                    }
                 }
 
                 alerts.push({
@@ -138,7 +160,7 @@ export class HealthAnalysisService {
                     title: title,
                     message: message,
                     link: `/dashboard/pets/${pet._id}?tab=health`,
-                    severity: status.status, // 'critical' | 'warning' maps directly
+                    severity: severity,
                     date: status.details.dueDate
                 });
             }

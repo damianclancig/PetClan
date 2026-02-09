@@ -3,8 +3,8 @@ import { IHealthRecord } from '@/models/HealthRecord';
 import { VeterinaryRules, VaccineSlot, VaccineStatus } from '@/utils/veterinaryRules';
 
 export interface UnifiedStatus {
-    status: 'critical' | 'warning' | 'ok'; // Simplified UI status
-    label: string; // "Vencida", "A tiempo", "Próxima"
+    status: 'critical' | 'warning' | 'ok' | 'due_now' | 'upcoming'; // Enhanced UI status
+    label: string; // "Vencida", "Es Ahora", "Próxima"
     message: string;
     action: 'update_weight' | 'visit_vet' | 'buy_medication' | 'none';
     details?: {
@@ -23,7 +23,7 @@ export class VeterinaryStatusService {
 
     /**
      * Evaluates the status of a specific health category (e.g. Internal Deworming).
-     * Enforces Priority: Overdue > Due Soon > Completed.
+     * Enforces Priority: Overdue > Due Now > Upcoming > Completed.
      */
     static getCategoryStatus(
         category: CategoryStatus['category'],
@@ -54,7 +54,6 @@ export class VeterinaryStatusService {
 
         // A. Critical: Any Overdue?
         // Sort by Age (Descending) to find the LATEST overdue requirement (most strictly binding).
-        // e.g. If Puppy 1 and Puppy 2 are overdue, usually Puppy 2 overrides Puppy 1 as the implementation target.
         findings.sort((a, b) => b.slot.minAgeWeeks - a.slot.minAgeWeeks);
 
         const overdue = findings.filter(f => f.status === 'overdue');
@@ -75,7 +74,7 @@ export class VeterinaryStatusService {
             };
         }
 
-        // B. Warning: Any Due Soon or Current Due?
+        // B. Unified Warning/Action: Any Due Soon or Current Due?
         const upcoming = findings.filter(f => f.status === 'due_soon' || f.status === 'current_due');
         if (upcoming.length > 0) {
             const primary = upcoming[0];
@@ -83,7 +82,7 @@ export class VeterinaryStatusService {
             const isCurrentDue = primary.status === 'current_due';
 
             return {
-                status: 'warning',
+                status: isCurrentDue ? 'due_now' : 'upcoming', // Green vs Yellow
                 label: isCurrentDue ? 'Es Ahora' : 'Próxima',
                 message: isCurrentDue
                     ? `Es el momento ideal para ${primary.slot.label}.`
@@ -98,13 +97,6 @@ export class VeterinaryStatusService {
         }
 
         // C. Success: All Covered?
-        // If we have completed slots, show the next due date if known (e.g. from Annual).
-        // Actually, if everything is completed, we are OK.
-        // We can try to find the "Next Future Slot" to show "Next: Annual (Date)".
-
-        // Find the slot that comes AFTER the last completed one?
-        // Or just return OK.
-
         return {
             status: 'ok',
             label: 'Al día',

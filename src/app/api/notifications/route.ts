@@ -62,10 +62,26 @@ export async function GET(req: Request) {
     }
 
     // 3. Merge and Sort
-    // We want critical health alerts first? Or just simple date sort?
-    // Let's sort all by date descending.
+    // Priority: Critical (0) > Success (1) > Warning (2) > Others (3)
+    // Then by Date Descending
+    const priorityMap: Record<string, number> = {
+        'critical': 0,
+        'success': 1,
+        'warning': 2
+    };
+
+    const getPriority = (n: any) => {
+        if (n.type === 'health' && n.severity) {
+            return priorityMap[n.severity] ?? 3;
+        }
+        return 3; // Standard notifications
+    };
+
     const allNotifications = [...healthAlerts, ...storedNotifications].sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        const pA = getPriority(a);
+        const pB = getPriority(b);
+        if (pA !== pB) return pA - pB; // Lower priority first (0 is top)
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); // Newest first
     });
 
     // Count unread (All computed are unread + stored unread)

@@ -20,7 +20,7 @@ interface NotificationItemProps {
         link?: string;
         isRead: boolean;
         createdAt: string;
-        severity?: 'warning' | 'critical';
+        severity?: 'warning' | 'critical' | 'success';
     };
     onClose: () => void;
 }
@@ -50,12 +50,22 @@ export default function NotificationItem({ notification, onClose }: Notification
     const getColor = () => {
         switch (notification.type) {
             case 'health':
+                if (notification.severity === 'success') return 'green';
                 return notification.severity === 'warning' ? 'orange' : 'red';
             case 'invitation': return 'blue';
             case 'social': return 'cyan'; // Cyan for birthday/social
             default: return 'gray';
         }
     };
+
+    const getBgColor = () => {
+        if (notification.type === 'health') {
+            if (notification.severity === 'success') return 'var(--mantine-color-green-light)';
+            if (notification.severity === 'warning') return 'var(--mantine-color-orange-light)';
+            return 'var(--mantine-color-red-light)';
+        }
+        return 'var(--mantine-color-blue-light)';
+    }
 
     return (
         <UnstyledButton
@@ -65,9 +75,7 @@ export default function NotificationItem({ notification, onClose }: Notification
                 width: '100%',
                 padding: '12px 16px',
                 // Use 'light' variant variables which adapt transparently in dark mode
-                backgroundColor: notification.type === 'health'
-                    ? (notification.severity === 'warning' ? 'var(--mantine-color-orange-light)' : 'var(--mantine-color-red-light)')
-                    : 'var(--mantine-color-blue-light)',
+                backgroundColor: getBgColor(),
                 borderBottom: '1px solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6))',
                 '&:hover': {
                     backgroundColor: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5))',

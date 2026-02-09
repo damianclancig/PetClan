@@ -29,6 +29,7 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
 
     const renderAction = (result: UnifiedStatus) => {
         const { action } = result;
+        const color = getStatusColor(result.status);
 
         if (action === 'none') return null;
 
@@ -39,7 +40,7 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
                         icon={<IconStethoscope size={16} />}
                         title="Recomendación"
                         message="Consultá con tu veterinario qué producto aplicar."
-                        color="blue"
+                        color={color}
                     />
                 </Stack>
             );
@@ -68,7 +69,7 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
                         icon={<IconStethoscope size={16} />}
                         title="Atención"
                         message="Consulta a tu veterinario para indicaciones específicas."
-                        color="red"
+                        color={color}
                     />
                 </Box>
             );
@@ -80,8 +81,9 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
     const getStatusColor = (status: UnifiedStatus['status']) => {
         switch (status) {
             case 'critical': return 'red';
-            case 'warning': return 'orange';
-            default: return 'green';
+            case 'due_now': return 'green'; // Semaphore Green for "Due Now"
+            case 'upcoming': return 'yellow'; // Semaphore Yellow for "Upcoming"
+            default: return 'gray'; // "ok" or others
         }
     };
 
