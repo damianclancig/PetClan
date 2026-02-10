@@ -361,10 +361,18 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                     <Transition transition="slide-up" mounted={true}>
                         {(transitionStyles) => (
                             <Button
-                                leftSection={<IconPlus size={22} />}
-                                style={{ ...transitionStyles, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+                                leftSection={<IconPlus size={18} />}
+                                style={{
+                                    ...transitionStyles,
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                                    height: 'auto',
+                                    paddingLeft: 12,
+                                    paddingRight: 16,
+                                    paddingTop: 8,
+                                    paddingBottom: 8,
+                                }}
                                 radius="xl"
-                                size="lg"
+                                size="sm"
                                 color={identityColor}
                                 onClick={onAddRecord}
                                 display={{ base: 'flex', xs: 'none' }}
