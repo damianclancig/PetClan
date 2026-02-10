@@ -71,20 +71,20 @@ export function HeroSection() {
 
             <Container size="lg">
                 <Flex
-                    direction={{ base: 'column-reverse', md: 'row' }}
+                    direction={{ base: 'column', md: 'row' }}
                     align="center"
-                    gap={50}
+                    gap={{ base: 40, md: 50 }}
                     justify="space-between"
                 >
                     <motion.div
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, width: '100%' }}
                     >
                         <motion.div variants={itemVariants}>
                             <Box mb={20}>
-                                <div style={{ position: 'relative', width: 350, height: 250, margin: '0 auto' }}>
+                                <div style={{ position: 'relative', width: '100%', maxWidth: 350, height: 250, margin: '0 auto' }}>
                                     <img
                                         src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png"
                                         alt="PetClan Logo"
@@ -116,7 +116,7 @@ export function HeroSection() {
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
-                            <Group mt={30} gap="md">
+                            <Group mt={30} gap="md" justify="center" style={{ width: '100%', justifyContent: 'flex-start' }}>
                                 <Button
                                     component={Link}
                                     href="/dashboard"
@@ -149,12 +149,17 @@ export function HeroSection() {
                         transition={{ duration: 0.8 }}
                         style={{ flex: 1, position: 'relative', display: 'flex', justifyContent: 'center' }}
                     >
-                        <Box style={{ position: 'relative', width: 300, height: 300 }}>
+                        <Box
+                            w={{ base: 220, sm: 300 }}
+                            h={{ base: 220, sm: 300 }}
+                            style={{ position: 'relative' }}
+                        >
                             <motion.div
                                 animate={{ y: [0, -10, 0] }}
                                 transition={{ repeat: Infinity, duration: 3 }}
+                                style={{ width: '100%', height: '100%' }}
                             >
-                                <ThemeIcon size={300} radius="100%" variant="light" color="blue" style={{ opacity: 0.2 }}>
+                                <ThemeIcon w="100%" h="100%" radius="100%" variant="light" color="blue" style={{ opacity: 0.2 }}>
                                     <IconPaw style={{ width: '60%', height: '60%' }} />
                                 </ThemeIcon>
                             </motion.div>
@@ -164,10 +169,10 @@ export function HeroSection() {
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.5 }}
-                                style={{ position: 'absolute', top: 20, left: 0 }}
+                                style={{ position: 'absolute', top: '10%', left: 0 }}
                             >
-                                <ThemeIcon size={60} radius="xl" color="teal" variant="filled">
-                                    <IconVaccine size={32} />
+                                <ThemeIcon size={50} radius="xl" color="teal" variant="filled">
+                                    <IconVaccine size={28} />
                                 </ThemeIcon>
                             </motion.div>
 
@@ -175,10 +180,10 @@ export function HeroSection() {
                                 initial={{ x: 20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 transition={{ delay: 0.7 }}
-                                style={{ position: 'absolute', bottom: 40, right: 0 }}
+                                style={{ position: 'absolute', bottom: '15%', right: 0 }}
                             >
-                                <ThemeIcon size={60} radius="xl" color="red" variant="filled">
-                                    <IconHeartbeat size={32} />
+                                <ThemeIcon size={50} radius="xl" color="red" variant="filled">
+                                    <IconHeartbeat size={28} />
                                 </ThemeIcon>
                             </motion.div>
                         </Box>

@@ -175,6 +175,10 @@ function LoginContent() {
                                 style={{
                                     borderColor: 'var(--mantine-color-gray-3)',
                                     transition: 'transform 0.2s ease',
+                                    height: 'auto',
+                                    minHeight: rem(50), // Maintain min height for visual consistency
+                                    paddingTop: rem(12),
+                                    paddingBottom: rem(12),
                                 }}
                                 styles={{
                                     root: {
@@ -182,6 +186,12 @@ function LoginContent() {
                                             transform: 'translateY(-2px)',
                                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                                         }
+                                    },
+                                    label: {
+                                        whiteSpace: 'normal',
+                                        overflow: 'visible',
+                                        lineHeight: 1.2,
+                                        textAlign: 'left' // Icon is left, text should probably look good left or center. Default is center usually. Let's try responsive or just let standard behavior work with wrapping.
                                     }
                                 }}
                             >
@@ -189,7 +199,7 @@ function LoginContent() {
                             </Button>
 
                             <Text c="dimmed" size="xs" ta="center">
-                                Al continuar, aceptas nuestros{' '}
+                                Al continuar, aceptas los<br />
                                 <Text
                                     span
                                     fw={500}
