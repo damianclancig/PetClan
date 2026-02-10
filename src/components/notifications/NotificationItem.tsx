@@ -20,6 +20,7 @@ interface NotificationItemProps {
         link?: string;
         isRead: boolean;
         createdAt: string;
+        severity?: 'warning' | 'critical' | 'success';
     };
     onClose: () => void;
 }
@@ -28,19 +29,7 @@ export default function NotificationItem({ notification, onClose }: Notification
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    const markRead = useMutation({
-        mutationFn: async () => {
-            await fetch(`/api/notifications/${notification._id}/read`, { method: 'PATCH' });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        },
-    });
-
     const handleClick = () => {
-        if (!notification.isRead) {
-            markRead.mutate();
-        }
         if (notification.link) {
             router.push(notification.link);
             onClose();
@@ -60,12 +49,23 @@ export default function NotificationItem({ notification, onClose }: Notification
 
     const getColor = () => {
         switch (notification.type) {
-            case 'health': return 'red';
+            case 'health':
+                if (notification.severity === 'success') return 'green';
+                return notification.severity === 'warning' ? 'orange' : 'red';
             case 'invitation': return 'blue';
             case 'social': return 'cyan'; // Cyan for birthday/social
             default: return 'gray';
         }
     };
+
+    const getBgColor = () => {
+        if (notification.type === 'health') {
+            if (notification.severity === 'success') return 'var(--mantine-color-green-light)';
+            if (notification.severity === 'warning') return 'var(--mantine-color-orange-light)';
+            return 'var(--mantine-color-red-light)';
+        }
+        return 'var(--mantine-color-blue-light)';
+    }
 
     return (
         <UnstyledButton
@@ -74,10 +74,11 @@ export default function NotificationItem({ notification, onClose }: Notification
                 display: 'block',
                 width: '100%',
                 padding: '12px 16px',
-                backgroundColor: notification.isRead ? 'transparent' : 'var(--mantine-color-blue-light)',
-                borderBottom: '1px solid var(--mantine-color-gray-1)',
+                // Use 'light' variant variables which adapt transparently in dark mode
+                backgroundColor: getBgColor(),
+                borderBottom: '1px solid light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-6))',
                 '&:hover': {
-                    backgroundColor: 'var(--mantine-color-gray-0)',
+                    backgroundColor: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-5))',
                 },
                 transition: 'background-color 0.2s ease',
             })}
@@ -97,7 +98,7 @@ export default function NotificationItem({ notification, onClose }: Notification
                     <Text size="sm" fw={notification.isRead ? 500 : 700} lh={1.3}>
                         {notification.title}
                     </Text>
-                    <Text size="xs" c="dimmed" mt={2} lineClamp={2}>
+                    <Text size="xs" c="dimmed" mt={2}>
                         {notification.message}
                     </Text>
                     <Text size="xs" c="dimmed" mt={4} style={{ fontSize: '10px' }}>

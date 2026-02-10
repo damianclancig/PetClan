@@ -19,42 +19,52 @@ export async function POST(req: Request) {
         }
 
         // Shift logic:
-        // To simulate that "Days" have passed, we must move the "Birth Date" and events INTO THE PAST.
-        // Example: If today is Day 10, and I want it to be Day 15 (Aging +5 days),
-        // I must move the Birth Date 5 days back.
-        // 5 days = 5 * 24 * 60 * 60 * 1000 ms
         const shiftMillis = days * 24 * 60 * 60 * 1000;
 
-        // 1. Update Pet
-        pet.birthDate = new Date(pet.birthDate.getTime() - shiftMillis);
+        // 1. Update Pet (Using updateOne to bypass pre-save hooks if any, or just to be raw)
+        // We shift birthDate, lastWeightUpdate, createdAt, updatedAt
+        const petUpdates: any = {
+            birthDate: new Date(pet.birthDate.getTime() - shiftMillis),
+            createdAt: new Date(pet.createdAt.getTime() - shiftMillis),
+            updatedAt: new Date(pet.updatedAt.getTime() - shiftMillis),
+        };
 
         if (pet.lastWeightUpdate) {
-            pet.lastWeightUpdate = new Date(pet.lastWeightUpdate.getTime() - shiftMillis);
+            petUpdates.lastWeightUpdate = new Date(pet.lastWeightUpdate.getTime() - shiftMillis);
         }
 
-        await pet.save();
+        await Pet.updateOne({ _id: pet._id }, { $set: petUpdates });
 
         // 2. Update Health Records
         const records = await HealthRecord.find({ petId });
 
-        const updatePromises = records.map(async (record) => {
-            record.appliedAt = new Date(record.appliedAt.getTime() - shiftMillis);
+        if (records.length > 0) {
+            const bulkOps = records.map((record) => {
+                const updates: any = {
+                    appliedAt: new Date(record.appliedAt.getTime() - shiftMillis),
+                    createdAt: new Date(record.createdAt.getTime() - shiftMillis),
+                    updatedAt: record.updatedAt ? new Date(record.updatedAt.getTime() - shiftMillis) : undefined
+                };
 
-            // Optional: Also shift nextDueAt if it exists?
-            // Usually nextDueAt is calculated, but if it's stored static:
-            if (record.nextDueAt) {
-                record.nextDueAt = new Date(record.nextDueAt.getTime() - shiftMillis);
-            }
+                if (record.nextDueAt) {
+                    updates.nextDueAt = new Date(record.nextDueAt.getTime() - shiftMillis);
+                }
 
-            return record.save();
-        });
+                return {
+                    updateOne: {
+                        filter: { _id: record._id },
+                        update: { $set: updates }
+                    }
+                };
+            });
 
-        await Promise.all(updatePromises);
+            await HealthRecord.bulkWrite(bulkOps);
+        }
 
         return NextResponse.json({
             success: true,
             message: `Simulated ${days} days passing.`,
-            newAge: new Date(pet.birthDate)
+            recordsUpdated: records.length
         });
 
     } catch (error: any) {

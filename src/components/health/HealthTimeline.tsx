@@ -16,12 +16,14 @@ interface HealthTimelineProps {
     petBirthDate?: Date;
     limit?: number;
     onViewAll?: () => void;
+    onAddRecord?: () => void;
 }
 
-export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewAll }: HealthTimelineProps) {
+export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewAll, onAddRecord }: HealthTimelineProps) {
     const { records, isLoading, createRecord, isCreating } = useHealthRecords(petId);
     const [opened, { open, close }] = useDisclosure(false);
     const t = useTranslations('Health');
+    const identityColor = getPetIdentityColor(petId);
 
     // Sort records using centralized logic (DRY)
     const sortedRecords = sortHealthRecords(records as IHealthRecord[] || []);
@@ -41,15 +43,23 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
         });
     }
 
-    const identityColor = getPetIdentityColor(petId);
-
     if (isLoading) return <Text>{t('loading')}</Text>;
+
+    const handleAdd = () => {
+        if (onAddRecord) {
+            onAddRecord();
+        } else {
+            open();
+        }
+    };
+
+    // ...
 
     return (
         <>
             <Group justify="space-between" mb="lg">
                 <Text size="lg" fw={500}>{t('title')}</Text>
-                <Button onClick={open} size="xs" variant="light" color={identityColor}>{t('addRecord')}</Button>
+                <Button onClick={handleAdd} size="xs" variant="light" color={identityColor}>Actualizar Libreta</Button>
             </Group>
 
             {(!sortedRecords || sortedRecords.length === 0) && <Text c="dimmed">{t('noRecords')}</Text>}
@@ -85,6 +95,11 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
                             lineVariant={isFuture ? 'dashed' : 'solid'}
                         >
                             <Text c="dimmed" size="xs" mt={4}>{record.description}</Text>
+                            {record.type === 'weight' && record.weightValue && (
+                                <Text size="xs" fw={600} c={identityColor}>
+                                    {record.weightValue} kg
+                                </Text>
+                            )}
                             <Group gap="xs" mt={4}>
                                 <Badge size="xs" color={typeColor} variant="subtle">
                                     {record.type === 'birth_event' ? 'Hito' : t(`types.${record.type}`)}
@@ -108,16 +123,19 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
                 </Button>
             )}
 
-            <SmartHealthRecordModal
-                opened={opened}
-                onClose={close}
-                petId={petId}
-                petSpecies={petSpecies || 'dog'} // Fallback
-                petBirthDate={petBirthDate || new Date()}
-                existingRecords={records as IHealthRecord[] || []}
-                createRecord={createRecord}
-                isCreating={isCreating}
-            />
+            {/* Only render internal modal if NO external handler provided */}
+            {!onAddRecord && (
+                <SmartHealthRecordModal
+                    opened={opened}
+                    onClose={close}
+                    petId={petId}
+                    petSpecies={petSpecies || 'dog'}
+                    petBirthDate={petBirthDate || new Date()}
+                    existingRecords={records as IHealthRecord[] || []}
+                    createRecord={createRecord}
+                    isCreating={isCreating}
+                />
+            )}
         </>
     );
 }

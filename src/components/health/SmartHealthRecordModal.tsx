@@ -11,6 +11,7 @@ import { IconVaccine, IconStethoscope, IconScale, IconPill, IconNote, IconChevro
 
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es'; // Import locale
 import { VaccineSlot, getVaccinationSchedule, getVaccineStatus, calculateNextDueDate } from '@/utils/vaccinationUtils';
 import { IHealthRecord } from '@/models/HealthRecord';
 import { MagicParticles } from '@/components/ui/MagicWrappers';
@@ -24,6 +25,8 @@ interface SmartHealthRecordModalProps {
     existingRecords: IHealthRecord[];
     createRecord: (data: any) => Promise<void>;
     isCreating: boolean;
+    initialConfig?: { type?: RecordType; title?: string; vaccineType?: string };
+    onSwitchToWeight?: () => void;
 }
 
 type RecordType = 'vaccine' | 'deworming' | 'external_deworming' | 'consultation' | 'weight' | 'other';
@@ -36,7 +39,9 @@ export function SmartHealthRecordModal({
     petBirthDate,
     existingRecords,
     createRecord,
-    isCreating
+    isCreating,
+    initialConfig,
+    onSwitchToWeight
 }: SmartHealthRecordModalProps) {
     const t = useTranslations('Health'); // Assuming generic keys for now or fallback
     const [step, setStep] = useState<1 | 2>(1);
@@ -63,11 +68,25 @@ export function SmartHealthRecordModal({
     // Reset state on open
     useEffect(() => {
         if (opened) {
-            setStep(1);
-            setSelectedType(null);
             form.reset();
+
+            if (initialConfig) {
+                // Skip directly to step 2 if type is provided
+                if (initialConfig.type) {
+                    setSelectedType(initialConfig.type);
+                    setStep(2);
+                    form.setValues({
+                        type: initialConfig.type as any,
+                        title: initialConfig.title || '',
+                        vaccineType: initialConfig.vaccineType || '' // e.g. 'rabies'
+                    });
+                }
+            } else {
+                setStep(1);
+                setSelectedType(null);
+            }
         }
-    }, [opened]);
+    }, [opened, initialConfig]);
 
     // Calculate suggestions when type selected
     useEffect(() => {
@@ -184,15 +203,30 @@ export function SmartHealthRecordModal({
             }
 
             if (externalDuration !== 'other') {
-                const nextDue = dayjs(form.values.appliedAt || new Date()).add(days, 'day').toDate();
-                if (form.values.nextDueAt?.getTime() !== nextDue.getTime()) {
+                const appliedDate = form.values.appliedAt instanceof Date ? form.values.appliedAt : new Date();
+                const nextDue = dayjs(appliedDate).add(days, 'day').toDate();
+
+                if (form.values.nextDueAt instanceof Date) {
+                    if (form.values.nextDueAt.getTime() !== nextDue.getTime()) {
+                        form.setFieldValue('nextDueAt', nextDue);
+                    }
+                } else {
                     form.setFieldValue('nextDueAt', nextDue);
                 }
             }
         }
-    }, [externalMethod, externalDuration, externalTargets, selectedType, form.values.appliedAt?.getTime()]);
+    }, [externalMethod, externalDuration, externalTargets, selectedType, form.values.appliedAt]);
+
+
+
 
     const handleTypeSelect = (type: RecordType) => {
+        // Intercept Weight Selection if handler provided
+        if (type === 'weight' && onSwitchToWeight) {
+            onSwitchToWeight();
+            return;
+        }
+
         setSelectedType(type);
 
         if (type === 'external_deworming') {
@@ -372,6 +406,8 @@ export function SmartHealthRecordModal({
             title={<Text size="lg" fw={700}>{step === 1 ? "¿Qué registramos hoy?" : "Detalles del Registro"}</Text>}
             size="lg"
             radius="lg"
+            closeOnClickOutside={false}
+            closeOnEscape={false}
         >
             {step === 1 ? (
                 <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="md">
@@ -458,9 +494,13 @@ export function SmartHealthRecordModal({
                             <Group grow>
                                 <DateInput
                                     label="Fecha Aplicación"
-                                    placeholder="Hoy"
+                                    placeholder="DD/MM/AAAA"
                                     required
                                     maxDate={new Date()}
+                                    valueFormat="DD/MM/YYYY"
+                                    clearable
+                                    locale="es"
+                                    popoverProps={{ withinPortal: true, zIndex: 10000 }}
                                     {...form.getInputProps('appliedAt')}
                                 />
                                 {(selectedType === 'vaccine' || selectedType === 'deworming') && (
@@ -468,7 +508,11 @@ export function SmartHealthRecordModal({
                                         label="Vencimiento / Próxima Dosis"
                                         placeholder="Calculado autom."
                                         minDate={new Date()}
+                                        valueFormat="DD/MM/YYYY"
+                                        clearable
+                                        locale="es"
                                         leftSection={<IconCalendarEvent size={16} />}
+                                        popoverProps={{ withinPortal: true, zIndex: 10000 }}
                                         {...form.getInputProps('nextDueAt')}
                                     />
                                 )}

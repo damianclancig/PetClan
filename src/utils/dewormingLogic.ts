@@ -1,6 +1,8 @@
 import { IPet } from '../models/Pet';
 import { IHealthRecord } from '../models/HealthRecord';
 import dayjs from 'dayjs';
+import { getPetAge } from '../lib/dateUtils';
+import { VeterinaryRules } from './veterinaryRules';
 
 export type DewormingStatus = 'up_to_date' | 'upcoming' | 'due_now' | 'overdue' | 'blocked';
 export type ActionType = 'buy_medication' | 'update_weight' | 'visit_vet' | 'none';
@@ -19,37 +21,11 @@ export interface DewormingResult {
     lastApplied?: Date;
 }
 
-// Helper: Calcular edad en meses y días
-const getAge = (birthDate: Date) => {
-    const now = dayjs();
-    const birth = dayjs(birthDate);
-    const months = now.diff(birth, 'months');
-    const days = now.diff(birth, 'days');
-    return { months, days };
-};
-
-// Reglas de Peso
-const isWeightValid = (pet: IPet): boolean => {
-    if (!pet.weight || !pet.lastWeightUpdate) return false;
-
-    const { months, days } = getAge(pet.birthDate);
-    const lastUpdateDays = dayjs().diff(dayjs(pet.lastWeightUpdate), 'days');
-
-    // Cachorros muy jóvenes (< 2 meses) -> Crecen muy rápido, peso válido solo 7 días
-    if (days < 60) {
-        return lastUpdateDays <= 7;
-    }
-    // Cachorros (2 - 6 meses) -> peso válido 15 días
-    if (months < 6) {
-        return lastUpdateDays <= 15;
-    }
-    // Adultos -> peso válido 30 días
-    return lastUpdateDays <= 30;
-};
+// Local helper removed, using VeterinaryRules.isWeightValid
 
 // Lógica de Desparasitación Interna
 export const calculateInternalDewormingStatus = (pet: IPet, records: IHealthRecord[]): DewormingResult => {
-    const { months, days } = getAge(pet.birthDate);
+    const { months, days } = getPetAge(pet.birthDate);
 
     // Regla: No recomendar antes de 15 días de vida
     if (days < 15) {
@@ -122,7 +98,7 @@ export const calculateInternalDewormingStatus = (pet: IPet, records: IHealthReco
     }
 
     // Si toca pronto o está atrasado, verificamos requisitos para la acción
-    const weightOk = isWeightValid(pet);
+    const weightOk = VeterinaryRules.isWeightValid(pet.birthDate, pet.lastWeightUpdate);
 
     if (!weightOk) {
         return {
@@ -152,22 +128,46 @@ export const calculateInternalDewormingStatus = (pet: IPet, records: IHealthReco
 
 // Lógica de Desparasitación Externa
 export const calculateExternalDewormingStatus = (pet: IPet, records: IHealthRecord[]): DewormingResult => {
-    // TODO: Implementar lógica externa similar, considerando environment y riskLevel
+    const { days } = getPetAge(pet.birthDate);
+
     const externalRecords = records
         .filter(r => r.type === 'deworming' && r.dewormingType === 'external')
         .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
 
     const lastRecord = externalRecords[0];
 
-    // Intervalo base 30 días (asumiendo pipeta estándar por defecto si no hay info de producto)
-    // Podríamos leer el producto si estuviera en description o un campo future 'productType'
+    // TODO: Implementar lógica externa similar, considerando environment y riskLevel
+    // Regla: No recomendar antes de 2 meses (60 días) salvo indicación veterinaria
+    // Usamos la constante de VET_RULES si queremos mantener consistencia, o hardcolemos 2 meses
+    const MIN_AGE_DAYS = 60;
+
+    // Si es muy joven (< 60 días), la fecha "ideal" de inicio es a los 60 días
+    if (!lastRecord && days < MIN_AGE_DAYS) {
+        return {
+            status: 'blocked',
+            nextAction: {
+                type: 'visit_vet',
+                recommendedDate: dayjs(pet.birthDate).add(MIN_AGE_DAYS, 'days').toDate(),
+                reason: 'Muy joven para pipeta estándar (esperar 2 meses).'
+            },
+            confidenceLevel: 'high'
+        };
+    }
+
     let intervalDays = 30;
 
     let nextDueDate: dayjs.Dayjs;
     if (lastRecord) {
         nextDueDate = dayjs(lastRecord.appliedAt).add(intervalDays, 'days');
     } else {
-        nextDueDate = dayjs();
+        // Nunca se aplicó.
+        // Si ya tiene > 2 meses, es para YA.
+        // Si tiene < 2 meses (ya manejado arriba), pero por seguridad:
+        if (days < MIN_AGE_DAYS) {
+            nextDueDate = dayjs(pet.birthDate).add(MIN_AGE_DAYS, 'days');
+        } else {
+            nextDueDate = dayjs();
+        }
     }
 
     const daysUntilDue = nextDueDate.diff(dayjs(), 'days');
@@ -194,7 +194,7 @@ export const calculateExternalDewormingStatus = (pet: IPet, records: IHealthReco
     }
 
     // Para externa, el peso también es importante para comprar la pipeta/pastilla correcta
-    const weightOk = isWeightValid(pet);
+    const weightOk = VeterinaryRules.isWeightValid(pet.birthDate, pet.lastWeightUpdate);
     if (!weightOk) {
         return {
             status: status === 'up_to_date' ? 'upcoming' : status,

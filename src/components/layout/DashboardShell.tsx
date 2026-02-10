@@ -75,21 +75,21 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                     }}
                 />
 
-                <Group h="100%" px="md" justify="space-between">
-                    <Group>
+                <Group h="100%" px={{ base: 'xs', sm: 'md' }} justify="space-between" wrap="nowrap">
+                    <Group wrap="nowrap" gap="xs">
                         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
                         <Group gap="xs">
-                            <Box w={160} h={55} style={{ position: 'relative' }}>
+                            <Box w={{ base: 110, sm: 160 }} h={55} style={{ position: 'relative' }}>
                                 <img
                                     src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
                                     alt="PetClan"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
                                 />
                             </Box>
                         </Group>
                     </Group>
 
-                    <Group>
+                    <Group gap="xs" wrap="nowrap">
                         <NotificationBell />
                         <ThemeToggle />
                         <Menu shadow="md" width={200} position="bottom-end">
@@ -100,6 +100,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                                         alt={user?.name}
                                         radius="xl"
                                         color="teal"
+                                        size={38}
                                     >
                                         {user?.name?.charAt(0).toUpperCase()}
                                     </Avatar>

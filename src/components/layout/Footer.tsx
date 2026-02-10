@@ -34,7 +34,7 @@ export function Footer() {
                 </Box>
 
                 {/* Column 2: Legal Disclaimer */}
-                <Stack gap={0} align="center" visibleFrom="xs">
+                <Stack gap={0} align="center" mt={{ base: 'md', sm: 0 }}>
                     <Text size="xs" c="dimmed">
                         Al navegar por el sitio aceptas nuestros
                     </Text>

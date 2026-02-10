@@ -224,7 +224,7 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
                         leftSection={<IconPlus size={14} />}
                         onClick={onAddRecord}
                     >
-                        Agregar
+                        Actualizar Libreta
                     </Button>
                 )}
             </Group>

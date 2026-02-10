@@ -1,12 +1,13 @@
+
 "use client";
 
-import { Card, Text, Button, Badge, Group, Stack, Progress, ThemeIcon, Paper, Divider, Box, Tooltip } from '@mantine/core';
+import { Text, Button, Badge, Group, Stack, ThemeIcon, Paper, Divider, Box, Tooltip } from '@mantine/core';
 import { IPet } from '@/models/Pet';
 import { IHealthRecord } from '@/models/HealthRecord';
-import { calculateInternalDewormingStatus, calculateExternalDewormingStatus, DewormingResult } from '@/utils/dewormingLogic';
-import { IconCheck, IconAlertTriangle, IconScale, IconStethoscope, IconBug, IconBugOff, IconInfoCircle } from '@tabler/icons-react';
+import { IconScale, IconStethoscope, IconBug, IconBugOff, IconInfoCircle } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useState, useEffect } from 'react';
+import { VeterinaryStatusService, UnifiedStatus } from '@/services/VeterinaryStatusService';
 
 interface DewormingCardProps {
     pet: IPet;
@@ -15,37 +16,37 @@ interface DewormingCardProps {
 }
 
 const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => {
-    const [internalStatus, setInternalStatus] = useState<DewormingResult | null>(null);
-    const [externalStatus, setExternalStatus] = useState<DewormingResult | null>(null);
+    const [internalStatus, setInternalStatus] = useState<UnifiedStatus | null>(null);
+    const [externalStatus, setExternalStatus] = useState<UnifiedStatus | null>(null);
 
     useEffect(() => {
-        if (pet && records) {
-            setInternalStatus(calculateInternalDewormingStatus(pet, records));
-            setExternalStatus(calculateExternalDewormingStatus(pet, records));
-        }
+        if (!pet) return;
+        setInternalStatus(VeterinaryStatusService.getCategoryStatus('deworming_internal', pet, records));
+        setExternalStatus(VeterinaryStatusService.getCategoryStatus('deworming_external', pet, records));
     }, [pet, records]);
 
     if (!internalStatus || !externalStatus) return null;
 
-    const renderAction = (result: DewormingResult) => {
-        const { nextAction } = result;
+    const renderAction = (result: UnifiedStatus) => {
+        const { action } = result;
+        const color = getStatusColor(result.status);
 
-        if (nextAction.type === 'none') return null;
+        if (action === 'none') return null;
 
-        if (nextAction.type === 'buy_medication') {
+        if (action === 'buy_medication') {
             return (
                 <Stack gap="xs" mt="sm">
                     <AlertIconMessage
                         icon={<IconStethoscope size={16} />}
                         title="Recomendación"
                         message="Consultá con tu veterinario qué producto aplicar."
-                        color="blue"
+                        color={color}
                     />
                 </Stack>
             );
         }
 
-        if (nextAction.type === 'update_weight') {
+        if (action === 'update_weight') {
             return (
                 <Button
                     leftSection={<IconScale size={16} />}
@@ -61,45 +62,33 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
             );
         }
 
-        if (nextAction.type === 'visit_vet') {
+        if (action === 'visit_vet') {
             return (
                 <Box mt="sm">
                     <AlertIconMessage
                         icon={<IconStethoscope size={16} />}
                         title="Atención"
-                        message="Consulta a tu veterinario para indicaciones específicas en esta etapa."
-                        color="red"
+                        message="Consulta a tu veterinario para indicaciones específicas."
+                        color={color}
                     />
                 </Box>
             );
         }
 
-        return null; // Should not reach here typically
+        return null;
     };
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: UnifiedStatus['status']) => {
         switch (status) {
-            case 'overdue': return 'red';
-            case 'due_now': return 'orange';
-            case 'upcoming': return 'yellow';
-            case 'blocked': return 'gray';
-            default: return 'green';
+            case 'critical': return 'red';
+            case 'due_now': return 'green'; // Semaphore Green for "Due Now"
+            case 'upcoming': return 'yellow'; // Semaphore Yellow for "Upcoming"
+            default: return 'gray'; // "ok" or others
         }
     };
 
-    const getStatusLabel = (status: string) => {
-        switch (status) {
-            case 'overdue': return 'Vencido';
-            case 'due_now': return 'Es Hora';
-            case 'upcoming': return 'Próximo';
-            case 'blocked': return 'En espera';
-            default: return 'Al día';
-        }
-    }
-
-    const DewormingSection = ({ title, icon, result, isLast = false }: { title: string, icon: React.ReactNode, result: DewormingResult, isLast?: boolean }) => {
+    const DewormingSection = ({ title, icon, result, isLast = false }: { title: string, icon: React.ReactNode, result: UnifiedStatus, isLast?: boolean }) => {
         const color = getStatusColor(result.status);
-        const isActionRequired = result.status === 'overdue' || result.status === 'due_now' || result.status === 'upcoming' || (result.status === 'blocked' && result.nextAction.type !== 'none');
 
         return (
             <Box py="sm">
@@ -111,27 +100,15 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
                         <Text fw={600} size="sm">{title}</Text>
                     </Group>
                     <Badge color={color} variant="dot" size="sm">
-                        {getStatusLabel(result.status)}
+                        {result.label}
                     </Badge>
                 </Group>
 
                 <Group gap={6} align="center" mt={4}>
                     <Text size="xs" c="dimmed">
-                        {result.nextAction.recommendedDate ? (
-                            <>Fecha sugerida: <b>{dayjs(result.nextAction.recommendedDate).format('DD/MM/YYYY')}</b></>
-                        ) : (
-                            result.nextAction.reason
-                        )}
+                        {result.message}
                     </Text>
-                    {/* If reason is not the date logic, show reason too if needed, but keeping it clean */}
                 </Group>
-
-                {/* Additional context if update weight needed */}
-                {result.nextAction.type !== 'none' && result.nextAction.reason && !result.nextAction.recommendedDate && (
-                    <Text size="xs" c={color} mt={2}>
-                        {result.nextAction.reason}
-                    </Text>
-                )}
 
                 {renderAction(result)}
             </Box>
@@ -172,7 +149,7 @@ const AlertIconMessage = ({ icon, title, message, color }: any) => (
                 {icon}
             </ThemeIcon>
             <Box style={{ flex: 1 }}>
-                {/* <Text size="xs" fw={700} c={`var(--mantine-color-${color}-light-color)`}>{title}</Text> */}
+                {/* <Text size="xs" fw={700} c={`var(--mantine - color - ${ color } -light - color)`}>{title}</Text> */}
                 <Text size="xs" c={`var(--mantine-color-${color}-light-color)`} lh={1.4}>
                     {message}
                 </Text>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Grid, Paper, Title, Text, Group, Badge, Loader, ActionIcon, Stack } from '@mantine/core';
+import { Container, Grid, Paper, Title, Text, Group, Badge, Loader, ActionIcon, Stack, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIconMotion } from '@/components/ui/MotionWrappers';
 import { usePet } from '@/hooks/usePets';
@@ -8,6 +8,7 @@ import { useHealthRecords } from '@/hooks/useHealthRecords';
 import { HealthTimeline } from '@/components/health/HealthTimeline';
 import { PetProfileHeader } from '@/components/pets/profile/PetProfileHeader';
 import { SharePetModal } from '@/components/pets/SharePetModal';
+import { PetExtraInfoCard } from '@/components/pets/profile/PetExtraInfoCard';
 import { useTranslations } from 'next-intl';
 import { IconPlus } from '@tabler/icons-react';
 import React from 'react';
@@ -19,6 +20,8 @@ import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } fr
 import { IHealthRecord } from '@/models/HealthRecord';
 import DewormingCard from '@/components/health/DewormingCard';
 
+import { HealthEventWizard } from '@/components/health/HealthEventWizard';
+
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
     const { pet, isLoading, isError } = usePet(id);
@@ -26,7 +29,18 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
     const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
+    const [wizardOpened, { open: openWizard, close: closeWizard }] = useDisclosure(false);
+    const [wizardConfig, setWizardConfig] = React.useState<any>(null);
     const [activeTab, setActiveTab] = React.useState<string | null>('summary');
+
+    const handleWizardSelect = (type: string, prefill?: any) => {
+        if (type === 'weight') {
+            openWeightModal();
+        } else {
+            setWizardConfig({ type, ...prefill });
+            openQuickAddModal();
+        }
+    };
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
@@ -75,8 +89,9 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const visibleStatuses = scheduleStatuses.filter(s => visibleSlotIds.has(s.slot.id));
 
     const overdueCount = visibleStatuses.filter(s => s.status === 'overdue').length;
-    const dueSoonCount = visibleStatuses.filter(s => s.status === 'due_soon' || s.status === 'current_due').length;
-    const isUpToDate = overdueCount === 0;
+    const dueNowCount = visibleStatuses.filter(s => s.status === 'current_due').length;
+    const upcomingCount = visibleStatuses.filter(s => s.status === 'due_soon').length;
+    const isUpToDate = overdueCount === 0 && dueNowCount === 0;
 
     // Rabies logic
     const hasOverdueRabies = scheduleStatuses.some((s, idx) =>
@@ -96,7 +111,23 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 activeTab={activeTab || 'summary'}
                 onTabChange={setActiveTab}
                 onShare={open}
+                onAddRecord={openQuickAddModal}
             />
+
+            {/* ... other tabs ... */}
+
+            {/* Note: I'm skipping the middle content for brevity in replacement, focusing on the end where Wizard was */}
+            {/* Wait, replace_file_content needs contiguous block. I should target the end block specifically. */}
+            {/* But I added onAddRecord={openWizard} in step 1199. I need to change it to openQuickAddModal. */}
+
+            {/* And I need to remove HealthEventWizard rendering at the end. */}
+            {/* I will do Header first. */}
+            {/* ... (keep existing grid content if not changing it, but since I can't skip ranges easily in one replace block if context is far, I assume user might want me to replace just the header and then the modal block separately. The header is near top of return) */}
+            {/* But wait, I need to insert Wizard near the other modals at the end. */}
+
+            {/* ... */}
+
+            {/* I will use MULTIPLE replace calls or separate steps. This step handles just the Header for now. */}
 
             {activeTab === 'summary' && (
                 <Grid>
@@ -106,16 +137,64 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                 <Title order={4} mb="md">Estado de Salud</Title>
                                 <Stack gap="xs">
                                     {overdueCount > 0 && (
-                                        <Badge color="red" size="lg" variant="filled" fullWidth>⚠️ Atención: Vacunas vencidas ({overdueCount})</Badge>
+                                        <Badge
+                                            color="red"
+                                            size="lg"
+                                            variant="filled"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ⚠️ Atención: Vacunas vencidas ({overdueCount})
+                                        </Badge>
                                     )}
-                                    {dueSoonCount > 0 && (
-                                        <Badge color="yellow" size="lg" variant="light" fullWidth>⏳ Próximas vacunas ({dueSoonCount})</Badge>
+                                    {dueNowCount > 0 && (
+                                        <Badge
+                                            color="green"
+                                            size="lg"
+                                            variant="filled"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ✅ Es el momento ideal ({dueNowCount})
+                                        </Badge>
                                     )}
-                                    {isUpToDate && overdueCount === 0 && (
-                                        <Badge color="green" size="lg" variant="light" fullWidth>✅ Vacunas al día</Badge>
+                                    {upcomingCount > 0 && (
+                                        <Badge
+                                            color="yellow"
+                                            size="lg"
+                                            variant="light"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ⏳ Próximas vacunas ({upcomingCount})
+                                        </Badge>
+                                    )}
+                                    {isUpToDate && (
+                                        <Badge
+                                            color="blue"
+                                            size="lg"
+                                            variant="light"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            ✨ Vacunas al día
+                                        </Badge>
                                     )}
                                     {hasRabies && (
-                                        <Badge color="blue" size="lg" variant="light" fullWidth>💉 Antirábica Vigente</Badge>
+                                        <Badge
+                                            color="blue"
+                                            size="lg"
+                                            variant="light"
+                                            fullWidth
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setActiveTab('health')}
+                                        >
+                                            💉 Antirábica Vigente
+                                        </Badge>
                                     )}
                                 </Stack>
                             </Paper>
@@ -135,22 +214,34 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                         </ActionIcon>
                                     </ActionIconMotion>
                                 </Group>
-                                <Text size="xl" fw={700} ta="center">{pet.weight} kg</Text>
+                                <Text size="xl" fw={700} ta="center" mb="xs">{pet.weight} kg</Text>
+                                <Button
+                                    variant="light"
+                                    size="xs"
+                                    fullWidth
+                                    onClick={() => setActiveTab('health')}
+                                >
+                                    Ver gráfico e historial
+                                </Button>
                             </Paper>
                         </Stack>
                     </Grid.Col>
 
                     <Grid.Col span={{ base: 12, md: 8 }}>
-                        <Paper withBorder p="md" radius="md">
-                            <Title order={4} mb="md">Últimos Eventos</Title>
-                            <HealthTimeline
-                                petId={pet._id as unknown as string}
-                                petSpecies={pet.species}
-                                petBirthDate={pet.birthDate}
-                                limit={10}
-                                onViewAll={() => setActiveTab('timeline')}
-                            />
-                        </Paper>
+                        <Stack>
+                            <PetExtraInfoCard pet={pet as any} />
+                            <Paper withBorder p="md" radius="md">
+                                <Title order={4} mb="md">Últimos Eventos</Title>
+                                <HealthTimeline
+                                    petId={pet._id as unknown as string}
+                                    petSpecies={pet.species}
+                                    petBirthDate={pet.birthDate}
+                                    limit={10}
+                                    onViewAll={() => setActiveTab('timeline')}
+                                    onAddRecord={openQuickAddModal}
+                                />
+                            </Paper>
+                        </Stack>
                     </Grid.Col>
                 </Grid>
             )}
@@ -161,6 +252,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         petId={pet._id as unknown as string}
                         petSpecies={pet.species}
                         petBirthDate={pet.birthDate}
+                        onAddRecord={openQuickAddModal}
                     />
                 </Paper>
             )}
@@ -207,6 +299,10 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 existingRecords={records as IHealthRecord[] || []}
                 createRecord={createRecord}
                 isCreating={isCreating}
+                onSwitchToWeight={() => {
+                    closeQuickAddModal();
+                    openWeightModal();
+                }}
             />
         </Container >
     );

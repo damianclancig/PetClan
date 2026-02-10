@@ -15,7 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <SessionProvider>
             <QueryClientProvider client={queryClient}>
-                <MantineProvider theme={theme}>
+                <MantineProvider theme={theme} defaultColorScheme="auto">
                     <Notifications />
                     <ModalsProvider>
                         {children}
