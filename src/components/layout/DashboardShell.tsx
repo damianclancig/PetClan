@@ -12,6 +12,7 @@ import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { HoverShine } from '@/components/ui/MotionWrappers';
 import { Footer } from '@/components/layout/Footer';
+import { TipsCarousel } from '@/components/ui/TipsCarousel';
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
     const [opened, { toggle }] = useDisclosure();
@@ -174,30 +175,28 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                 {/* Mini Card Contextual (Example) */}
                 <Box style={{ position: 'relative', zIndex: 1 }}>
                     <Divider my="sm" />
-                    <Box p="xs" bg="var(--mantine-color-default)" style={{ borderRadius: 'var(--mantine-radius-md)', border: '1px solid var(--mantine-color-default-border)' }}>
-                        <Group gap="xs">
-                            <ThemeIcon color="orange" variant="light" size="md" radius="xl">
-                                <IconPaw size={16} />
-                            </ThemeIcon>
-                            <Box>
-                                <Text size="xs" fw={700}>Tip del día</Text>
-                                <Text size="xs" c="dimmed" lineClamp={2}>
-                                    Mantén las vacunas al día.
-                                </Text>
-                            </Box>
-                        </Group>
-                    </Box>
+                    <TipsCarousel />
                 </Box>
             </AppShell.Navbar>
 
-            <AppShell.Main bg="var(--bg-background)" style={{ position: 'relative' }}>
+            <AppShell.Main
+                bg="var(--bg-background)"
+                style={{
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: '100dvh' // Ensure it takes full viewport height
+                }}
+            >
                 <AnimatedBackground style={{ zIndex: 0 }} />
+
+                {/* Content Wrapper - Grows to fill space */}
                 <Box pt={10} style={{ position: 'relative', zIndex: 1, flex: 1 }}>
                     {children}
                 </Box>
 
-                {/* Mobile Footer (Scrollable) */}
-                <Box hiddenFrom="sm" py="xl" pb={100} style={{ position: 'relative', zIndex: 1 }}>
+                {/* Mobile Footer - Pushed to bottom via flex:1 on content */}
+                <Box hiddenFrom="sm" py="xl" style={{ position: 'relative', zIndex: 1 }}>
                     <Footer />
                 </Box>
             </AppShell.Main>
