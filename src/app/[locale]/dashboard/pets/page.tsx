@@ -1,6 +1,7 @@
 'use client';
 
-import { Title, Text, Button, Group, Container, SimpleGrid, Loader, Tabs } from '@mantine/core';
+import { Title, Text, Button, Group, Container, SimpleGrid, Tabs } from '@mantine/core';
+import { PetListSkeleton } from '@/components/ui/Skeletons';
 import { Link } from '@/i18n/routing';
 import { usePets } from '@/hooks/usePets';
 import { useTranslations } from 'next-intl';
@@ -27,7 +28,6 @@ export default function PetsPage() {
     const t = useTranslations('Pets');
     const tCommon = useTranslations('Common');
 
-    if (isLoading) return <Container><Loader /></Container>;
     if (isError) return <Container><Text c="red">Error al cargar las mascotas.</Text></Container>;
 
     return (
@@ -46,7 +46,9 @@ export default function PetsPage() {
                 </Tabs.List>
             </Tabs>
 
-            {pets && pets.length === 0 ? (
+            {isLoading ? (
+                <PetListSkeleton />
+            ) : pets && pets.length === 0 ? (
                 <Text c="dimmed" fs="italic" ta="center" py="xl">
                     {activeTab === 'active' ? t('noPets') : 'No tienes mascotas en el historial.'}
                 </Text>

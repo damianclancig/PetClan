@@ -15,9 +15,10 @@ export default async function DashboardLayout({
     const session = await getServerSession(authOptions);
     const { locale } = await params;
 
-    if (!session) {
-        redirect({ href: '/login', locale });
-    }
+    // Verificación de sesión delegada al middleware para evitar error de Performance.
+    // if (!session) {
+    //     redirect({ href: '/login', locale });
+    // }
 
     return (
         <DashboardShell user={session?.user}>

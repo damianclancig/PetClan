@@ -1,6 +1,7 @@
 'use client';
 
-import { Container, Grid, Paper, Title, Text, Group, Badge, Loader, ActionIcon, Stack, Button } from '@mantine/core';
+import { Container, Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button } from '@mantine/core';
+import { PetProfileSkeleton } from '@/components/ui/Skeletons';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIconMotion } from '@/components/ui/MotionWrappers';
 import { usePet } from '@/hooks/usePets';
@@ -37,7 +38,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const t = useTranslations('PetDetail');
     const tPets = useTranslations('Pets');
 
-    if (isLoading) return <Container><Loader /></Container>;
+    if (isLoading) return <PetProfileSkeleton />;
     if (isError || !pet) return <Container><Text>{t('notFound')}</Text></Container>;
     // Calculate status from client side records using unified logic
     const healthRecords = records as IHealthRecord[] || [];
