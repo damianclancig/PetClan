@@ -9,6 +9,7 @@ import { getPetIdentityColor } from '@/utils/pet-identity';
 import { sortHealthRecords } from '@/utils/recordUtils';
 import { SmartHealthRecordModal } from './SmartHealthRecordModal';
 import { IHealthRecord } from '@/models/HealthRecord';
+import { HealthTimelineSkeleton } from '@/components/ui/Skeletons';
 
 interface HealthTimelineProps {
     petId: string;
@@ -43,7 +44,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
         });
     }
 
-    if (isLoading) return <Text>{t('loading')}</Text>;
+    if (isLoading) return <HealthTimelineSkeleton />;
 
     const handleAdd = () => {
         if (onAddRecord) {
