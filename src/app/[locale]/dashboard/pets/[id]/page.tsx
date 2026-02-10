@@ -20,7 +20,7 @@ import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } fr
 import { IHealthRecord } from '@/models/HealthRecord';
 import DewormingCard from '@/components/health/DewormingCard';
 
-import { HealthEventWizard } from '@/components/health/HealthEventWizard';
+
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
@@ -29,18 +29,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
     const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
-    const [wizardOpened, { open: openWizard, close: closeWizard }] = useDisclosure(false);
-    const [wizardConfig, setWizardConfig] = React.useState<any>(null);
     const [activeTab, setActiveTab] = React.useState<string | null>('summary');
-
-    const handleWizardSelect = (type: string, prefill?: any) => {
-        if (type === 'weight') {
-            openWeightModal();
-        } else {
-            setWizardConfig({ type, ...prefill });
-            openQuickAddModal();
-        }
-    };
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
