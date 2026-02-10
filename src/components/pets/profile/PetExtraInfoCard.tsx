@@ -1,77 +1,81 @@
-import { Paper, Title, Text, Group, Stack, ThemeIcon, Badge, Divider, Grid } from '@mantine/core';
+import { Paper, Title, Text, Group, Stack, ThemeIcon, SimpleGrid, Box } from '@mantine/core';
 import { IconNotes, IconFirstAidKit, IconStethoscope, IconPaw } from '@tabler/icons-react';
-import { IPet } from '@/models/Pet';
 
 interface PetExtraInfoCardProps {
-    pet: IPet;
+    pet: any;
+}
+
+function InfoRow({ icon: Icon, color, title, content }: { icon: any, color: string, title: string, content: string }) {
+    if (!content) return null;
+
+    return (
+        <Group align="flex-start" wrap="nowrap">
+            <ThemeIcon variant="light" color={color} size="xl" radius="md" style={{ flexShrink: 0 }}>
+                <Icon size={24} />
+            </ThemeIcon>
+            <Box style={{ flex: 1 }}>
+                <Text size="xs" tt="uppercase" c="dimmed" fw={700} mb={4}>
+                    {title}
+                </Text>
+                <Text size="sm" style={{ whiteSpace: 'pre-line', lineHeight: 1.5 }}>
+                    {content}
+                </Text>
+            </Box>
+        </Group>
+    );
 }
 
 export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
-    // Check if any extra info exists
-    const hasInfo = pet.characteristics || pet.diseases || pet.treatments || pet.notes;
+    const hasCharacteristics = !!pet.characteristics;
+    const hasDiseases = !!pet.diseases;
+    const hasTreatments = !!pet.treatments;
+    const hasNotes = !!pet.keywords || !!pet.notes;
+
+    const hasInfo = hasCharacteristics || hasDiseases || hasTreatments || hasNotes;
 
     if (!hasInfo) return null;
 
     return (
-        <Paper withBorder p="md" radius="md">
-            <Title order={4} mb="md">Información Adicional</Title>
-            <Stack gap="lg">
-                {pet.characteristics && (
-                    <Grid gutter="xs">
-                        <Grid.Col span={1}>
-                            <ThemeIcon variant="light" color="orange" size="lg" radius="md">
-                                <IconPaw size={20} />
-                            </ThemeIcon>
-                        </Grid.Col>
-                        <Grid.Col span={11}>
-                            <Text fw={600} size="sm">Características</Text>
-                            <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>{pet.characteristics}</Text>
-                        </Grid.Col>
-                    </Grid>
+        <Paper withBorder p="lg" radius="md" mt="md">
+            <Title order={4} mb="lg">Información Adicional</Title>
+
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing={32} verticalSpacing="xl">
+                {hasCharacteristics && (
+                    <InfoRow
+                        icon={IconPaw}
+                        color="orange"
+                        title="Características"
+                        content={pet.characteristics}
+                    />
                 )}
 
-                {pet.diseases && (
-                    <Grid gutter="xs">
-                        <Grid.Col span={1}>
-                            <ThemeIcon variant="light" color="red" size="lg" radius="md">
-                                <IconStethoscope size={20} />
-                            </ThemeIcon>
-                        </Grid.Col>
-                        <Grid.Col span={11}>
-                            <Text fw={600} size="sm">Enfermedades / Condiciones</Text>
-                            <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>{pet.diseases}</Text>
-                        </Grid.Col>
-                    </Grid>
+                {hasDiseases && (
+                    <InfoRow
+                        icon={IconStethoscope}
+                        color="red"
+                        title="Enfermedades / Condiciones"
+                        content={pet.diseases}
+                    />
                 )}
 
-                {pet.treatments && (
-                    <Grid gutter="xs">
-                        <Grid.Col span={1}>
-                            <ThemeIcon variant="light" color="blue" size="lg" radius="md">
-                                <IconFirstAidKit size={20} />
-                            </ThemeIcon>
-                        </Grid.Col>
-                        <Grid.Col span={11}>
-                            <Text fw={600} size="sm">Tratamientos</Text>
-                            <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>{pet.treatments}</Text>
-                        </Grid.Col>
-                    </Grid>
+                {hasTreatments && (
+                    <InfoRow
+                        icon={IconFirstAidKit}
+                        color="blue"
+                        title="Tratamientos"
+                        content={pet.treatments}
+                    />
                 )}
 
-                {pet.notes && (
-                    <Grid gutter="xs">
-                        <Grid.Col span={1}>
-                            <ThemeIcon variant="light" color="gray" size="lg" radius="md">
-                                <IconNotes size={20} />
-                            </ThemeIcon>
-                        </Grid.Col>
-                        <Grid.Col span={11}>
-                            <Text fw={600} size="sm">Notas Adicionales</Text>
-                            <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>{pet.notes}</Text>
-                        </Grid.Col>
-                    </Grid>
+                {(pet.notes || pet.keywords) && (
+                    <InfoRow
+                        icon={IconNotes}
+                        color="gray"
+                        title="Notas"
+                        content={[pet.notes, pet.keywords].filter(Boolean).join('\n')}
+                    />
                 )}
-            </Stack>
+            </SimpleGrid>
         </Paper>
     );
 }

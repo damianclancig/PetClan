@@ -20,6 +20,8 @@ import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } fr
 import { IHealthRecord } from '@/models/HealthRecord';
 import DewormingCard from '@/components/health/DewormingCard';
 
+import { HealthEventWizard } from '@/components/health/HealthEventWizard';
+
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
     const { pet, isLoading, isError } = usePet(id);
@@ -27,7 +29,18 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
     const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
+    const [wizardOpened, { open: openWizard, close: closeWizard }] = useDisclosure(false);
+    const [wizardConfig, setWizardConfig] = React.useState<any>(null);
     const [activeTab, setActiveTab] = React.useState<string | null>('summary');
+
+    const handleWizardSelect = (type: string, prefill?: any) => {
+        if (type === 'weight') {
+            openWeightModal();
+        } else {
+            setWizardConfig({ type, ...prefill });
+            openQuickAddModal();
+        }
+    };
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
@@ -98,7 +111,23 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 activeTab={activeTab || 'summary'}
                 onTabChange={setActiveTab}
                 onShare={open}
+                onAddRecord={openQuickAddModal}
             />
+
+            {/* ... other tabs ... */}
+
+            {/* Note: I'm skipping the middle content for brevity in replacement, focusing on the end where Wizard was */}
+            {/* Wait, replace_file_content needs contiguous block. I should target the end block specifically. */}
+            {/* But I added onAddRecord={openWizard} in step 1199. I need to change it to openQuickAddModal. */}
+
+            {/* And I need to remove HealthEventWizard rendering at the end. */}
+            {/* I will do Header first. */}
+            {/* ... (keep existing grid content if not changing it, but since I can't skip ranges easily in one replace block if context is far, I assume user might want me to replace just the header and then the modal block separately. The header is near top of return) */}
+            {/* But wait, I need to insert Wizard near the other modals at the end. */}
+
+            {/* ... */}
+
+            {/* I will use MULTIPLE replace calls or separate steps. This step handles just the Header for now. */}
 
             {activeTab === 'summary' && (
                 <Grid>
@@ -209,6 +238,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                     petBirthDate={pet.birthDate}
                                     limit={10}
                                     onViewAll={() => setActiveTab('timeline')}
+                                    onAddRecord={openQuickAddModal}
                                 />
                             </Paper>
                         </Stack>
@@ -222,6 +252,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         petId={pet._id as unknown as string}
                         petSpecies={pet.species}
                         petBirthDate={pet.birthDate}
+                        onAddRecord={openQuickAddModal}
                     />
                 </Paper>
             )}
@@ -268,6 +299,10 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 existingRecords={records as IHealthRecord[] || []}
                 createRecord={createRecord}
                 isCreating={isCreating}
+                onSwitchToWeight={() => {
+                    closeQuickAddModal();
+                    openWeightModal();
+                }}
             />
         </Container >
     );

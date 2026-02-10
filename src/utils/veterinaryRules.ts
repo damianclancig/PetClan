@@ -201,7 +201,7 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         label: 'Desparasitación 2 Meses',
         ageLabel: '8-9 Semanas',
         minAgeWeeks: 8,
-        maxAgeWeeks: 10,
+        maxAgeWeeks: 12, // Extended to cover gap to 3m
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
     },
@@ -210,7 +210,7 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         label: 'Desparasitación 3 Meses',
         ageLabel: '3 Meses',
         minAgeWeeks: 12,
-        maxAgeWeeks: 13,
+        maxAgeWeeks: 16, // Extended to cover gap to 4m
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
     },
@@ -219,7 +219,7 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         label: 'Desparasitación 4 Meses',
         ageLabel: '4 Meses',
         minAgeWeeks: 16,
-        maxAgeWeeks: 17,
+        maxAgeWeeks: 20, // Extended to cover gap to 5m
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
     },
@@ -228,7 +228,7 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         label: 'Desparasitación 5 Meses',
         ageLabel: '5 Meses',
         minAgeWeeks: 20,
-        maxAgeWeeks: 21,
+        maxAgeWeeks: 24, // Extended to cover gap to 6m
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
     },
@@ -237,7 +237,7 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         label: 'Desparasitación 6 Meses',
         ageLabel: '6 Meses',
         minAgeWeeks: 24,
-        maxAgeWeeks: 25,
+        maxAgeWeeks: 26, // Extended to start of adult schedule
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
         isCore: true
     },
@@ -456,18 +456,36 @@ export const VeterinaryRules = {
         const today = dayjs();
         const birthDate = dayjs(petBirthDate);
 
-        // 1. Filter Relevant Records
+        // 1. Identify Slot Type
         const isDeworming = slot.vaccineType.some(t => t.includes('desparasitacion') || t.includes('deworming'));
+        const isSlotExternal = slot.vaccineType.some(t => t === 'external' || t === 'pulgas' || t === 'garrapatas' || t.includes('pipeta'));
         const bufferWeeks = isDeworming ? 0.5 : 1;
 
-        const relevantRecords = records.filter(r =>
-            (r.type === 'vaccine' || r.type === 'deworming') &&
-            slot.vaccineType.some(t => r.title.toLowerCase().includes(t) || r.vaccineType === t) &&
-            dayjs(r.appliedAt).isAfter(birthDate.add(slot.minAgeWeeks - bufferWeeks, 'week'))
-        ).sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()); // Newest first
+        // 2. Filter Relevant Records
+        const relevantRecords = records.filter(r => {
+            if (r.type !== 'vaccine' && r.type !== 'deworming') return false;
 
-        // 2. Special Logic for External Deworming (pipettes)
-        const isExternal = slot.vaccineType.some(t => t === 'external' || t === 'pulgas' || t === 'garrapatas' || t.includes('pipeta'));
+            // Age check first
+            if (!dayjs(r.appliedAt).isAfter(birthDate.add(slot.minAgeWeeks - bufferWeeks, 'week'))) return false;
+
+            // Deworming Specific Logic
+            if (r.type === 'deworming') {
+                // If slot is external, accept explicit external type
+                if (isSlotExternal && r.dewormingType === 'external') return true;
+                // If slot is internal, reject explicit external type
+                if (!isSlotExternal && r.dewormingType === 'external') return false;
+                // If slot is external, reject explicit internal type
+                if (isSlotExternal && r.dewormingType === 'internal') return false;
+                // If slot is internal, accept explicit internal type
+                if (!isSlotExternal && r.dewormingType === 'internal') return true;
+            }
+
+            // Fallback to text matching (Title or VaccineType string)
+            return slot.vaccineType.some(t => r.title.toLowerCase().includes(t) || r.vaccineType === t);
+        }).sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()); // Newest first
+
+        // 3. Special Logic for External Deworming (pipettes)
+        const isExternal = isSlotExternal;
 
         if (isExternal) {
             const lastRecord = relevantRecords[0];
@@ -480,8 +498,20 @@ export const VeterinaryRules = {
 
             // Validity Duration Logic
             const titleLower = lastRecord.title.toLowerCase();
+            const noteLower = (lastRecord.description || '').toLowerCase();
+            // Actually getSlotStatus receives IHealthRecord which has notes? Let's check IHealthRecord definition. 
+            // Assuming title checks for now.
+
             let durationDays = 30; // Default
-            if (titleLower.includes('bravecto') || titleLower.includes('90 dias') || titleLower.includes('90 días')) durationDays = 90;
+            if (
+                titleLower.includes('bravecto') ||
+                titleLower.includes('90 dias') ||
+                titleLower.includes('90 días') ||
+                titleLower.includes('3 meses') ||
+                titleLower.includes('trimestral')
+            ) {
+                durationDays = 90;
+            }
             else if (titleLower.includes('simparica')) durationDays = 35;
             else if (titleLower.includes('seresto')) durationDays = 240;
 

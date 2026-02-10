@@ -32,7 +32,8 @@ export function parseDate(date: string | Date | undefined | null) {
  */
 export function formatDate(date: string | Date | undefined | null, format: string = DATE_FORMAT_DISPLAY) {
     if (!date) return '';
-    return dayjs(date).utc().format(format);
+    // Display in local time to match user's context (e.g. late night entries stored as next day UTC should show as today local)
+    return dayjs(date).format(format);
 }
 
 /**

@@ -25,6 +25,8 @@ interface SmartHealthRecordModalProps {
     existingRecords: IHealthRecord[];
     createRecord: (data: any) => Promise<void>;
     isCreating: boolean;
+    initialConfig?: { type?: RecordType; title?: string; vaccineType?: string };
+    onSwitchToWeight?: () => void;
 }
 
 type RecordType = 'vaccine' | 'deworming' | 'external_deworming' | 'consultation' | 'weight' | 'other';
@@ -37,7 +39,9 @@ export function SmartHealthRecordModal({
     petBirthDate,
     existingRecords,
     createRecord,
-    isCreating
+    isCreating,
+    initialConfig,
+    onSwitchToWeight
 }: SmartHealthRecordModalProps) {
     const t = useTranslations('Health'); // Assuming generic keys for now or fallback
     const [step, setStep] = useState<1 | 2>(1);
@@ -64,11 +68,25 @@ export function SmartHealthRecordModal({
     // Reset state on open
     useEffect(() => {
         if (opened) {
-            setStep(1);
-            setSelectedType(null);
             form.reset();
+
+            if (initialConfig) {
+                // Skip directly to step 2 if type is provided
+                if (initialConfig.type) {
+                    setSelectedType(initialConfig.type);
+                    setStep(2);
+                    form.setValues({
+                        type: initialConfig.type as any,
+                        title: initialConfig.title || '',
+                        vaccineType: initialConfig.vaccineType || '' // e.g. 'rabies'
+                    });
+                }
+            } else {
+                setStep(1);
+                setSelectedType(null);
+            }
         }
-    }, [opened]);
+    }, [opened, initialConfig]);
 
     // Calculate suggestions when type selected
     useEffect(() => {
@@ -203,6 +221,12 @@ export function SmartHealthRecordModal({
 
 
     const handleTypeSelect = (type: RecordType) => {
+        // Intercept Weight Selection if handler provided
+        if (type === 'weight' && onSwitchToWeight) {
+            onSwitchToWeight();
+            return;
+        }
+
         setSelectedType(type);
 
         if (type === 'external_deworming') {
