@@ -20,7 +20,7 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
     }
 
     return (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+        <SimpleGrid cols={{ base: 1, xs: 1, sm: 2, md: 3 }} spacing="md">
             {pets.map((pet) => {
                 const petAlerts = alerts.filter(a => a.link.includes(pet._id));
                 const hasCritical = petAlerts.some(a => a.severity === 'critical');
@@ -55,48 +55,48 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
                         }}
                         className="hover:shadow-md hover:-translate-y-1"
                     >
-                        <Group align="flex-start" wrap="nowrap">
-                            <Box style={{ position: 'relative' }}>
-                                <Avatar
-                                    src={pet.photoUrl}
-                                    size="lg"
-                                    radius="xl"
-                                    color={pet.identityColor}
-                                >
-                                    {pet.name.charAt(0)}
-                                </Avatar>
-                                <ThemeIcon
-                                    size={20}
-                                    radius="xl"
-                                    color="white"
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: -4,
-                                        right: -4,
-                                        border: '2px solid var(--mantine-color-body)',
-                                        color: 'var(--mantine-color-text)'
-                                    }}
-                                >
-                                    {pet.species === 'dog' ? <IconDog size={12} /> : pet.species === 'cat' ? <IconCat size={12} /> : <IconHelp size={12} />}
-                                </ThemeIcon>
-                            </Box>
+                        <Group align="center" wrap="nowrap" gap="md">
+                            <Stack align="center" gap="xs">
+                                <Box style={{ position: 'relative' }}>
+                                    <Avatar
+                                        src={pet.photoUrl}
+                                        size="lg"
+                                        radius="xl"
+                                        color={pet.identityColor}
+                                    >
+                                        {pet.name.charAt(0)}
+                                    </Avatar>
+                                    <ThemeIcon
+                                        size={20}
+                                        radius="xl"
+                                        color="white"
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: -4,
+                                            right: -4,
+                                            border: '2px solid var(--mantine-color-body)',
+                                            color: 'var(--mantine-color-text)'
+                                        }}
+                                    >
+                                        {pet.species === 'dog' ? <IconDog size={12} /> : pet.species === 'cat' ? <IconCat size={12} /> : <IconHelp size={12} />}
+                                    </ThemeIcon>
+                                </Box>
+                                <Badge color={statusColor} variant="light" size="xs" leftSection={<StatusIcon size={10} />}>
+                                    {statusLabel}
+                                </Badge>
+                            </Stack>
 
-                            <Stack gap={4} style={{ flex: 1 }}>
-                                <Group justify="space-between" wrap="nowrap">
-                                    <Text fw={600} lineClamp={1}>{pet.name}</Text>
-                                    <Badge color={statusColor} variant="light" size="xs" leftSection={<StatusIcon size={10} />}>
-                                        {statusLabel}
-                                    </Badge>
-                                </Group>
+                            <Stack gap={2} style={{ flex: 1 }}>
+                                <Text fw={600} size="lg" lineClamp={1}>{pet.name}</Text>
 
-                                <Text size="xs" c="dimmed">
+                                <Text size="sm" c="dimmed">
                                     {pet.ageLabel}
                                 </Text>
 
                                 {pet.weight > 0 && (
-                                    <Group gap={4} mt={4}>
-                                        <IconScale size={12} style={{ opacity: 0.5 }} />
-                                        <Text size="xs" c="dimmed">{pet.weight} kg</Text>
+                                    <Group gap={4} mt={2}>
+                                        <IconScale size={14} style={{ opacity: 0.5 }} />
+                                        <Text size="sm" c="dimmed">{pet.weight} kg</Text>
                                     </Group>
                                 )}
                             </Stack>
