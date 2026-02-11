@@ -1,15 +1,20 @@
-import { Title, Text, Container, Box } from '@mantine/core';
-import { TipsCarousel } from '@/components/ui/TipsCarousel';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { DashboardService } from '@/services/DashboardService';
+import DashboardView from '@/components/dashboard/DashboardView';
 
-export default function DashboardPage() {
-    return (
-        <Container>
-            <Title order={2}>Panel Principal</Title>
-            <Text>Bienvenido a tu panel de control. Selecciona una opción del menú para comenzar.</Text>
+export const dynamic = 'force-dynamic';
 
-            <Box mt="md" hiddenFrom="sm">
-                <TipsCarousel />
-            </Box>
-        </Container>
-    );
+export default async function DashboardPage() {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+        redirect('/login');
+    }
+
+    const dashboardData = await DashboardService.getDashboardData(session.user.id);
+
+    return <DashboardView data={dashboardData} />;
 }
+
