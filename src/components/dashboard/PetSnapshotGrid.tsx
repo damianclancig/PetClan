@@ -1,6 +1,7 @@
 'use client';
 
 import { SimpleGrid, Paper, Stack, Text, Group, Avatar, Badge, ThemeIcon, Box } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconDog, IconCat, IconHelp, IconScale, IconCheck, IconAlertTriangle } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
 import type { DashboardPet, DashboardAlert } from '@/types/dashboard';
@@ -11,6 +12,8 @@ interface PetSnapshotGridProps {
 }
 
 export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
+    const isDesktop = useMediaQuery('(min-width: 992px)'); // md breakpoint
+
     if (!pets || pets.length === 0) {
         return (
             <Paper withBorder p="xl" radius="md" ta="center">
@@ -20,7 +23,7 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
     }
 
     return (
-        <SimpleGrid cols={{ base: 1, xs: 1, sm: 2, md: 3 }} spacing="md">
+        <SimpleGrid cols={{ base: 3, md: 4 }} spacing={4}>
             {pets.map((pet) => {
                 const petAlerts = alerts.filter(a => a.link.includes(pet._id));
                 const hasCritical = petAlerts.some(a => a.severity === 'critical');
@@ -46,7 +49,7 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
                         component={Link}
                         href={`/dashboard/pets/${pet._id}`}
                         withBorder
-                        p="md"
+                        p={8}
                         radius="md"
                         style={{
                             textDecoration: 'none',
@@ -55,52 +58,69 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
                         }}
                         className="hover:shadow-md hover:-translate-y-1"
                     >
-                        <Group align="center" wrap="nowrap" gap="md">
-                            <Stack align="center" gap="xs">
-                                <Box style={{ position: 'relative' }}>
+                        <Stack gap={8}>
+                            <Group
+                                align="center"
+                                wrap="nowrap"
+                                justify={isDesktop ? "space-evenly" : "flex-start"}
+                                gap={isDesktop ? 10 : 12}
+                                style={{ width: '100%' }}
+                            >
+                                <Box style={{ position: 'relative', flexShrink: 0 }}>
                                     <Avatar
                                         src={pet.photoUrl}
-                                        size="lg"
+                                        size={isDesktop ? 'xl' : 'lg'} // Increased to LG on mobile
                                         radius="xl"
                                         color={pet.identityColor}
                                     >
                                         {pet.name.charAt(0)}
                                     </Avatar>
                                     <ThemeIcon
-                                        size={20}
+                                        size={16} // Slightly larger for visibility
                                         radius="xl"
                                         color="white"
                                         style={{
                                             position: 'absolute',
-                                            bottom: -4,
-                                            right: -4,
-                                            border: '2px solid var(--mantine-color-body)',
-                                            color: 'var(--mantine-color-text)'
+                                            bottom: -2,
+                                            right: -2,
+                                            border: '1px solid var(--mantine-color-body)',
+                                            color: 'black' // Force black color for contrast on white
                                         }}
                                     >
-                                        {pet.species === 'dog' ? <IconDog size={12} /> : pet.species === 'cat' ? <IconCat size={12} /> : <IconHelp size={12} />}
+                                        {pet.species === 'dog' ? <IconDog size={10} /> : pet.species === 'cat' ? <IconCat size={10} /> : <IconHelp size={10} />}
                                     </ThemeIcon>
                                 </Box>
-                                <Badge color={statusColor} variant="light" size="xs" leftSection={<StatusIcon size={10} />}>
-                                    {statusLabel}
-                                </Badge>
-                            </Stack>
 
-                            <Stack gap={2} style={{ flex: 1 }}>
-                                <Text fw={600} size="lg" lineClamp={1}>{pet.name}</Text>
+                                <Stack
+                                    gap={1}
+                                    style={{
+                                        overflow: 'hidden',
+                                        justifyContent: 'center',
+                                        flex: isDesktop ? 'none' : 1, // On mobile, take all available space
+                                        textAlign: isDesktop ? 'center' : 'left' // Align text left on mobile for better reading flow
+                                    }}
+                                >
+                                    <Text fw={600} size="sm" lineClamp={1} style={{ lineHeight: 1.1 }}>{pet.name}</Text>
+                                    <Text size="xs" c="dimmed" style={{ lineHeight: 1.1 }}>
+                                        {pet.ageLabel}
+                                    </Text>
+                                    {pet.weight > 0 && (
+                                        <Text size="xs" c="dimmed" style={{ lineHeight: 1.1 }}>{pet.weight} kg</Text>
+                                    )}
+                                </Stack>
+                            </Group>
 
-                                <Text size="sm" c="dimmed">
-                                    {pet.ageLabel}
-                                </Text>
-
-                                {pet.weight > 0 && (
-                                    <Group gap={4} mt={2}>
-                                        <IconScale size={14} style={{ opacity: 0.5 }} />
-                                        <Text size="sm" c="dimmed">{pet.weight} kg</Text>
-                                    </Group>
-                                )}
-                            </Stack>
-                        </Group>
+                            <Badge
+                                color={statusColor}
+                                variant="light"
+                                size="sm"
+                                fullWidth
+                                leftSection={<StatusIcon size={10} />}
+                                styles={{ root: { paddingLeft: 4, paddingRight: 4, height: 20 } }}
+                            >
+                                {statusLabel}
+                            </Badge>
+                        </Stack>
                     </Paper>
                 );
             })}

@@ -441,8 +441,8 @@ export const VeterinaryRules = {
      */
     getSchedule(species: string): VaccineSlot[] {
         const normalized = (species || '').toLowerCase().trim();
-        if (normalized === 'dog' || normalized === 'perro') return DOG_VACCINATION_SCHEDULE;
-        if (normalized === 'cat' || normalized === 'gato') return CAT_VACCINATION_SCHEDULE;
+        if (normalized === 'dog' || normalized === 'perro' || normalized === 'canino') return DOG_VACCINATION_SCHEDULE;
+        if (normalized === 'cat' || normalized === 'gato' || normalized === 'felino') return CAT_VACCINATION_SCHEDULE;
         return [];
     },
 
@@ -568,7 +568,20 @@ export const VeterinaryRules = {
         const dueStart = birthDate.add(slot.minAgeWeeks, 'week').startOf('day');
         const dueEnd = birthDate.add(slot.maxAgeWeeks, 'week').endOf('day');
 
-        if (today.isAfter(dueEnd)) return { status: 'overdue', dueDate: dueStart.toDate() };
+        if (today.isAfter(dueEnd)) {
+            // FIX: If pet is an adult (> 1 year) and the slot was for a puppy (< 9 months), 
+            // mark it as 'missed_replaced' (skipped) instead of 'overdue'.
+            // This prevents "Puppy Deworming 15 days" overdue for a 6-year-old dog.
+            const petAgeWeeks = today.diff(birthDate, 'week');
+            const isEarlyStageSlot = slot.maxAgeWeeks < 36; // Approx 8-9 months
+            const isAdultPet = petAgeWeeks > 52; // 1 year
+
+            if (isAdultPet && isEarlyStageSlot) {
+                return { status: 'missed_replaced' };
+            }
+
+            return { status: 'overdue', dueDate: dueStart.toDate() };
+        }
 
         // Current Due
         if ((today.isAfter(dueStart) || today.isSame(dueStart)) && (today.isBefore(dueEnd) || today.isSame(dueEnd))) {

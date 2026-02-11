@@ -69,10 +69,13 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
         const familySlots = slotsWithStatus.filter(s => getSlotFamily(s.slot.id) === family);
 
         // Find last completed
-        const completedSlots = familySlots.filter(s => s.status === 'completed' || s.status === 'missed_replaced');
+        // FIX: Don't show 'missed_replaced' as completed history. 
+        // We want to hide them entirely so only relevant future/pending slots are shown for adults.
+        const completedSlots = familySlots.filter(s => s.status === 'completed');
         const lastCompleted = completedSlots[completedSlots.length - 1];
 
         // Find first future/pending
+        // Also exclude 'missed_replaced' here just in case, ensuring we find the first REAL pending slot.
         const pendingSlots = familySlots.filter(s => s.status !== 'completed' && s.status !== 'missed_replaced');
         const firstPending = pendingSlots[0];
 
