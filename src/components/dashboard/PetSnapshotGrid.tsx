@@ -23,7 +23,7 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
     }
 
     return (
-        <SimpleGrid cols={{ base: 3, md: 4 }} spacing={4}>
+        <SimpleGrid cols={{ base: 2, xs: 3, md: 4 }} spacing={4}>
             {pets.map((pet) => {
                 const petAlerts = alerts.filter(a => a.link.includes(pet._id));
                 const hasCritical = petAlerts.some(a => a.severity === 'critical');
