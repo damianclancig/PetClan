@@ -13,12 +13,12 @@ export function TipsCarousel() {
     const [activeFace, setActiveFace] = useState<'front' | 'back'>('front');
 
     useEffect(() => {
-        const timer = setInterval(() => {
+        const timer = setTimeout(() => {
             triggerFlip();
         }, 8000);
 
-        return () => clearInterval(timer);
-    }, []);
+        return () => clearTimeout(timer);
+    }, [page]);
 
     const triggerFlip = () => {
         setTimeout(() => {

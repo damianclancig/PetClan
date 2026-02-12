@@ -54,28 +54,36 @@ export async function sendMailerooEmail(
         tracking: true,
     };
 
-    try {
-        const response = await fetch(MAILEROO_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Api-Key': apiKey,
-            },
-            body: JSON.stringify(payload),
-        });
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            const response = await fetch(MAILEROO_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Api-Key': apiKey,
+                },
+                body: JSON.stringify(payload),
+                signal: AbortSignal.timeout(10000) // 10s timeout to avoid hanging indefinitely
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (!data.success) {
-            console.error('Maileroo API Error:', data);
-            return false;
+            if (!data.success) {
+                console.error('Maileroo API Error:', data);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error(`Error sending email with Maileroo (Attempts left: ${retries - 1}):`, error);
+            retries--;
+            if (retries === 0) return false;
+            // Wait 1 second before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
-
-        return true;
-    } catch (error) {
-        console.error('Error sending email with Maileroo:', error);
-        return false;
     }
+    return false;
 }
 
 export async function sendWelcomeEmail(user: { email: string; name: string }) {
