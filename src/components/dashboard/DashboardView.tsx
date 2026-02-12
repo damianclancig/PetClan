@@ -35,7 +35,7 @@ export default function DashboardView({ data }: DashboardViewProps) {
                         </Box>
 
                         <Box>
-                            <QuickActionsGrid />
+                            <QuickActionsGrid pets={pets} />
                         </Box>
                     </Stack>
                 </Grid.Col>
