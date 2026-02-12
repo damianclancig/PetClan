@@ -80,6 +80,15 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                     <Group wrap="nowrap" gap="xs">
                         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
                         <Group gap="xs">
+                            {/* Isotype */}
+                            <Box w={34} h={34} style={{ position: 'relative' }}>
+                                <img
+                                    src="/assets/logo-icon.png"
+                                    alt="PetClan Isotype"
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                />
+                            </Box>
+                            {/* Full Logo Text */}
                             <Box w={{ base: 110, sm: 160 }} h={55} style={{ position: 'relative' }}>
                                 <img
                                     src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"

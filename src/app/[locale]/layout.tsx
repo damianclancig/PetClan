@@ -17,13 +17,32 @@ export const metadata: Metadata = {
     },
     description: 'Gestiona la salud de tus mascotas de forma fácil y segura. Historial de vacunas, recordatorios y más.',
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://petclan.vercel.app'),
+    icons: {
+        icon: '/assets/logo-icon.png',
+        shortcut: '/assets/logo-icon.png',
+        apple: '/assets/logo-icon.png',
+    },
     openGraph: {
         title: 'PetClan',
-        description: 'Libreta Sanitaria Digital para tus mascotas.',
+        description: 'Libreta Sanitaria Digital para tus mascotas. Historial clínico, recordatorios de vacunas y más.',
         url: '/',
         siteName: 'PetClan',
         locale: 'es_AR',
         type: 'website',
+        images: [
+            {
+                url: 'https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png',
+                width: 1200,
+                height: 630,
+                alt: 'PetClan - Libreta Sanitaria Digital',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'PetClan',
+        description: 'Libreta Sanitaria Digital para tus mascotas. Gestiona su salud de forma fácil y segura.',
+        images: ['https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png'],
     },
 };
 
