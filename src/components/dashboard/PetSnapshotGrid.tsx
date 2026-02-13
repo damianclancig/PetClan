@@ -5,6 +5,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { IconDog, IconCat, IconHelp, IconScale, IconCheck, IconAlertTriangle } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
 import type { DashboardPet, DashboardAlert } from '@/types/dashboard';
+import { EmptyPetsState } from '@/components/pets/EmptyPetsState';
 
 interface PetSnapshotGridProps {
     pets: DashboardPet[];
@@ -16,9 +17,7 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
 
     if (!pets || pets.length === 0) {
         return (
-            <Paper withBorder p="xl" radius="md" ta="center">
-                <Text c="dimmed">No tienes mascotas registradas aún.</Text>
-            </Paper>
+            <EmptyPetsState />
         );
     }
 

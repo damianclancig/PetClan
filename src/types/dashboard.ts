@@ -11,6 +11,7 @@ export interface DashboardPet {
     // Computed fields for UI convenience
     ageLabel: string;
     identityColor: string;
+    lastWeightDate?: string; // ISO String of last weight record
 }
 
 export interface DashboardAlert {

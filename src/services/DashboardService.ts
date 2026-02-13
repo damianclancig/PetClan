@@ -54,6 +54,11 @@ export class DashboardService {
             const age = getPetAge(pet.birthDate);
             const ageLabel = age.years > 0 ? `${age.years} años` : `${age.months} meses`;
 
+            // Find last weight record
+            const lastWeightRecord = plainRecords
+                .filter((r: any) => r.type === 'weight')
+                .sort((a: any, b: any) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime())[0];
+
             dashboardPets.push({
                 _id: pet._id,
                 name: pet.name,
@@ -62,7 +67,8 @@ export class DashboardService {
                 birthDate: new Date(pet.birthDate).toISOString(),
                 weight: pet.weight,
                 ageLabel,
-                identityColor: getPetIdentityColor(pet._id)
+                identityColor: getPetIdentityColor(pet._id),
+                lastWeightDate: lastWeightRecord ? new Date(lastWeightRecord.appliedAt).toISOString() : undefined
             });
         }
 
