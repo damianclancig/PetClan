@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Container, Paper, Title, Checkbox, Button, Stack, Text, LoadingOverlay, Group } from '@mantine/core';
+import { Paper, Checkbox, Button, Stack, Text, LoadingOverlay, Group } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { PageContainer } from '@/components/layout/PageContainer';
 
 export default function NotificationSettingsPage() {
     const [preferences, setPreferences] = useState({ email: true, inApp: true });
@@ -78,11 +79,9 @@ export default function NotificationSettingsPage() {
     };
 
     return (
-        <Container size="sm" py="xl">
+        <PageContainer size="sm" title="Configuración de Notificaciones 🔔">
             <Paper radius="md" p="xl" withBorder pos="relative">
                 <LoadingOverlay visible={loading} overlayProps={{ radius: 'md', blur: 2 }} />
-
-                <Title order={2} mb="lg">Configuración de Notificaciones 🔔</Title>
 
                 <Text c="dimmed" mb="xl">
                     Elige cómo quieres recibir las alertas sobre tus mascotas y la comunidad.
@@ -117,6 +116,6 @@ export default function NotificationSettingsPage() {
                     </Group>
                 </Stack>
             </Paper>
-        </Container>
+        </PageContainer>
     );
 }

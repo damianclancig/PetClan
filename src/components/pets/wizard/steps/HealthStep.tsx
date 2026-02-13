@@ -9,11 +9,11 @@ export default function HealthStep() {
     const name = watch('name');
 
     return (
-        <Stack gap="xl">
-            <Text size="xl" fw={800} ta="center">Datos de Salud de {name}</Text>
+        <Stack gap="sm">
+            <Text size="md" fw={700} ta="center">Datos de Salud de {name}</Text>
 
-            <Paper p="lg" radius="md" withBorder>
-                <Stack gap="md">
+            <Paper p={{ base: 'md', sm: 'lg' }} radius="md" withBorder>
+                <Stack gap="sm">
                     <Group justify="space-between">
                         <Group gap="xs">
                             <IconScale size={20} />

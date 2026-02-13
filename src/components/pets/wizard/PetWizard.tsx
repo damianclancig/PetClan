@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { IconDog, IconCat, IconCheck, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
+import { Link } from '@/i18n/routing';
 import IdentityStep from './steps/IdentityStep';
 import DetailsStep from './steps/DetailsStep';
 import HealthStep from './steps/HealthStep';
@@ -99,7 +100,7 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
     };
 
     return (
-        <Container size="sm" mt="xl">
+        <Container size="sm" mt="xl" px={{ base: 'xs', sm: 'md' }}>
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {/* Progress Indicator (Circular or Linear?) - Let's use simple Stepper for clarity but hidden/minimal */}
@@ -119,7 +120,7 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                         </Group>
                     </Center>
 
-                    <Paper shadow="md" radius="lg" p="xl" withBorder style={{ overflow: 'hidden', minHeight: 450, display: 'flex', flexDirection: 'column' }}>
+                    <Paper shadow="md" radius="lg" p={{ base: 'sm', sm: 'xl' }} withBorder style={{ overflow: 'hidden', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
 
                         <div style={{ flex: 1, position: 'relative' }}>
                             <AnimatePresence mode='wait' custom={direction}>
@@ -167,7 +168,9 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                                     Atrás
                                 </Button>
                             ) : (
-                                <div></div> // Spacer
+                                <Button variant="subtle" color="red" component={Link} href="/dashboard/pets">
+                                    Cancelar
+                                </Button>
                             )}
 
                             {active < 3 ? (

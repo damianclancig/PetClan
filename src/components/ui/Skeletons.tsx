@@ -1,4 +1,5 @@
-import { Skeleton, Card, Group, Stack, Grid, SimpleGrid, Container } from '@mantine/core';
+import { Skeleton, Card, Group, Stack, Grid, SimpleGrid, Box, Paper } from '@mantine/core';
+import { PageContainer } from '@/components/layout/PageContainer';
 
 export const PetCardSkeleton = () => {
     return (
@@ -30,18 +31,82 @@ export const PetListSkeleton = () => {
     );
 };
 
+const DashboardHeaderSkeleton = () => (
+    <Box mb="xl">
+        <Group justify="space-between" align="flex-end">
+            <Stack gap={0}>
+                <Skeleton height={14} width={150} radius="xl" mb={4} />
+                <Skeleton height={32} width={250} radius="xl" />
+                <Skeleton height={14} width={200} radius="xl" mt={4} />
+            </Stack>
+        </Group>
+    </Box>
+);
+
+const ActiveAlertsSkeleton = () => (
+    <Paper withBorder p="md" radius="md">
+        <Group justify="space-between" mb="md">
+            <Skeleton height={24} width={120} radius="md" />
+            <Skeleton height={20} width={20} radius="xl" />
+        </Group>
+        <Stack gap="md">
+            {Array(2).fill(0).map((_, i) => (
+                <Paper key={i} withBorder p="sm" radius="md">
+                    <Group wrap="nowrap" align="flex-start">
+                        <Skeleton height={40} width={40} radius="md" />
+                        <Box style={{ flex: 1 }}>
+                            <Skeleton height={16} width="60%" radius="xl" mb={8} />
+                            <Skeleton height={10} width="90%" radius="xl" mb={4} />
+                            <Skeleton height={10} width="40%" radius="xl" />
+                        </Box>
+                    </Group>
+                </Paper>
+            ))}
+        </Stack>
+    </Paper>
+);
+
+const QuickActionsSkeleton = () => (
+    <Paper withBorder p="md" radius="md">
+        <Skeleton height={24} width={140} mb="md" radius="md" />
+        <SimpleGrid cols={{ base: 2, sm: 4 }}>
+            {Array(4).fill(0).map((_, i) => (
+                <Skeleton key={i} height={100} radius="md" />
+            ))}
+        </SimpleGrid>
+    </Paper>
+);
+
 export const DashboardSkeleton = () => {
     return (
-        <Container size="lg">
-            <Skeleton height={40} width={200} mb="xl" />
-            <PetListSkeleton />
-        </Container>
+        <PageContainer>
+            <DashboardHeaderSkeleton />
+
+            <Grid gutter="lg">
+                <Grid.Col span={{ base: 12, md: 8 }}>
+                    <Stack gap="xl">
+                        <Box>
+                            <PetListSkeleton />
+                        </Box>
+                        <Box>
+                            <QuickActionsSkeleton />
+                        </Box>
+                    </Stack>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, md: 4 }} visibleFrom="md">
+                    <Stack gap="lg">
+                        <ActiveAlertsSkeleton />
+                    </Stack>
+                </Grid.Col>
+            </Grid>
+        </PageContainer>
     );
 };
 
 export const PetProfileSkeleton = () => {
     return (
-        <Container size="lg">
+        <PageContainer>
             {/* Header Skeleton */}
             <Card withBorder padding="xl" radius="md" mb="xl">
                 <Stack align="center">
@@ -66,7 +131,7 @@ export const PetProfileSkeleton = () => {
                     <Skeleton height={500} radius="md" />
                 </Grid.Col>
             </Grid>
-        </Container>
+        </PageContainer>
     );
 };
 

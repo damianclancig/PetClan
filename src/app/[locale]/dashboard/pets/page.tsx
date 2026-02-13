@@ -1,15 +1,15 @@
 'use client';
 
-import { Title, Text, Button, Group, Container, SimpleGrid, Tabs } from '@mantine/core';
+import { Text, Button, SimpleGrid, Tabs } from '@mantine/core';
 import { PetListSkeleton } from '@/components/ui/Skeletons';
 import { Link } from '@/i18n/routing';
 import { usePets } from '@/hooks/usePets';
 import { useTranslations } from 'next-intl';
-import dayjs from 'dayjs';
 import { useState } from 'react';
 import { PetCard } from '@/components/pets/PetCard';
 import { EmptyPetsState } from '@/components/pets/EmptyPetsState';
 import { IconPlus } from '@tabler/icons-react';
+import { PageContainer } from '@/components/layout/PageContainer';
 
 import { useRouter } from '@/i18n/routing';
 import { AnimatePresence } from 'framer-motion';
@@ -28,20 +28,18 @@ export default function PetsPage() {
     // Si tab es 'active', enviamos undefined para traer (active+lost). Si es 'history', enviamos 'history' (deceased+archived).
     const { pets, isLoading, isError } = usePets(activeTab === 'active' ? undefined : 'history');
     const t = useTranslations('Pets');
-    const tCommon = useTranslations('Common');
 
-    if (isError) return <Container><Text c="red">Error al cargar las mascotas.</Text></Container>;
+    if (isError) return <PageContainer><Text c="red">Error al cargar las mascotas.</Text></PageContainer>;
+
+    const actionButton = (
+        <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan" leftSection={<IconPlus size={16} />}>
+            Nueva Mascota
+        </Button>
+    );
 
     return (
-        <Container size="lg" px={{ base: 5, xs: 'md' }}>
-            <Group justify="space-between" mb="xs" px={{ base: 'xs', xs: 0 }}>
-                <Title order={2}>{t('title')}</Title>
-                <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan" leftSection={<IconPlus size={16} />}>
-                    Nueva Mascota
-                </Button>
-            </Group>
-
-            <Tabs value={activeTab} onChange={setActiveTab} mb="xl" px={{ base: 'xs', xs: 0 }}>
+        <PageContainer title={t('title')} action={actionButton}>
+            <Tabs value={activeTab} onChange={setActiveTab} mb="xl">
                 <Tabs.List>
                     <Tabs.Tab value="active">Mis Mascotas</Tabs.Tab>
                     <Tabs.Tab value="history">Historial</Tabs.Tab>
@@ -74,6 +72,6 @@ export default function PetsPage() {
                     </AnimatePresence>
                 </SimpleGrid>
             )}
-        </Container>
+        </PageContainer>
     );
 }

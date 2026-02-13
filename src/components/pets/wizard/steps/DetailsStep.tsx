@@ -23,12 +23,12 @@ export default function DetailsStep() {
 
         if (years === 0 && months === 0) return '¡Recién nacido!';
         if (years === 0) return `${months} ${months === 1 ? 'mes' : 'meses'}`;
-        return `${years} años${months > 0 ? ` y ${months} meses` : ''}`;
+        return `${years}a ${months > 0 ? `${months}m` : ''}`;
     };
 
     return (
-        <Stack gap="xl">
-            <Text size="xl" fw={800} ta="center">Un poco sobre {name}...</Text>
+        <Stack gap="sm">
+            <Text size="md" fw={700} ta="center">Un poco sobre {name}...</Text>
 
             <Controller
                 name="sex"
@@ -36,8 +36,8 @@ export default function DetailsStep() {
                 render={({ field }) => (
                     <Group justify="center" gap="lg">
                         {[
-                            { value: 'male', label: 'Macho', icon: <IconGenderMale size={30} />, color: 'blue' },
-                            { value: 'female', label: 'Hembra', icon: <IconGenderFemale size={30} />, color: 'pink' }
+                            { value: 'male', label: 'Macho', icon: <IconGenderMale size={24} />, color: 'blue' },
+                            { value: 'female', label: 'Hembra', icon: <IconGenderFemale size={24} />, color: 'pink' }
                         ].map((option) => {
                             const isSelected = field.value === option.value;
                             return (
@@ -46,11 +46,11 @@ export default function DetailsStep() {
                                     component="button"
                                     type="button"
                                     onClick={() => field.onChange(option.value)}
-                                    p="md"
-                                    radius="lg"
+                                    p="sm"
+                                    radius="md"
                                     withBorder
                                     style={{
-                                        width: 140,
+                                        width: 120,
                                         cursor: 'pointer',
                                         backgroundColor: isSelected ? `var(--mantine-color-${option.color}-0)` : 'transparent',
                                         borderColor: isSelected ? `var(--mantine-color-${option.color}-5)` : 'var(--mantine-color-gray-3)',
@@ -59,16 +59,16 @@ export default function DetailsStep() {
                                         transform: isSelected ? 'scale(1.05)' : 'scale(1)',
                                     }}
                                 >
-                                    <Stack align="center" gap="xs">
+                                    <Stack align="center" gap={4}>
                                         <ThemeIcon
-                                            size={48}
+                                            size={36}
                                             radius="xl"
                                             variant={isSelected ? 'filled' : 'light'}
                                             color={option.color}
                                         >
                                             {option.icon}
                                         </ThemeIcon>
-                                        <Text fw={700} c={isSelected ? `${option.color}.8` : 'dimmed'}>
+                                        <Text size="sm" fw={700} c={isSelected ? `${option.color}.8` : 'dimmed'}>
                                             {option.label}
                                         </Text>
                                     </Stack>

@@ -1,12 +1,13 @@
 'use client';
 
-import { Container, Grid, Stack, Box } from '@mantine/core';
+import { Grid, Stack, Box } from '@mantine/core';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { ActiveAlertsWidget } from '@/components/dashboard/ActiveAlertsWidget';
 import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
 import { PetSnapshotGrid } from '@/components/dashboard/PetSnapshotGrid';
 import { TipsCarousel } from '@/components/ui/TipsCarousel';
 import type { DashboardData } from '@/types/dashboard';
+import { PageContainer } from '@/components/layout/PageContainer';
 
 interface DashboardViewProps {
     data: DashboardData;
@@ -16,7 +17,7 @@ export default function DashboardView({ data }: DashboardViewProps) {
     const { userName, pets, alerts } = data;
 
     return (
-        <Container size="xl" py="lg">
+        <PageContainer>
             <DashboardHeader userName={userName} />
 
             <Box mb="xl" hiddenFrom="sm">
@@ -50,6 +51,6 @@ export default function DashboardView({ data }: DashboardViewProps) {
                     </Stack>
                 </Grid.Col>
             </Grid>
-        </Container>
+        </PageContainer>
     );
 }

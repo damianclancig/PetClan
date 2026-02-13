@@ -52,81 +52,88 @@ export default function IdentityStep() {
     };
 
     return (
-        <Stack gap="xl" align="center">
-            <Text size="xl" fw={800} ta="center">¿Quién se une a la familia?</Text>
+        <Stack gap="sm" align="center">
+            <Text size="md" fw={700} ta="center" lh={1.1}>
+                ¿Quién se une a la familia?
+            </Text>
 
             {/* Photo Avatar */}
-            <div style={{ position: 'relative' }}>
-                <Avatar
-                    src={preview}
-                    size={160}
-                    radius={160}
-                    color="cyan"
-                    styles={{
-                        root: { border: '4px solid var(--mantine-color-cyan-1)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
-                    }}
-                >
-                    {!preview && (name?.charAt(0)?.toUpperCase() || <IconPaw size={60} />)}
-                </Avatar>
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ position: 'relative' }}>
+                    <Avatar
+                        src={preview}
+                        size={120}
+                        radius={120}
+                        color="cyan"
+                        styles={{
+                            root: { border: '3px solid var(--mantine-color-cyan-1)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+                        }}
+                    >
+                        {!preview && (name?.charAt(0)?.toUpperCase() || <IconPaw size={40} />)}
+                    </Avatar>
 
-                <FileButton onChange={handleFileChange} accept="image/png,image/jpeg">
-                    {(props) => (
+                    <FileButton onChange={handleFileChange} accept="image/png,image/jpeg">
+                        {(props) => (
+                            <ActionIcon
+                                {...props}
+                                radius="xl"
+                                size="md"
+                                variant="filled"
+                                color="cyan"
+                                style={{ position: 'absolute', bottom: 0, right: 0, boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
+                            >
+                                <IconCamera size={16} />
+                            </ActionIcon>
+                        )}
+                    </FileButton>
+
+                    {preview && (
                         <ActionIcon
-                            {...props}
                             radius="xl"
-                            size="lg"
+                            size="md"
                             variant="filled"
-                            color="cyan"
-                            style={{ position: 'absolute', bottom: 10, right: 10, boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
+                            color="red"
+                            onClick={() => {
+                                setPreview(null);
+                                setValue('photoUrl', '');
+                            }}
+                            style={{ position: 'absolute', bottom: 0, left: 0, boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
                         >
-                            <IconCamera size={20} />
+                            <IconTrash size={16} />
                         </ActionIcon>
                     )}
-                </FileButton>
-
-                {preview && (
-                    <ActionIcon
-                        radius="xl"
-                        size="lg"
-                        variant="filled"
-                        color="red"
-                        onClick={() => {
-                            setPreview(null);
-                            setValue('photoUrl', '');
-                        }}
-                        style={{ position: 'absolute', bottom: 10, left: 10, boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
-                    >
-                        <IconTrash size={20} />
-                    </ActionIcon>
+                </div>
+                {!preview && (
+                    <Text size="xs" c="dimmed" mt={4}>Toca para agregar foto</Text>
                 )}
             </div>
 
-            {/* Name Input - Large */}
+            {/* Name Input - Compacted */}
             <TextInput
                 disabled={false} // Mantine bug check
-                placeholder="Nombre de la mascota"
-                size="lg"
+                placeholder="Nombre"
+                size="md"
                 variant="filled"
                 radius="md"
                 withAsterisk
                 {...register('name')}
                 error={errors.name?.message as string}
-                style={{ width: '100%', maxWidth: 400 }}
-                styles={{ input: { textAlign: 'center', fontWeight: 'bold', fontSize: 24 } }}
+                style={{ width: '100%', maxWidth: 280 }}
+                styles={{ input: { textAlign: 'center', fontWeight: 'bold', fontSize: 18, height: 42, minHeight: 42 } }}
             />
 
             {/* Species Selector - Visual Cards */}
-            <Stack gap="xs" align="center">
+            <Stack gap="xs" align="center" w="100%">
                 <Text size="sm" c="dimmed" fw={600}>ESPECIE</Text>
                 <Controller
                     name="species"
                     control={control}
                     render={({ field }) => (
-                        <Group gap="md">
+                        <SimpleGrid cols={3} spacing="xs" w="100%">
                             {[
-                                { value: 'dog', label: 'Perro', icon: <IconDog size={32} /> },
-                                { value: 'cat', label: 'Gato', icon: <IconCat size={32} /> },
-                                { value: 'other', label: 'Otro', icon: <IconPaw size={32} /> },
+                                { value: 'dog', label: 'Perro', icon: <IconDog size={24} /> },
+                                { value: 'cat', label: 'Gato', icon: <IconCat size={24} /> },
+                                { value: 'other', label: 'Otro', icon: <IconPaw size={24} /> },
                             ].map((item) => {
                                 const isSelected = field.value === item.value;
                                 return (
@@ -135,12 +142,12 @@ export default function IdentityStep() {
                                         component="button"
                                         type="button"
                                         onClick={() => field.onChange(item.value)}
-                                        p="md"
-                                        radius="lg"
+                                        p="xs"
+                                        radius="md"
                                         withBorder
                                         style={{
-                                            width: 100,
-                                            height: 100,
+                                            width: '100%',
+                                            height: 85,
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
@@ -149,25 +156,25 @@ export default function IdentityStep() {
                                             backgroundColor: isSelected ? 'var(--mantine-color-cyan-0)' : 'transparent',
                                             borderColor: isSelected ? 'var(--mantine-color-cyan-5)' : 'var(--mantine-color-gray-3)',
                                             transition: 'all 0.2s',
-                                            transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+                                            transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                                             boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
                                         }}
                                     >
                                         <ThemeIcon
-                                            size={48}
+                                            size={32}
                                             radius="xl"
                                             variant={isSelected ? 'filled' : 'light'}
                                             color={isSelected ? 'cyan' : 'gray'}
                                         >
                                             {item.icon}
                                         </ThemeIcon>
-                                        <Text size="xs" mt="xs" fw={700} c={isSelected ? 'cyan.8' : 'dimmed'}>
+                                        <Text size="xs" mt={4} fw={700} c={isSelected ? 'cyan.8' : 'dimmed'}>
                                             {item.label}
                                         </Text>
                                     </Paper>
                                 );
                             })}
-                        </Group>
+                        </SimpleGrid>
                     )}
                 />
             </Stack>

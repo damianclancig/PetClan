@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Title, Text } from '@mantine/core';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { notifications } from '@mantine/notifications';
@@ -41,11 +41,11 @@ export default function NewPetPage() {
     });
 
     return (
-        <Container size="md" py="xl">
+        <PageContainer size="md" title={t('title')}>
             <PetWizard
                 onSubmit={(values) => createPet.mutate(values)}
                 isLoading={createPet.isPending}
             />
-        </Container>
+        </PageContainer>
     );
 }

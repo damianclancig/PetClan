@@ -1,6 +1,7 @@
 'use client';
 
-import { Container, Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button } from '@mantine/core';
+import { Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button } from '@mantine/core';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { PetProfileSkeleton } from '@/components/ui/Skeletons';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIconMotion } from '@/components/ui/MotionWrappers';
@@ -38,8 +39,8 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const t = useTranslations('PetDetail');
     const tPets = useTranslations('Pets');
 
-    if (isLoading) return <PetProfileSkeleton />;
-    if (isError || !pet) return <Container><Text>{t('notFound')}</Text></Container>;
+    if (isLoading) return <PageContainer><PetProfileSkeleton /></PageContainer>;
+    if (isError || !pet) return <PageContainer><Text>{t('notFound')}</Text></PageContainer>;
     // Calculate status from client side records using unified logic
     const healthRecords = records as IHealthRecord[] || [];
     const schedule = pet ? getVaccinationSchedule(pet.species) : DOG_VACCINATION_SCHEDULE;
@@ -95,7 +96,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
 
     return (
-        <Container size="lg" px={{ base: 5, xs: 'md' }}>
+        <PageContainer>
             <PetProfileHeader
                 pet={pet}
                 activeTab={activeTab || 'summary'}
@@ -294,6 +295,6 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                     openWeightModal();
                 }}
             />
-        </Container >
+        </PageContainer>
     );
 }
