@@ -29,7 +29,7 @@ export default function NewPetPage() {
                 color: 'green',
             });
             queryClient.invalidateQueries({ queryKey: ['pets'] });
-            router.push('/dashboard/pets');
+            // router.push('/dashboard/pets'); // Redirection handled by Wizard Success Step
         },
         onError: () => {
             notifications.show({

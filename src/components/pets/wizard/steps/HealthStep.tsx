@@ -1,8 +1,8 @@
 'use client';
 
-import { TextInput, Stack, Text, Slider, NumberInput, Group, Textarea, Paper } from '@mantine/core';
+import { TextInput, Stack, Text, NumberInput, Group, Textarea, Paper, ActionIcon } from '@mantine/core';
 import { useFormContext, Controller } from 'react-hook-form';
-import { IconScale, IconId, IconClipboardText } from '@tabler/icons-react';
+import { IconScale, IconId, IconMinus, IconPlus } from '@tabler/icons-react';
 
 export default function HealthStep() {
     const { register, control, watch, setValue, formState: { errors } } = useFormContext();
@@ -13,49 +13,65 @@ export default function HealthStep() {
             <Text size="md" fw={700} ta="center">Datos de Salud de {name}</Text>
 
             <Paper p={{ base: 'md', sm: 'lg' }} radius="md" withBorder>
-                <Stack gap="sm">
-                    <Group justify="space-between">
-                        <Group gap="xs">
-                            <IconScale size={20} />
-                            <Text fw={600}>Peso Actual (kg)</Text>
-                        </Group>
-                        <Controller
-                            name="weight"
-                            control={control}
-                            render={({ field }) => (
-                                <NumberInput
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    min={0.1}
-                                    max={100}
-                                    step={0.1}
-                                    w={100}
-                                    size="sm"
-                                    suffix=" kg"
-                                    error={errors.weight?.message as string}
-                                />
-                            )}
-                        />
+                <Stack gap="md">
+                    <Group justify="center" gap="xs">
+                        <IconScale size={20} />
+                        <Text fw={600}>Peso Actual (kg)</Text>
                     </Group>
 
                     <Controller
                         name="weight"
                         control={control}
                         render={({ field }) => (
-                            <Slider
-                                value={typeof field.value === 'number' ? field.value : 0}
-                                onChange={field.onChange}
-                                min={0.5}
-                                max={60}
-                                step={0.5}
-                                marks={[
-                                    { value: 5, label: '5kg' },
-                                    { value: 20, label: '20kg' },
-                                    { value: 40, label: '40kg' },
-                                ]}
-                                color="cyan"
-                                label={(val) => `${val} kg`}
-                            />
+                            <Group justify="center" gap="md">
+                                <ActionIcon
+                                    size={42}
+                                    variant="light"
+                                    color="cyan"
+                                    radius="xl"
+                                    onClick={() => {
+                                        const current = Number(field.value) || 0;
+                                        const next = Math.max(0.1, Number((current - 0.1).toFixed(1)));
+                                        field.onChange(next);
+                                    }}
+                                    disabled={!field.value || Number(field.value) <= 0.1}
+                                >
+                                    <IconMinus size={24} />
+                                </ActionIcon>
+
+                                <NumberInput
+                                    value={field.value}
+                                    onChange={(val) => field.onChange(val)}
+                                    min={0.1}
+                                    max={100}
+                                    step={0.1}
+                                    allowNegative={false}
+                                    clampBehavior="strict"
+                                    decimalScale={1}
+                                    fixedDecimalScale
+                                    w={120}
+                                    size="lg"
+                                    radius="md"
+                                    styles={{ input: { textAlign: 'center', fontSize: 24, fontWeight: 'bold' } }}
+                                    rightSection={<Text size="xs" c="dimmed" mr={10}>kg</Text>}
+                                    rightSectionWidth={40}
+                                    error={errors.weight?.message as string}
+                                />
+
+                                <ActionIcon
+                                    size={42}
+                                    variant="filled"
+                                    color="cyan"
+                                    radius="xl"
+                                    onClick={() => {
+                                        const current = Number(field.value) || 0;
+                                        const next = Math.min(100, Number((current + 0.1).toFixed(1)));
+                                        field.onChange(next);
+                                    }}
+                                >
+                                    <IconPlus size={24} />
+                                </ActionIcon>
+                            </Group>
                         )}
                     />
                 </Stack>

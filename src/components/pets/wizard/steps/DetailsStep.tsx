@@ -1,30 +1,16 @@
 'use client';
 
-import { TextInput, Group, Stack, Text, SegmentedControl, Paper, ThemeIcon, Center } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
+import { TextInput, Group, Stack, Text, SegmentedControl, Paper, ThemeIcon, Center, Modal } from '@mantine/core';
+import { DatePicker } from '@mantine/dates';
+import { useDisclosure } from '@mantine/hooks';
 import { useFormContext, Controller } from 'react-hook-form';
 import { IconGenderMale, IconGenderFemale, IconCake } from '@tabler/icons-react';
-import { differenceInMonths, differenceInYears } from 'date-fns';
+import { parseDate, formatDate, formatAge, dayjs } from '@/lib/dateUtils';
 
 export default function DetailsStep() {
     const { register, control, watch, formState: { errors } } = useFormContext();
     const birthDate = watch('birthDate');
     const name = watch('name');
-
-    // Calculate Age Display
-    const getAgeDisplay = (dateStr: string | Date) => {
-        if (!dateStr) return '';
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return '';
-
-        const today = new Date();
-        const years = differenceInYears(today, date);
-        const months = differenceInMonths(today, date) % 12;
-
-        if (years === 0 && months === 0) return '¡Recién nacido!';
-        if (years === 0) return `${months} ${months === 1 ? 'mes' : 'meses'}`;
-        return `${years}a ${months > 0 ? `${months}m` : ''}`;
-    };
 
     return (
         <Stack gap="sm">
@@ -92,43 +78,64 @@ export default function DetailsStep() {
             <Controller
                 name="birthDate"
                 control={control}
-                render={({ field }) => (
-                    <Stack gap={5}>
-                        <DateInput
-                            label="Fecha de Nacimiento"
-                            placeholder="DD/MM/AAAA"
-                            size="md"
-                            radius="md"
-                            withAsterisk
-                            value={field.value ? new Date(field.value) : null}
-                            onChange={(date: any) => {
-                                if (date instanceof Date) {
-                                    field.onChange(date.toISOString());
-                                } else if (typeof date === 'string') {
-                                    // Handle string input (e.g. from native date picker fallback or behavior quirks)
-                                    const d = new Date(date);
-                                    if (!isNaN(d.getTime())) {
-                                        field.onChange(d.toISOString());
-                                    }
-                                } else if (date === null) {
-                                    field.onChange('');
-                                }
-                            }}
-                            valueFormat="DD/MM/YYYY"
-                            clearable
-                            locale="es"
-                            maxDate={new Date()}
-                            popoverProps={{ withinPortal: true, zIndex: 10000 }}
-                            error={errors.birthDate?.message as string}
-                            leftSection={<IconCake size={18} />}
-                        />
-                        {field.value && (
-                            <Text size="sm" c="dimmed" ta="right">
-                                Edad: <Text span fw={700} c="cyan">{getAgeDisplay(field.value)}</Text>
-                            </Text>
-                        )}
-                    </Stack>
-                )}
+                render={({ field }) => {
+                    const [opened, { open, close }] = useDisclosure(false);
+                    // Use global util to parse date string to dayjs, then convert to JS Date for picker
+                    const dateObj = parseDate(field.value);
+                    const dateValue = dateObj ? dateObj.toDate() : null;
+
+                    return (
+                        <Stack gap={5}>
+                            <TextInput
+                                label="Fecha de Nacimiento"
+                                placeholder="Selecciona una fecha"
+                                size="md"
+                                radius="md"
+                                withAsterisk
+                                value={formatDate(field.value)}
+                                onClick={open}
+                                readOnly
+                                rightSection={<IconCake size={18} />}
+                                style={{ cursor: 'pointer' }}
+                                styles={{ input: { cursor: 'pointer' } }}
+                                error={errors.birthDate?.message as string}
+                            />
+
+                            <Modal
+                                opened={opened}
+                                onClose={close}
+                                title="Selecciona fecha de nacimiento"
+                                centered
+                                size="auto"
+                            >
+                                <Center>
+                                    <DatePicker
+                                        value={dateValue}
+                                        onChange={(date) => {
+                                            if (date) {
+                                                // Use dayjs to format locally to YYYY-MM-DD
+                                                // This ensures we keep exactly the selected day
+                                                field.onChange(dayjs(date).format('YYYY-MM-DD'));
+                                                close();
+                                            }
+                                        }}
+                                        defaultLevel="year"
+                                        defaultDate={dateValue || new Date()}
+                                        locale="es"
+                                        maxDate={new Date()}
+                                        minDate={new Date(1990, 0, 1)}
+                                    />
+                                </Center>
+                            </Modal>
+
+                            {field.value && (
+                                <Text size="sm" c="dimmed" ta="right">
+                                    Edad: <Text span fw={700} c="cyan">{formatAge(field.value)}</Text>
+                                </Text>
+                            )}
+                        </Stack>
+                    );
+                }}
             />
         </Stack>
     );
