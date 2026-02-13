@@ -23,9 +23,11 @@ export default function DashboardView({ data }: DashboardViewProps) {
                 <TipsCarousel />
             </Box>
 
-            <Box mb="xl" hiddenFrom="md">
-                <ActiveAlertsWidget alerts={alerts} />
-            </Box>
+            {pets.length > 0 && (
+                <Box mb="xl" hiddenFrom="md">
+                    <ActiveAlertsWidget alerts={alerts} />
+                </Box>
+            )}
 
             <Grid gutter="lg">
                 <Grid.Col span={{ base: 12, md: 8 }}>
@@ -34,15 +36,17 @@ export default function DashboardView({ data }: DashboardViewProps) {
                             <PetSnapshotGrid pets={pets} alerts={alerts} />
                         </Box>
 
-                        <Box>
-                            <QuickActionsGrid pets={pets} />
-                        </Box>
+                        {pets.length > 0 && (
+                            <Box>
+                                <QuickActionsGrid pets={pets} />
+                            </Box>
+                        )}
                     </Stack>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, md: 4 }} visibleFrom="md">
                     <Stack gap="lg">
-                        <ActiveAlertsWidget alerts={alerts} />
+                        {pets.length > 0 && <ActiveAlertsWidget alerts={alerts} />}
                     </Stack>
                 </Grid.Col>
             </Grid>

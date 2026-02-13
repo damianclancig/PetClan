@@ -8,6 +8,8 @@ import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { PetCard } from '@/components/pets/PetCard';
+import { EmptyPetsState } from '@/components/pets/EmptyPetsState';
+import { IconPlus } from '@tabler/icons-react';
 
 import { useRouter } from '@/i18n/routing';
 import { AnimatePresence } from 'framer-motion';
@@ -34,8 +36,8 @@ export default function PetsPage() {
         <Container size="lg" px={{ base: 5, xs: 'md' }}>
             <Group justify="space-between" mb="xs" px={{ base: 'xs', xs: 0 }}>
                 <Title order={2}>{t('title')}</Title>
-                <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan">
-                    {t('addPet')}
+                <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan" leftSection={<IconPlus size={16} />}>
+                    Nueva Mascota
                 </Button>
             </Group>
 
@@ -49,9 +51,13 @@ export default function PetsPage() {
             {isLoading ? (
                 <PetListSkeleton />
             ) : pets && pets.length === 0 ? (
-                <Text c="dimmed" fs="italic" ta="center" py="xl">
-                    {activeTab === 'active' ? t('noPets') : 'No tienes mascotas en el historial.'}
-                </Text>
+                activeTab === 'active' ? (
+                    <EmptyPetsState />
+                ) : (
+                    <Text c="dimmed" fs="italic" ta="center" py="xl">
+                        No tienes mascotas en el historial.
+                    </Text>
+                )
             ) : (
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 10, sm: 'lg' }}>
                     <AnimatePresence mode="popLayout">
