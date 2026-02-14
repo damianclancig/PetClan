@@ -155,15 +155,14 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                         />
                     </svg>
 
-                    {/* Name Positioning */}
-                    <Container size="lg" h="100%">
+                    {/* Name Positioning - DESKTOP ONLY */}
+                    <Container size="lg" h="100%" display={{ base: 'none', xs: 'block' }}>
                         <Flex
                             h="100%"
-                            align={{ base: 'flex-start', xs: 'flex-end' }}
-                            justify={{ base: 'center', xs: 'flex-start' }}
-                            pb={{ base: 0, xs: 16 }}
-                            pl={{ base: 0, xs: 160 }}
-                            pt={{ base: 20, xs: 0 }}
+                            align="flex-end"
+                            justify="flex-start"
+                            pb={16}
+                            pl={160}
                         >
                             <Title
                                 order={1}
@@ -270,8 +269,8 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
 
                 <Container size="lg" style={{ marginTop: -60, paddingBottom: 16, position: 'relative' }}>
                     <Flex
-                        direction={{ base: 'column', xs: 'row' }}
-                        align={{ base: 'center', xs: 'flex-start' }} // Align top to start badges below name visual
+                        direction="row" // Always row for mobile and desktop (Mobile: Avatar left, Name right)
+                        align={{ base: 'center', xs: 'flex-start' }} // Center vertically on mobile (for half-color alignment), Top on desktop
                         gap={{ base: 'sm', xs: 'md' }}
                     >
                         <Avatar
@@ -285,46 +284,80 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 color: 'white',
                                 fontSize: '3rem',
                                 fontWeight: 700,
-                                flexShrink: 0
+                                flexShrink: 0 // Do not shrink avatar unless absolutely necessary? User asked for resizing if name is long.
+                            }}
+                            styles={{
+                                root: {
+                                    flexShrink: 1, // Allow shrinking on small screens if needed
+                                    minWidth: 80, // Minimum size
+                                }
                             }}
                         >
                             {pet.name.charAt(0).toUpperCase()}
                         </Avatar>
 
                         <Box
-                            style={{ flex: 1 }}
-                            mt={{ base: 0, xs: 72 }} // Push badges down on desktop to clear overlapped area
-                            ta={{ base: 'center', xs: 'left' }}
+                            style={{ flex: 1, minWidth: 0, zIndex: 10 }}
+                            mt={{ base: 0, xs: 72 }} // Display badges below separate title on Desktop
+                            ta="left"
+                            h={{ base: 130, xs: 'auto' }} // Fix height in mobile (slightly > 120 for spacing)
+                            display={{ base: 'flex', xs: 'block' }} // Flex col in mobile
                         >
-                            <Flex gap={8} justify={{ base: 'center', xs: 'flex-start' }} wrap="wrap" align="center">
-                                <PetSpeciesBadge
-                                    species={pet.species}
-                                    sex={pet.sex}
-                                    color={identityColor}
-                                    size="lg"
-                                />
-
-                                <Badge
-                                    size="lg"
-                                    radius="md"
-                                    variant="light" // Light variant looks good on surface
-                                    color={identityColor} // Use identity color for consistency
-                                    leftSection={<IconDna size={16} style={{ marginTop: 4 }} />}
-                                    style={{ textTransform: 'none' }}
+                            <Flex
+                                direction="column"
+                                justify={{ base: 'space-between', xs: 'flex-start' }}
+                                h="100%"
+                                w="100%"
+                            >
+                                {/* MOBILE TITLE: Visible only on mobile, right next to avatar */}
+                                <Title
+                                    order={1}
+                                    fw={800}
+                                    c="white"
+                                    display={{ base: 'block', xs: 'none' }} // Mobile Only
+                                    style={{
+                                        textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                        lineHeight: 1.1,
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        paddingTop: 20 // Increased padding to lower the name
+                                    }}
+                                    fz={28}
                                 >
-                                    {pet.breed}
-                                </Badge>
+                                    {pet.name}
+                                </Title>
 
-                                <Badge
-                                    size="lg"
-                                    radius="md"
-                                    variant="light"
-                                    color="gray" // Gray for date
-                                    leftSection={<IconCake size={16} style={{ marginTop: 2 }} />}
-                                    style={{ textTransform: 'none' }}
-                                >
-                                    {dayjs(pet.birthDate).utc().format('DD/MM/YY')} ({formatAge(pet.birthDate)})
-                                </Badge>
+                                <Flex gap={8} justify="flex-start" wrap="wrap" align="center" pb={{ base: 4, xs: 0 }}>
+                                    <PetSpeciesBadge
+                                        species={pet.species}
+                                        sex={pet.sex}
+                                        color={identityColor}
+                                        size="md"
+                                    />
+
+                                    <Badge
+                                        size="md"
+                                        radius="md"
+                                        variant="light" // Light variant looks good on surface
+                                        color={identityColor} // Use identity color for consistency
+                                        leftSection={<IconDna size={14} style={{ marginTop: 4 }} />}
+                                        style={{ textTransform: 'none' }}
+                                    >
+                                        {pet.breed}
+                                    </Badge>
+
+                                    <Badge
+                                        size="md"
+                                        radius="md"
+                                        variant="light"
+                                        color="gray" // Gray for date
+                                        leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
+                                        style={{ textTransform: 'none' }}
+                                    >
+                                        {dayjs(pet.birthDate).utc().format('DD/MM/YY')} ({formatAge(pet.birthDate)})
+                                    </Badge>
+                                </Flex>
                             </Flex>
                         </Box>
                     </Flex>
