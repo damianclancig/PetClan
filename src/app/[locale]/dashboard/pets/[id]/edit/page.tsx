@@ -51,6 +51,23 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
     const onSubmit = async (data: PetFormValues) => {
         try {
             await updatePet({ id, data: { ...data, status } });
+
+            // Detect weight change and record history
+            if (pet.weight !== data.weight) {
+                await fetch('/api/records', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        petId: id,
+                        type: 'weight',
+                        title: 'Control de Peso',
+                        description: 'Actualización dada al editar perfil',
+                        appliedAt: new Date(),
+                        weightValue: Number(data.weight),
+                    }),
+                });
+            }
+
             notifications.show({
                 title: 'Mascota actualizada',
                 message: 'Los datos se han guardado correctamente',

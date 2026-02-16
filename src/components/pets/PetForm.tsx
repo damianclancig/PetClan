@@ -1,14 +1,17 @@
 'use client';
 
-import { TextInput, NumberInput, Select, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
+import { TextInput, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid } from '@mantine/core';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useState, useRef, useEffect } from 'react';
-import { IconTrash, IconGenderMale, IconGenderFemale } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
+import { SpeciesSelector } from './form/SpeciesSelector';
+import { SexSelector } from './form/SexSelector';
+import { BirthDatePicker } from './form/BirthDatePicker';
+import { WeightInput } from './form/WeightInput';
 import 'dayjs/locale/es';
 
 export type PetFormValues = {
@@ -153,89 +156,67 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                 placeholder={t('placeholders.name')}
                 {...register('name')}
                 error={errors.name?.message}
-                mb={{ base: 'xs', md: 'md' }}
+                mb={{ base: 'md', md: 'lg' }}
                 withAsterisk
             />
 
-            <Controller
-                name="birthDate"
-                control={control}
-                render={({ field }) => (
-                    <DateInput
-                        label={t('birthDate')}
-                        placeholder="DD/MM/AAAA"
-                        error={errors.birthDate?.message}
-                        mb={{ base: 'xs', md: 'md' }}
-                        withAsterisk
-                        value={field.value ? new Date(field.value) : null}
-                        onChange={(date: any) => field.onChange(date ? date.toISOString() : '')}
-                        valueFormat="DD/MM/YYYY"
-                        clearable
-                        locale="es"
-                        maxDate={new Date()}
-                        popoverProps={{ withinPortal: true, zIndex: 10000 }}
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb={{ base: 'md', md: 'lg' }}>
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>{t('species')} <Text span c="red">*</Text></Text>
+                    <Controller
+                        name="species"
+                        control={control}
+                        render={({ field }) => (
+                            <SpeciesSelector
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                            />
+                        )}
                     />
-                )}
-            />
+                </Stack>
 
-            <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>
-                <Select
-                    label={t('species')}
-                    data={[
-                        { value: 'dog', label: tCommon('species.dog') },
-                        { value: 'cat', label: tCommon('species.cat') },
-                        { value: 'other', label: tCommon('species.other') },
-                    ]}
-                    defaultValue={initialValues?.species || 'dog'}
-                    onChange={(val) => setValue('species', val as 'dog' | 'cat' | 'other')}
-                    error={errors.species?.message}
-                    withAsterisk
-                />
-                <TextInput
-                    label={t('breed')}
-                    placeholder={t('placeholders.breed')}
-                    {...register('breed')}
-                    error={errors.breed?.message}
-                    withAsterisk
-                />
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>{t('sex')} <Text span c="red">*</Text></Text>
+                    <Controller
+                        name="sex"
+                        control={control}
+                        render={({ field }) => (
+                            <SexSelector
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                            />
+                        )}
+                    />
+                </Stack>
             </SimpleGrid>
 
-            <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>
-                <Select
-                    label={t('sex')}
-                    data={[
-                        { value: 'male', label: tCommon('sex.male') },
-                        { value: 'female', label: tCommon('sex.female') },
-                    ]}
-                    defaultValue={initialValues?.sex || 'male'}
-                    onChange={(val) => setValue('sex', val as 'male' | 'female')}
-                    error={errors.sex?.message}
-                    withAsterisk
-                    leftSection={
-                        watch('sex') === 'male'
-                            ? <IconGenderMale size={16} color="var(--mantine-color-blue-5)" />
-                            : <IconGenderFemale size={16} color="var(--mantine-color-pink-5)" />
-                    }
-                    renderOption={({ option }) => (
-                        <Group gap="xs">
-                            {option.value === 'male'
-                                ? <IconGenderMale size={16} color="var(--mantine-color-blue-5)" />
-                                : <IconGenderFemale size={16} color="var(--mantine-color-pink-5)" />
-                            }
-                            <Text fz="sm">{option.label}</Text>
-                        </Group>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb={{ base: 'md', md: 'lg' }}>
+                <Controller
+                    name="birthDate"
+                    control={control}
+                    render={({ field }) => (
+                        <BirthDatePicker
+                            value={field.value}
+                            onChange={(val) => field.onChange(val)}
+                            error={errors.birthDate?.message}
+                        />
                     )}
                 />
-                <NumberInput
-                    label={t('weight')}
-                    placeholder="5.5"
-                    min={0}
-                    step={0.1}
-                    defaultValue={initialValues?.weight}
-                    onChange={(val) => setValue('weight', Number(val))}
-                    error={errors.weight?.message}
-                    withAsterisk
-                />
+
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>{t('weight')} <Text span c="red">*</Text></Text>
+                    <Controller
+                        name="weight"
+                        control={control}
+                        render={({ field }) => (
+                            <WeightInput
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                                error={errors.weight?.message}
+                            />
+                        )}
+                    />
+                </Stack>
             </SimpleGrid>
 
             <TextInput

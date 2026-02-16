@@ -1,8 +1,9 @@
 'use client';
 
-import { TextInput, Stack, Text, NumberInput, Group, Textarea, Paper, ActionIcon } from '@mantine/core';
+import { TextInput, Stack, Text, Group, Textarea, Paper } from '@mantine/core';
 import { useFormContext, Controller } from 'react-hook-form';
-import { IconScale, IconId, IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconScale, IconId } from '@tabler/icons-react';
+import { WeightInput } from '../../form/WeightInput';
 
 export default function HealthStep() {
     const { register, control, watch, setValue, formState: { errors } } = useFormContext();
@@ -23,55 +24,11 @@ export default function HealthStep() {
                         name="weight"
                         control={control}
                         render={({ field }) => (
-                            <Group justify="center" gap="md">
-                                <ActionIcon
-                                    size={42}
-                                    variant="light"
-                                    color="cyan"
-                                    radius="xl"
-                                    onClick={() => {
-                                        const current = Number(field.value) || 0;
-                                        const next = Math.max(0.1, Number((current - 0.1).toFixed(1)));
-                                        field.onChange(next);
-                                    }}
-                                    disabled={!field.value || Number(field.value) <= 0.1}
-                                >
-                                    <IconMinus size={24} />
-                                </ActionIcon>
-
-                                <NumberInput
-                                    value={field.value}
-                                    onChange={(val) => field.onChange(val)}
-                                    min={0.1}
-                                    max={100}
-                                    step={0.1}
-                                    allowNegative={false}
-                                    clampBehavior="strict"
-                                    decimalScale={1}
-                                    fixedDecimalScale
-                                    w={120}
-                                    size="lg"
-                                    radius="md"
-                                    styles={{ input: { textAlign: 'center', fontSize: 24, fontWeight: 'bold' } }}
-                                    rightSection={<Text size="xs" c="dimmed" mr={10}>kg</Text>}
-                                    rightSectionWidth={40}
-                                    error={errors.weight?.message as string}
-                                />
-
-                                <ActionIcon
-                                    size={42}
-                                    variant="filled"
-                                    color="cyan"
-                                    radius="xl"
-                                    onClick={() => {
-                                        const current = Number(field.value) || 0;
-                                        const next = Math.min(100, Number((current + 0.1).toFixed(1)));
-                                        field.onChange(next);
-                                    }}
-                                >
-                                    <IconPlus size={24} />
-                                </ActionIcon>
-                            </Group>
+                            <WeightInput
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                                error={errors.weight?.message as string}
+                            />
                         )}
                     />
                 </Stack>

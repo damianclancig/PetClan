@@ -1,6 +1,7 @@
 'use client';
 
-import { Modal, NumberInput, Button, Group, Stack, Textarea } from '@mantine/core';
+import { Modal, Button, Group, Stack, Textarea, Text } from '@mantine/core';
+import { WeightInput } from './form/WeightInput';
 import { useForm } from 'react-hook-form';
 import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query'; // Or equivalent hook
@@ -66,16 +67,13 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
     return (
         <Modal opened={opened} onClose={onClose} title="Registrar Peso ⚖️" centered>
             <Stack>
-                <NumberInput
-                    label="Peso Actual (kg)"
-                    placeholder="Ej: 12.5"
-                    value={weight}
-                    onChange={setWeight}
-                    min={0}
-                    step={0.1}
-                    decimalScale={2}
-                    data-autofocus
-                />
+                <Stack gap={5}>
+                    <Text size="sm" fw={500}>Peso Actual (kg)</Text>
+                    <WeightInput
+                        value={weight}
+                        onChange={setWeight}
+                    />
+                </Stack>
 
                 <Textarea
                     label="Notas (Opcional)"
