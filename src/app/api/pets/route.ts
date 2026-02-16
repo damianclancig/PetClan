@@ -37,7 +37,7 @@ export async function GET(req: Request) {
     }
 
     // Buscar mascotas donde el usuario sea owner y cumplan el filtro de estado
-    const pets = await Pet.find(filter).sort({ createdAt: -1 });
+    const pets = await Pet.find(filter).sort({ name: 1 });
 
     return NextResponse.json(pets);
 }

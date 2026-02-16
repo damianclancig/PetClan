@@ -21,7 +21,7 @@ export class DashboardService {
         const pets = await Pet.find({
             owners: userId,
             status: { $ne: 'archived' }
-        }).lean();
+        }).sort({ name: 1 }).lean();
 
         // 3. Process Pets & Alerts
         const dashboardPets: DashboardPet[] = [];
