@@ -68,7 +68,8 @@ export class DashboardService {
                 weight: pet.weight,
                 ageLabel,
                 identityColor: getPetIdentityColor(pet._id),
-                lastWeightDate: lastWeightRecord ? new Date(lastWeightRecord.appliedAt).toISOString() : undefined
+                lastWeightDate: lastWeightRecord ? new Date(lastWeightRecord.appliedAt).toISOString() : undefined,
+                status: pet.status
             });
         }
 

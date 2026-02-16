@@ -1,5 +1,5 @@
 import { ActionIcon, Badge, Box, Card, Group, Image, Stack, Text } from '@mantine/core';
-import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw } from '@tabler/icons-react';
+import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw, IconGhost, IconArchive } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { MagicTap } from '@/components/ui/MagicWrappers';
@@ -130,6 +130,12 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                         >
                             {pet.status === 'lost' && (
                                 <Badge color="red" variant="filled">🚨 PERDIDO</Badge>
+                            )}
+                            {pet.status === 'deceased' && (
+                                <Badge color="violet" variant="light" leftSection={<IconGhost size={12} />}>En Memoria</Badge>
+                            )}
+                            {pet.status === 'archived' && (
+                                <Badge color="gray" variant="filled" leftSection={<IconArchive size={12} />}>Archivado</Badge>
                             )}
                             {/* Simulated Vaccine Status */}
                             {/* <Badge circle size="sm" color="green" title="Vacunas al día">✓</Badge> */}

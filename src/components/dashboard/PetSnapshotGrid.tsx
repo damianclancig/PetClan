@@ -32,7 +32,11 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
                 let StatusIcon = IconCheck;
                 let statusLabel = 'Salud Ok';
 
-                if (hasCritical) {
+                if (pet.status === 'lost') {
+                    statusColor = 'red';
+                    StatusIcon = IconAlertTriangle;
+                    statusLabel = 'PERDIDO - AYÚDAME';
+                } else if (hasCritical) {
                     statusColor = 'red';
                     StatusIcon = IconAlertTriangle;
                     statusLabel = 'Atención';
@@ -50,12 +54,13 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
                         withBorder
                         p={8}
                         radius="md"
+                        className={`hover:shadow-md hover:-translate-y-1 ${pet.status === 'lost' ? 'border-red-500' : ''}`}
                         style={{
                             textDecoration: 'none',
                             color: 'inherit',
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                            borderColor: pet.status === 'lost' ? 'var(--mantine-color-red-5)' : undefined
                         }}
-                        className="hover:shadow-md hover:-translate-y-1"
                     >
                         <Stack gap={8}>
                             <Group
@@ -111,7 +116,7 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
 
                             <Badge
                                 color={statusColor}
-                                variant="light"
+                                variant={pet.status === 'lost' ? 'filled' : 'light'}
                                 size="sm"
                                 fullWidth
                                 leftSection={<StatusIcon size={10} />}
