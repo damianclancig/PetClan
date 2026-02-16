@@ -20,7 +20,7 @@ export class DashboardService {
         // 2. Fetch Pets
         const pets = await Pet.find({
             owners: userId,
-            status: { $ne: 'archived' }
+            status: { $in: ['active', 'lost'] }
         }).sort({ name: 1 }).lean();
 
         // 3. Process Pets & Alerts

@@ -25,8 +25,9 @@ export default function PetsPage() {
             router.push(`/dashboard/pets/${petId}`);
         }, 500);
     };
-    // Si tab es 'active', enviamos undefined para traer (active+lost). Si es 'history', enviamos 'history' (deceased+archived).
-    const { pets, isLoading, isError } = usePets(activeTab === 'active' ? undefined : 'history');
+
+    // Fetch ALL pets to filter client-side and determine if we need the Memorias tab
+    const { pets, isLoading, isError } = usePets('all');
     const t = useTranslations('Pets');
 
     if (isError) return <PageContainer><Text c="red">Error al cargar las mascotas.</Text></PageContainer>;
@@ -37,30 +38,40 @@ export default function PetsPage() {
         </Button>
     );
 
+    // Client-side filtering
+    const allPets = pets || [];
+    const activePets = allPets.filter((p: any) => ['active', 'lost'].includes(p.status));
+    const historyPets = allPets.filter((p: any) => ['deceased', 'archived'].includes(p.status));
+    const showHistoryTab = historyPets.length > 0;
+
+    const displayedPets = activeTab === 'active' ? activePets : historyPets;
+
     return (
         <PageContainer title={t('title')} action={actionButton}>
-            <Tabs value={activeTab} onChange={setActiveTab} mb="xl">
-                <Tabs.List>
-                    <Tabs.Tab value="active">Mis Mascotas</Tabs.Tab>
-                    <Tabs.Tab value="history">Historial</Tabs.Tab>
-                </Tabs.List>
-            </Tabs>
+            {showHistoryTab && (
+                <Tabs value={activeTab} onChange={setActiveTab} mb="xl">
+                    <Tabs.List>
+                        <Tabs.Tab value="active">Mis Mascotas</Tabs.Tab>
+                        <Tabs.Tab value="history">Memorias</Tabs.Tab>
+                    </Tabs.List>
+                </Tabs>
+            )}
 
             {isLoading ? (
                 <PetListSkeleton />
-            ) : pets && pets.length === 0 ? (
+            ) : displayedPets.length === 0 ? (
                 activeTab === 'active' ? (
                     <EmptyPetsState />
                 ) : (
                     <Text c="dimmed" fs="italic" ta="center" py="xl">
-                        No tienes mascotas en el historial.
+                        No hay memorias para mostrar.
                     </Text>
                 )
             ) : (
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 10, sm: 'lg' }}>
                     <AnimatePresence mode="popLayout">
-                        {pets
-                            ?.filter((pet: any) => !selectedPetId || pet._id === selectedPetId)
+                        {displayedPets
+                            .filter((pet: any) => !selectedPetId || pet._id === selectedPetId)
                             .map((pet: any) => (
                                 <PetCard
                                     key={pet._id}
