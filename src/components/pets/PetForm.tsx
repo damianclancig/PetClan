@@ -13,6 +13,7 @@ import { SpeciesSelector } from './form/SpeciesSelector';
 import { SexSelector } from './form/SexSelector';
 import { BirthDatePicker } from './form/BirthDatePicker';
 import { WeightInput } from './form/WeightInput';
+import { ModalDatePicker } from '../ui/ModalDatePicker';
 import 'dayjs/locale/es';
 
 export type PetFormValues = {
@@ -288,16 +289,13 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                         control={control}
                         render={({ field }) => (
                             <div>
-                                <DateInput
+                                <ModalDatePicker
                                     label="Fecha de Fallecimiento"
                                     placeholder="DD/MM/AAAA"
-                                    value={field.value ? new Date(field.value) : null}
-                                    onChange={(date) => field.onChange(date?.toString())}
+                                    value={field.value || ''}
+                                    onChange={(val) => field.onChange(val)}
                                     maxDate={new Date()}
                                     minDate={lastRecordDate}
-                                    valueFormat="DD/MM/YYYY"
-                                    locale="es"
-                                    error={undefined} // Error handling passed via form state usually, or custom logic
                                 />
                                 {lastRecordDate && (
                                     <Text size="xs" c="dimmed" mt={4} style={{ lineHeight: 1.2 }}>
