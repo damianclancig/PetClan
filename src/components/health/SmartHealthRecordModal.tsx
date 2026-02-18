@@ -15,6 +15,7 @@ import 'dayjs/locale/es'; // Import locale
 import { VaccineSlot, getVaccinationSchedule, getVaccineStatus, calculateNextDueDate } from '@/utils/vaccinationUtils';
 import { IHealthRecord } from '@/models/HealthRecord';
 import { MagicParticles } from '@/components/ui/MagicWrappers';
+import { CounterInput } from '@/components/ui/CounterInput';
 
 interface SmartHealthRecordModalProps {
     opened: boolean;
@@ -181,22 +182,30 @@ export function SmartHealthRecordModal({
     }, [selectedType, petSpecies, existingRecords, petBirthDate]);
 
     // External Deworming State
-    const [externalMethod, setExternalMethod] = useState<'pipette' | 'tablet' | 'collar'>('pipette');
+    const [externalMethod, setExternalMethod] = useState<'pipette' | 'tablet' | 'collar' | 'other'>('pipette');
+    const [customMethodName, setCustomMethodName] = useState<string>(''); // For 'other' method
     const [externalDuration, setExternalDuration] = useState<string>('30');
+    const [customDurationDays, setCustomDurationDays] = useState<number | ''>(30); // For 'other' duration
     const [externalTargets, setExternalTargets] = useState<string[]>(['fleas', 'ticks']);
 
-    // Sync form with external deworming helpers
     // Sync form with external deworming helpers
     useEffect(() => {
         if (selectedType === 'external_deworming') {
             const daysMap: Record<string, number> = { '30': 30, '60': 60, '90': 90 };
-            const days = daysMap[externalDuration] || 30;
+            // If 'other', use customDurationDays (default 30 if empty/invalid for safety in calc, but UI shows input)
+            const days = externalDuration === 'other' ? (typeof customDurationDays === 'number' ? customDurationDays : 30) : (daysMap[externalDuration] || 30);
 
-            const methodLabel = {
-                'pipette': 'Pipeta',
-                'tablet': 'Comprimido',
-                'collar': 'Collar'
-            }[externalMethod];
+            // Determine Method Label
+            let methodLabel = '';
+            if (externalMethod === 'other') {
+                methodLabel = customMethodName || 'Producto';
+            } else {
+                methodLabel = {
+                    'pipette': 'Pipeta',
+                    'tablet': 'Comprimido',
+                    'collar': 'Collar'
+                }[externalMethod];
+            }
 
             const targetLabels = {
                 'fleas': 'Pulgas',
@@ -208,8 +217,10 @@ export function SmartHealthRecordModal({
 
             // Auto-generate title logic
             let title = `${methodLabel} (${days} días)`;
-            if (externalDuration === 'other') title = `${methodLabel} - Manual`;
-            if (externalMethod === 'collar') title = `Collar ${externalDuration === 'other' ? '' : '(' + externalDuration + ' días)'}`;
+
+            // Special case for Collar to match previous logic logic if needed, but generic approach above covers it well.
+            // Keeping it simple: "[Method] ([Days] días)" is clear. 
+            // If method is 'collar' and duration is standard, it might just say "Collar (X días)".
 
             // Guards to prevent infinite loops
             if (form.values.title !== title) {
@@ -221,20 +232,19 @@ export function SmartHealthRecordModal({
                 form.setFieldValue('description', description);
             }
 
-            if (externalDuration !== 'other') {
-                const appliedDate = form.values.appliedAt instanceof Date ? form.values.appliedAt : new Date();
-                const nextDue = dayjs(appliedDate).add(days, 'day').toDate();
+            // Calculate Next Due Date
+            const appliedDate = form.values.appliedAt instanceof Date ? form.values.appliedAt : new Date();
+            const nextDue = dayjs(appliedDate).add(days, 'day').toDate();
 
-                if (form.values.nextDueAt instanceof Date) {
-                    if (form.values.nextDueAt.getTime() !== nextDue.getTime()) {
-                        form.setFieldValue('nextDueAt', nextDue);
-                    }
-                } else {
+            if (form.values.nextDueAt instanceof Date) {
+                if (form.values.nextDueAt.getTime() !== nextDue.getTime()) {
                     form.setFieldValue('nextDueAt', nextDue);
                 }
+            } else {
+                form.setFieldValue('nextDueAt', nextDue);
             }
         }
-    }, [externalMethod, externalDuration, externalTargets, selectedType, form.values.appliedAt]);
+    }, [externalMethod, customMethodName, externalDuration, customDurationDays, externalTargets, selectedType, form.values.appliedAt]);
 
 
 
@@ -302,7 +312,7 @@ export function SmartHealthRecordModal({
         );
     };
 
-    const renderMethodCard = (value: 'pipette' | 'tablet' | 'collar', label: string) => {
+    const renderMethodCard = (value: 'pipette' | 'tablet' | 'collar' | 'other', label: string) => {
         const isSelected = externalMethod === value;
         return (
             <Paper
@@ -325,7 +335,9 @@ export function SmartHealthRecordModal({
                     gap: 4
                 }}
             >
-                <Text size="lg">{value === 'pipette' ? '💧' : value === 'tablet' ? '💊' : '🧣'}</Text>
+                <Text size="lg">
+                    {value === 'pipette' ? '💧' : value === 'tablet' ? '💊' : value === 'collar' ? '🧣' : '✨'}
+                </Text>
                 <Text size="xs" fw={700} c={isSelected ? 'white' : 'dimmed'} style={{ lineHeight: 1.1 }}>{label}</Text>
             </Paper>
         );
@@ -443,8 +455,8 @@ export function SmartHealthRecordModal({
                 </SimpleGrid>
             ) : (
                 <Stack>
-                    {/* Suggestions Area */}
-                    {(selectedType === 'vaccine' || selectedType === 'deworming' || selectedType === 'external_deworming') && suggestions.length > 0 && (
+                    {/* Suggestions Area - Hidden for External Deworming as per user request */}
+                    {(selectedType === 'vaccine' || selectedType === 'deworming') && suggestions.length > 0 && (
                         <Paper bg="var(--mantine-color-blue-light)" p="md" radius="md">
                             <Group align="center" mb="xs">
                                 <IconAlertCircle size={16} color="var(--mantine-color-blue-7)" />
@@ -479,11 +491,22 @@ export function SmartHealthRecordModal({
                                     <Stack gap="sm">
                                         <Text size="sm" fw={600} c="dimmed">Configuración del Producto</Text>
 
-                                        <SimpleGrid cols={3} spacing="xs">
+                                        <SimpleGrid cols={4} spacing="xs">
                                             {renderMethodCard('pipette', 'Pipeta')}
-                                            {renderMethodCard('tablet', 'Comprimido')}
+                                            {renderMethodCard('tablet', 'Compri.')}
                                             {renderMethodCard('collar', 'Collar')}
+                                            {renderMethodCard('other', 'Otro')}
                                         </SimpleGrid>
+
+                                        {externalMethod === 'other' && (
+                                            <TextInput
+                                                label="Tipo de Producto"
+                                                placeholder="Ej: Spray, Talco, Baño..."
+                                                value={customMethodName}
+                                                onChange={(e) => setCustomMethodName(e.currentTarget.value)}
+                                                required
+                                            />
+                                        )}
 
                                         <Stack gap={4}>
                                             <Text size="xs" fw={500}>Duración</Text>
@@ -494,6 +517,20 @@ export function SmartHealthRecordModal({
                                                 {renderDurationCard('other', 'Otro')}
                                             </SimpleGrid>
                                         </Stack>
+
+                                        {externalDuration === 'other' && (
+                                            <Stack align="center">
+                                                <Text size="sm" fw={500}>Duración Personalizada</Text>
+                                                <CounterInput
+                                                    value={customDurationDays}
+                                                    onChange={(val) => setCustomDurationDays(val)}
+                                                    min={1}
+                                                    max={365}
+                                                    step={1}
+                                                    suffix="días"
+                                                />
+                                            </Stack>
+                                        )}
 
                                         <Stack gap={4}>
                                             <Text size="xs" fw={500}>Protección</Text>

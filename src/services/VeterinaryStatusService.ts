@@ -85,8 +85,8 @@ export class VeterinaryStatusService {
                 status: isCurrentDue ? 'due_now' : 'upcoming', // Green vs Yellow
                 label: isCurrentDue ? 'Es Ahora' : 'Próxima',
                 message: isCurrentDue
-                    ? `Es el momento ideal para ${primary.slot.label}.`
-                    : `Se acerca la fecha para ${primary.slot.label}.`,
+                    ? `${pet.name}: Es el momento ideal para ${primary.slot.label}.`
+                    : `${pet.name}: Se acerca la fecha para ${primary.slot.label}.`,
                 action: weightOk ? (category.includes('deworming') ? 'buy_medication' : 'visit_vet') : 'update_weight',
                 details: {
                     slot: primary.slot,

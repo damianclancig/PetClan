@@ -470,14 +470,19 @@ export const VeterinaryRules = {
 
             // Deworming Specific Logic
             if (r.type === 'deworming') {
-                // If slot is external, accept explicit external type
-                if (isSlotExternal && r.dewormingType === 'external') return true;
-                // If slot is internal, reject explicit external type
-                if (!isSlotExternal && r.dewormingType === 'external') return false;
-                // If slot is external, reject explicit internal type
-                if (isSlotExternal && r.dewormingType === 'internal') return false;
-                // If slot is internal, accept explicit internal type
-                if (!isSlotExternal && r.dewormingType === 'internal') return true;
+                // 1. If slot is External Deworming -> Only accept External records
+                if (isSlotExternal) {
+                    return r.dewormingType === 'external';
+                }
+
+                // 2. If slot is Internal Deworming -> Only accept Internal records
+                // (undefined dewormingType is treated as internal for legacy compatibility)
+                if (isDeworming) {
+                    return r.dewormingType === 'internal' || !r.dewormingType;
+                }
+
+                // 3. If slot is neither (e.g. Vaccine) -> Reject deworming records
+                return false;
             }
 
             // Fallback to text matching (Title or VaccineType string)
