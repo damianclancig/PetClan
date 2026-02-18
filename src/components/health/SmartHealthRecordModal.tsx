@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Modal, Group, Stack, Text, Button, SimpleGrid, Paper, ThemeIcon, TextInput, NumberInput, Select, Textarea, SegmentedControl, Chip } from '@mantine/core';
+import { Modal, Group, Stack, Text, Button, SimpleGrid, Paper, ThemeIcon, TextInput, NumberInput, Select, Textarea, SegmentedControl, Chip, Autocomplete } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { IconVaccine, IconStethoscope, IconScale, IconPill, IconNote, IconChevronRight, IconCheck, IconCalendarEvent, IconAlertCircle, IconBug } from '@tabler/icons-react';
@@ -90,75 +90,94 @@ export function SmartHealthRecordModal({
 
     // Calculate suggestions when type selected
     useEffect(() => {
-        if ((selectedType === 'vaccine' || selectedType === 'deworming') && petSpecies) {
-            const schedule = getVaccinationSchedule(petSpecies);
+        if (!selectedType || !petSpecies) {
+            setSuggestions([]);
+            return;
+        }
 
-            // Calculate status for all potential slots
-            const candidateSlots = schedule.filter(slot => {
-                const isVac = selectedType === 'vaccine' && !slot.vaccineType.includes('desparasitacion');
-                const isDew = selectedType === 'deworming' && slot.vaccineType.includes('desparasitacion');
-                return isVac || isDew;
-            }).map(slot => ({
-                slot,
-                ...getVaccineStatus(slot, petBirthDate, existingRecords)
-            }));
+        const schedule = getVaccinationSchedule(petSpecies);
+        const records = existingRecords || [];
 
-            // Filter logic:
-            // 1. Must be actionable (not completed, not blocked/pending far in future)
-            // 2. Prioritize 'due_now' and 'overdue'.
-            // 3. User requested "intelligent" -> Show the RECOMMENDED one.
+        // 1. Strict Category Filtering
+        const relevantSlots = schedule.filter(slot => {
+            const isDeworming = slot.vaccineType.some(t => t.includes('desparasitacion') || t.includes('deworming'));
+            const isExternal = slot.vaccineType.some(t => t === 'external' || t === 'pulgas' || t === 'garrapatas' || t.includes('pipeta'));
 
-            // Sort by priority: Overdue > Due Now > Upcoming > Current Due
-            const priorityMap: Record<string, number> = {
-                'overdue': 4,
-                'due_now': 3,
-                'current_due': 3,
-                'due_soon': 2,
-                'pending': 1, // Only if very close?
-                'completed': 0,
-                'missed_replaced': 0
-            };
-
-            const actionable = candidateSlots.filter(c => priorityMap[c.status] >= 2);
-
-            // Sort by priority desc (Higher priority first)
-            actionable.sort((a, b) => priorityMap[b.status] - priorityMap[a.status]);
-
-            // "Winner Takes All" Logic:
-            // If we have distinct Priorities, show ONLY the highest priority group.
-            // Example: If we have "Due Now" (3) and "Due Soon" (2), show ONLY "Due Now".
-            // Don't distract user with "Upcoming" if there is something "Due Today".
-
-            if (actionable.length > 0) {
-                const maxPriority = priorityMap[actionable[0].status];
-                // Filter to keep only those with the top priority found
-                const topTier = actionable.filter(c => priorityMap[c.status] === maxPriority);
-
-                // If we still have multiple (e.g. multiple "Due Soon"), maybe allow them.
-                // But for "Due Now", usually we want the *first* sequential one.
-                // Assuming `schedule` was ordered by age, we can sort topTier by minAgeWeeks to be safe.
-                topTier.sort((a, b) => a.slot.minAgeWeeks - b.slot.minAgeWeeks);
-
-                // If strictly sequential required (e.g. 15 days before 30 days), take the first one.
-                // For now, let's show all top-tier candidates (e.g. maybe Deworming AND Vaccine are both due today).
-                setSuggestions(topTier.map(c => c.slot));
-            } else {
-                setSuggestions([]);
+            if (selectedType === 'vaccine') {
+                // Must be a vaccine (not deworming, not external)
+                return !isDeworming && !isExternal;
             }
-        } else if (selectedType === 'external_deworming') {
-            // Synthetic suggestion for External
-            setSuggestions([{
-                id: 'synthetic_external',
-                label: 'Pipeta / Comprimido Mensual',
-                ageLabel: 'Mensual',
-                minAgeWeeks: 0,
-                maxAgeWeeks: 1000,
-                vaccineType: ['external'],
-                isCore: true
-            }]);
+
+            if (selectedType === 'deworming') {
+                // Must be internal deworming
+                return isDeworming && !isExternal;
+            }
+
+            // External deworming handled separately via synthetic or special UI usually, 
+            // but if we used slots for it:
+            if (selectedType === 'external_deworming') {
+                return isExternal;
+            }
+
+            return false;
+        });
+
+        // 2. Calculate Status for Relevant Slots
+        const candidates = relevantSlots.map(slot => ({
+            slot,
+            ...getVaccineStatus(slot, petBirthDate, records)
+        }));
+
+        // 3. Priority & Filtering Logic
+        // We want to show "Due Now", "Overdue", and maybe "Due Soon".
+        // We do NOT want to show "Completed" or "Missed/Replaced" (unless debugging).
+
+        const priorityScore = (status: string, isCore: boolean): number => {
+            switch (status) {
+                case 'overdue': return 4 + (isCore ? 1 : 0);
+                case 'due_now': return 4 + (isCore ? 1 : 0); // Equal urgency to overdue
+                case 'current_due': return 3 + (isCore ? 1 : 0);
+                case 'due_soon': return 2;
+                default: return 0;
+            }
+        };
+
+        const actionable = candidates.filter(c => {
+            const score = priorityScore(c.status, c.slot.isCore);
+            return score >= 2; // Show Due Soon, Current Due, Due Now, Overdue
+        });
+
+        // Sort by Score Descending
+        actionable.sort((a, b) => {
+            const scoreA = priorityScore(a.status, a.slot.isCore);
+            const scoreB = priorityScore(b.status, b.slot.isCore);
+            return scoreB - scoreA;
+        });
+
+        // 4. Selection Strategy
+        // Instead of "Winner Takes All", we show TOP recommendations.
+        // If we have multiple high-priority core vaccines (e.g. Polyvalent + Rabies), show BOTH.
+
+        if (actionable.length > 0) {
+            const bestScore = priorityScore(actionable[0].status, actionable[0].slot.isCore);
+            // Show everything that is within a close range of the best score, 
+            // OR explicitly all "Core" vaccines that are due.
+
+            // Heuristic: Show all candidates that are at least "Current Due" (Score >= 3)
+            // If nothing is Current Due, show "Due Soon".
+
+            const threshold = bestScore >= 3 ? 3 : 2;
+            const finalSuggestions = actionable.filter(c => priorityScore(c.status, c.slot.isCore) >= threshold);
+
+            // Sort by age (legacy order) effectively to keep logical order (e.g. Dose 1 before Dose 2)
+            // utilizing the original index in schedule or minAgeWeeks
+            finalSuggestions.sort((a, b) => a.slot.minAgeWeeks - b.slot.minAgeWeeks);
+
+            setSuggestions(finalSuggestions.map(c => c.slot));
         } else {
             setSuggestions([]);
         }
+
     }, [selectedType, petSpecies, existingRecords, petBirthDate]);
 
     // External Deworming State
@@ -221,6 +240,9 @@ export function SmartHealthRecordModal({
 
 
     const handleTypeSelect = (type: RecordType) => {
+        // Reset form to base state to prevent carry-over from previous edits if any
+        form.reset();
+
         // Intercept Weight Selection if handler provided
         if (type === 'weight' && onSwitchToWeight) {
             onSwitchToWeight();
@@ -229,6 +251,7 @@ export function SmartHealthRecordModal({
 
         setSelectedType(type);
 
+        // Set specific defaults based on type
         if (type === 'external_deworming') {
             form.setValues({
                 type: 'deworming',
@@ -484,10 +507,22 @@ export function SmartHealthRecordModal({
                                 </Paper>
                             )}
 
-                            <TextInput
+                            <Autocomplete
                                 label="Título"
                                 placeholder="Ej: Triple Felina"
                                 required
+                                data={
+                                    selectedType === 'vaccine' ? [
+                                        'Polivalente Canina', 'Sextuple', 'Quíntuple',
+                                        'Antirrábica', 'Tos de las Perreras (Bordetella)',
+                                        'Giardia', 'Triple Felina', 'Leucemia Felina'
+                                    ] :
+                                        selectedType === 'deworming' ? [
+                                            'Desparasitación Interna (Comprimido)',
+                                            'Desparasitación Interna (Jarabe)',
+                                            'Antiparasitario General'
+                                        ] : []
+                                }
                                 {...form.getInputProps('title')}
                             />
 
@@ -546,7 +581,17 @@ export function SmartHealthRecordModal({
                             />
 
                             <Group justify="space-between" mt="xl">
-                                <Button variant="subtle" color="gray" onClick={() => setStep(1)} leftSection={<IconChevronRight style={{ transform: 'rotate(180deg)' }} />}>
+                                <Button
+                                    variant="subtle"
+                                    color="gray"
+                                    onClick={() => {
+                                        setStep(1);
+                                        setSelectedType(null);
+                                        form.reset();
+                                        setSuggestions([]);
+                                    }}
+                                    leftSection={<IconChevronRight style={{ transform: 'rotate(180deg)' }} />}
+                                >
                                     Volver
                                 </Button>
                                 <Button type="submit" loading={isCreating}>
