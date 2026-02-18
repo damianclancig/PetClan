@@ -10,25 +10,29 @@ import React, { useState, useEffect } from 'react';
 import { formatDateForInput } from '@/lib/dateUtils';
 import { IconAlertTriangle, IconArchive, IconTrash } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
+import { useHealthRecords } from '@/hooks/useHealthRecords';
+import { IHealthRecord } from '@/models/HealthRecord';
 
 export default function EditPetPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
     const { pet, isLoading, isError, updatePet, deletePet, isUpdating, isDeleting } = usePet(id);
+    const { records } = useHealthRecords(id); // Fetch records for validation
     const router = useRouter();
     const t = useTranslations('NewPet');
     const tCommon = useTranslations('Common');
 
-    // Status state
-    const [status, setStatus] = useState<string>('active');
+    // Calculate last record date for validation
+    const lastRecordDate = React.useMemo(() => {
+        if (!records || records.length === 0) return undefined;
+        // Find the most recent date from all records
+        const sorted = [...(records as IHealthRecord[])].sort((a, b) =>
+            new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime()
+        );
+        return sorted[0]?.appliedAt ? new Date(sorted[0].appliedAt) : undefined;
+    }, [records]);
 
     // Delete/Archive modal
     const [deleteOpened, { open: openDeleteData, close: closeDeleteData }] = useDisclosure(false);
-
-    useEffect(() => {
-        if (pet) {
-            setStatus(pet.status || 'active');
-        }
-    }, [pet]);
 
     if (isLoading) return <Container><Loader /></Container>;
     if (isError || !pet) return <Container><Text>Error loading pet</Text></Container>;
@@ -46,11 +50,14 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
         diseases: pet.diseases,
         treatments: pet.treatments,
         notes: pet.notes,
+        status: pet.status,
+        deathDate: pet.deathDate ? formatDateForInput(pet.deathDate) : undefined,
     }), [pet]);
 
     const onSubmit = async (data: PetFormValues) => {
         try {
-            await updatePet({ id, data: { ...data, status } });
+            // Status and DeathDate are now part of 'data'
+            await updatePet({ id, data: { ...data } });
 
             // Detect weight change and record history
             if (pet.weight !== data.weight) {
@@ -121,38 +128,13 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
             <Title order={2} mb="xl">{tCommon('edit')} {pet.name}</Title>
 
             <Paper withBorder shadow="md" p={{ base: 10, xs: 30 }} radius="md" mb="xl">
-                <Stack mb="lg">
-                    <Title order={4}>Estado de la Mascota</Title>
-                    <Select
-                        label="Estado actual"
-                        data={[
-                            { value: 'active', label: 'Activo (En Casa)' },
-                            { value: 'lost', label: '🚔 Perdido (Alerta)' },
-                            { value: 'deceased', label: '🕊️ Fallecido' },
-                            { value: 'archived', label: 'Archivado' }
-                        ]}
-                        value={status}
-                        onChange={(val) => setStatus(val || 'active')}
-                    />
-
-                    {status === 'lost' && (
-                        <Alert variant="light" color="red" title="Alerta de Mascota Perdida" icon={<IconAlertTriangle />}>
-                            Al marcar como perdido, la mascota se destacará en rojo en tu panel para facilitar su identificación.
-                        </Alert>
-                    )}
-
-                    {status === 'deceased' && (
-                        <Alert variant="light" color="gray" title="En Memoria">
-                            La mascota se moverá al historial, conservando sus registros médicos como recuerdo.
-                        </Alert>
-                    )}
-                </Stack>
-
                 <PetForm
                     initialValues={initialValues}
                     onSubmit={onSubmit}
                     isLoading={isUpdating}
                     submitLabel={tCommon('save')}
+                    lastRecordDate={lastRecordDate}
+                    isEditMode={true}
                 />
             </Paper>
 

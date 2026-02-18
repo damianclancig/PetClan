@@ -1,6 +1,7 @@
 'use client';
 
-import { TextInput, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid } from '@mantine/core';
+import { TextInput, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid, Select, Alert } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,17 +28,21 @@ export type PetFormValues = {
     diseases?: string;
     treatments?: string;
     notes?: string;
+    status: 'active' | 'lost' | 'deceased' | 'archived';
+    deathDate?: string;
 };
 
 interface PetFormProps {
     initialValues?: Partial<PetFormValues>;
-    onSubmit: (values: PetFormValues) => void;
-    isLoading: boolean;
+    onSubmit: (data: PetFormValues) => void;
+    isLoading?: boolean;
     submitLabel?: string;
+    lastRecordDate?: Date; // New prop for validation
+    isEditMode?: boolean;
 }
 
-export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: PetFormProps) {
-    const t = useTranslations('NewPet');
+export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastRecordDate, isEditMode }: PetFormProps) {
+    const t = useTranslations('NewPet'); // Use NewPet translations for labels
     const tCommon = useTranslations('Common');
     const tValidation = useTranslations('Validation');
     const [file, setFile] = useState<File | null>(null);
@@ -59,6 +64,8 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         diseases: z.string().optional(),
         treatments: z.string().optional(),
         notes: z.string().optional(),
+        status: z.enum(['active', 'lost', 'deceased', 'archived']),
+        deathDate: z.string().optional(),
     });
 
     const { register, handleSubmit, formState: { errors }, setValue, watch, control, reset } = useForm<PetFormValues>({
@@ -66,6 +73,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         defaultValues: {
             species: 'dog',
             sex: 'male',
+            status: 'active',
             ...initialValues,
         },
     });
@@ -254,6 +262,69 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                 minRows={2}
                 mb={{ base: 'xs', md: 'md' }}
             />
+
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb={{ base: 'md', md: 'lg' }}>
+                <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            label="Estado"
+                            data={[
+                                { value: 'active', label: 'Activo' },
+                                { value: 'lost', label: 'Perdido' },
+                                { value: 'deceased', label: 'Fallecido' },
+                                { value: 'archived', label: 'Archivado' },
+                            ]}
+                            value={field.value}
+                            onChange={(val) => field.onChange(val)}
+                        />
+                    )}
+                />
+
+                {watch('status') === 'deceased' && (
+                    <Controller
+                        name="deathDate"
+                        control={control}
+                        render={({ field }) => (
+                            <div>
+                                <DateInput
+                                    label="Fecha de Fallecimiento"
+                                    placeholder="DD/MM/AAAA"
+                                    value={field.value ? new Date(field.value) : null}
+                                    onChange={(date) => field.onChange(date?.toString())}
+                                    maxDate={new Date()}
+                                    minDate={lastRecordDate}
+                                    valueFormat="DD/MM/YYYY"
+                                    locale="es"
+                                    error={undefined} // Error handling passed via form state usually, or custom logic
+                                />
+                                {lastRecordDate && (
+                                    <Text size="xs" c="dimmed" mt={4} style={{ lineHeight: 1.2 }}>
+                                        Debe ser posterior al último registro ({lastRecordDate.toLocaleDateString()})
+                                    </Text>
+                                )}
+                            </div>
+                        )}
+                    />
+                )}
+            </SimpleGrid>
+
+            {watch('status') === 'lost' && (
+                <Stack mb="lg">
+                    <Alert variant="light" color="red" title="⚠️ Alerta de Mascota Perdida">
+                        Al marcar como perdido, la mascota se destacará en rojo en tu panel para facilitar su identificación.
+                    </Alert>
+                </Stack>
+            )}
+
+            {watch('status') === 'deceased' && (
+                <Stack mb="lg">
+                    <Alert variant="light" color="gray" title="🕊️ En Memoria">
+                        La mascota se moverá al historial, conservando sus registros médicos como recuerdo.
+                    </Alert>
+                </Stack>
+            )}
 
             {/* Mobile Buttons: Full width, side by side */}
             <Box hiddenFrom="xs" mt="xl">

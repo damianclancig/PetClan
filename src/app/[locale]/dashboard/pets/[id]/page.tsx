@@ -93,7 +93,35 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     );
     const hasRabies = !hasOverdueRabies && hasCompletedRabies;
 
+    // --- Deceased View (In Memoriam) ---
+    if (pet.status === 'deceased') {
+        return (
+            <PageContainer>
+                <PetProfileHeader
+                    pet={pet}
+                    activeTab="timeline"
+                    onTabChange={() => { }}
+                    onShare={() => { }}
+                    onAddRecord={undefined}
+                />
 
+                <Stack gap="xl">
+                    <Paper withBorder p="md" radius="md">
+                        <Title order={4} mb="md">Recuerdos y Eventos</Title>
+                        <HealthTimeline
+                            petId={pet._id as unknown as string}
+                            petSpecies={pet.species}
+                            petBirthDate={pet.birthDate}
+                            petDeathDate={pet.deathDate}
+                            readOnly={true}
+                        />
+                    </Paper>
+
+                    <PetExtraInfoCard pet={pet as any} />
+                </Stack>
+            </PageContainer>
+        );
+    }
 
     return (
         <PageContainer>

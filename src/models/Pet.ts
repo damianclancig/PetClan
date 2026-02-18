@@ -19,6 +19,7 @@ export interface IPet {
     riskLevel: 'low' | 'medium' | 'high';
     status: 'active' | 'lost' | 'deceased' | 'archived';
     owners: Types.ObjectId[];
+    deathDate?: Date; // New field for deceased pets
     createdAt: Date;
     updatedAt: Date;
 }
@@ -53,6 +54,7 @@ const PetSchema = new Schema<IPet>({
         default: 'active',
         required: true
     },
+    deathDate: { type: Date }, // Optional
     owners: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

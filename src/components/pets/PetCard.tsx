@@ -140,6 +140,29 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                             {/* Simulated Vaccine Status */}
                             {/* <Badge circle size="sm" color="green" title="Vacunas al día">✓</Badge> */}
                         </Stack>
+
+                        {/* Deceased Date Overlay */}
+                        {pet.status === 'deceased' && (
+                            <Box
+                                style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    textAlign: 'center',
+                                    width: 'auto',
+                                    padding: '4px 12px',
+                                    zIndex: 10,
+                                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                    borderRadius: '16px',
+                                    backdropFilter: 'blur(2px)'
+                                }}
+                            >
+                                <Text size="sm" c="white" fw={500} fs="italic">
+                                    🕊️ {dayjs(pet.birthDate).format('YYYY')} - {pet.deathDate ? dayjs(pet.deathDate).format('YYYY') : '...'}
+                                </Text>
+                            </Box>
+                        )}
                     </Card.Section>
 
                     <Card.Section p="md">

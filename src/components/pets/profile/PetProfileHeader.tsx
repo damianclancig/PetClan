@@ -198,66 +198,99 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
 
                     {/* Actions Top Right */}
                     <Flex style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }} gap="xs" align="center">
-                        {onAddRecord && (
+                        {/* Only show actions if NOT deceased */}
+                        {pet.status !== 'deceased' && (
+                            <>
+                                {onAddRecord && (
+                                    <MagicParticles color="white">
+                                        <Button
+                                            variant="white"
+                                            color={identityColor}
+                                            radius="xl"
+                                            leftSection={<IconPlus size={18} />}
+                                            onClick={onAddRecord}
+                                            style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)', fontWeight: 600 }}
+                                            className="shiny-button"
+                                            display={{ base: 'none', xs: 'flex' }}
+                                        >
+                                            Actualizar Libreta
+                                        </Button>
+                                    </MagicParticles>
+                                )}
+                                <MagicParticles onClick={onShare} color="white">
+                                    <ActionIconMotion>
+                                        <ActionIcon
+                                            variant="white"
+                                            color={identityColor}
+                                            size="lg"
+                                            radius="xl"
+                                            aria-label="Compartir"
+                                            style={{ pointerEvents: 'none' }} // Click handled by wrapper
+                                        >
+                                            <IconShare size={18} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
+                                </MagicParticles>
+
+                                <MagicParticles color="white">
+                                    <ActionIconMotion>
+                                        <ActionIcon
+                                            component={Link}
+                                            href={`/dashboard/pets/${pet._id}/edit`}
+                                            variant="white"
+                                            color={identityColor}
+                                            size="lg"
+                                            radius="xl"
+                                            aria-label="Editar"
+                                        >
+                                            <IconPencil size={18} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
+                                </MagicParticles>
+                                <MagicParticles color="white">
+                                    <ActionIconMotion>
+                                        <ActionIcon
+                                            variant="white"
+                                            color={identityColor}
+                                            size="lg"
+                                            radius="xl"
+                                            aria-label="Simular Tiempo"
+                                            onClick={() => setShowTimeTravel(true)}
+                                        >
+                                            <IconHistory size={18} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
+                                </MagicParticles>
+                            </>
+                        )}
+
+                        {/* If deceased, maybe show only edit to allow restoring/deleting? 
+                            User said "neither share nor update record". 
+                            Usually one wants to be able to edit (to fix the date or delete).
+                            Let's keep Edit button but hide others?
+                            User said: "tampoco se podrá compartir, ni actualizar libreta". 
+                            Did not explicitly forbid "Edit". 
+                            However, the prompt implies a read-only view.
+                            But if I hide Edit, they can never change it back if they made a mistake or want to delete.
+                            I will SHOW Edit but HIDE Share/Add/TimeTravel. 
+                        */}
+                        {pet.status === 'deceased' && (
                             <MagicParticles color="white">
-                                <Button
-                                    variant="white"
-                                    color={identityColor}
-                                    radius="xl"
-                                    leftSection={<IconPlus size={18} />}
-                                    onClick={onAddRecord}
-                                    style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)', fontWeight: 600 }}
-                                    className="shiny-button"
-                                    display={{ base: 'none', xs: 'flex' }}
-                                >
-                                    Actualizar Libreta
-                                </Button>
+                                <ActionIconMotion>
+                                    <ActionIcon
+                                        component={Link}
+                                        href={`/dashboard/pets/${pet._id}/edit`}
+                                        variant="white"
+                                        color={identityColor}
+                                        size="lg"
+                                        radius="xl"
+                                        aria-label="Editar"
+                                    >
+                                        <IconPencil size={18} />
+                                    </ActionIcon>
+                                </ActionIconMotion>
                             </MagicParticles>
                         )}
-                        <MagicParticles onClick={onShare} color="white">
-                            <ActionIconMotion>
-                                <ActionIcon
-                                    variant="white"
-                                    color={identityColor}
-                                    size="lg"
-                                    radius="xl"
-                                    aria-label="Compartir"
-                                    style={{ pointerEvents: 'none' }} // Click handled by wrapper
-                                >
-                                    <IconShare size={18} />
-                                </ActionIcon>
-                            </ActionIconMotion>
-                        </MagicParticles>
-
-                        <MagicParticles color="white">
-                            <ActionIconMotion>
-                                <ActionIcon
-                                    component={Link}
-                                    href={`/dashboard/pets/${pet._id}/edit`}
-                                    variant="white"
-                                    color={identityColor}
-                                    size="lg"
-                                    radius="xl"
-                                    aria-label="Editar"
-                                >
-                                    <IconPencil size={18} />
-                                </ActionIcon>
-                            </ActionIconMotion>
-                        </MagicParticles>
-                        <MagicParticles color="white">
-                            <ActionIconMotion>
-                                <ActionIcon
-                                    variant="white"
-                                    color={identityColor}
-                                    size="lg"
-                                    radius="xl"
-                                    aria-label="Simular Tiempo"
-                                    onClick={() => setShowTimeTravel(true)}
-                                >
-                                    <IconHistory size={18} />
-                                </ActionIcon>
-                            </ActionIconMotion>
-                        </MagicParticles>
                     </Flex>
                 </Box>
 
@@ -347,45 +380,60 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                         {pet.breed}
                                     </Badge>
 
-                                    <Badge
-                                        size="md"
-                                        radius="md"
-                                        variant="light"
-                                        color="gray" // Gray for date
-                                        leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
-                                        style={{ textTransform: 'none' }}
-                                    >
-                                        {dayjs(pet.birthDate).utc().format('DD/MM/YY')} ({formatAge(pet.birthDate)})
-                                    </Badge>
+                                    {pet.status === 'deceased' ? (
+                                        <Badge
+                                            size="md"
+                                            radius="md"
+                                            variant="light"
+                                            color="gray"
+                                            leftSection={<Text size="xs">🕊️</Text>}
+                                            style={{ textTransform: 'none' }}
+                                        >
+                                            {dayjs(pet.birthDate).utc().format('YYYY')} - {pet.deathDate ? dayjs(pet.deathDate).utc().format('YYYY') : '...'}
+                                        </Badge>
+                                    ) : (
+                                        <Badge
+                                            size="md"
+                                            radius="md"
+                                            variant="light"
+                                            color="gray" // Gray for date
+                                            leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
+                                            style={{ textTransform: 'none' }}
+                                        >
+                                            {dayjs(pet.birthDate).utc().format('DD/MM/YY')} ({formatAge(pet.birthDate)})
+                                        </Badge>
+                                    )}
                                 </Flex>
                             </Flex>
                         </Box>
                     </Flex>
 
-                    <Tabs
-                        value={activeTab}
-                        onChange={onTabChange}
-                        variant="outline"
-                        radius="md"
-                        mt="xl"
-                        color={identityColor}
-                    >
-                        <Tabs.List>
-                            <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                Resumen
-                                {activeTab === 'summary' && <MagicTabBackground />}
-                            </Tabs.Tab>
-                            <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                Línea de tiempo
-                                {activeTab === 'timeline' && <MagicTabBackground />}
-                            </Tabs.Tab>
-                            <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                Salud
-                                {activeTab === 'health' && <MagicTabBackground />}
-                            </Tabs.Tab>
-                            {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
-                        </Tabs.List>
-                    </Tabs>
+                    {pet.status !== 'deceased' && (
+                        <Tabs
+                            value={activeTab}
+                            onChange={onTabChange}
+                            variant="outline"
+                            radius="md"
+                            mt="xl"
+                            color={identityColor}
+                        >
+                            <Tabs.List>
+                                <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    Resumen
+                                    {activeTab === 'summary' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    Línea de tiempo
+                                    {activeTab === 'timeline' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    Salud
+                                    {activeTab === 'health' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
+                            </Tabs.List>
+                        </Tabs>
+                    )}
                 </Container>
             </Paper>
 

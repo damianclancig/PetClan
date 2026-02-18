@@ -15,12 +15,14 @@ interface HealthTimelineProps {
     petId: string;
     petSpecies?: string;
     petBirthDate?: Date;
+    petDeathDate?: Date | string; // Enable death date prop
     limit?: number;
     onViewAll?: () => void;
     onAddRecord?: () => void;
+    readOnly?: boolean;
 }
 
-export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewAll, onAddRecord }: HealthTimelineProps) {
+export function HealthTimeline({ petId, petSpecies, petBirthDate, petDeathDate, limit, onViewAll, onAddRecord, readOnly = false }: HealthTimelineProps) {
     const { records, isLoading, createRecord, isCreating } = useHealthRecords(petId);
     const [opened, { open, close }] = useDisclosure(false);
     const t = useTranslations('Health');
@@ -28,6 +30,30 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
 
     // Sort records using centralized logic (DRY)
     const sortedRecords = sortHealthRecords(records as IHealthRecord[] || []);
+
+    // Inject "Death" event if exists (most recent usually)
+    if (petDeathDate) {
+        const deathDateObj = new Date(petDeathDate);
+        sortedRecords.unshift({
+            _id: 'death-event',
+            type: 'death_event' as any,
+            title: 'Hasta siempre 🕊️',
+            description: 'Siempre en nuestro recuerdo.',
+            appliedAt: deathDateObj,
+            petId: petId as any,
+            createdBy: 'system' as any,
+            createdAt: deathDateObj,
+            version: 1,
+            isSystemEvent: true
+        } as any);
+
+        // Re-sort to ensure correct order if other records happen to be "future" relative to death (unlikely but possible if scheduled)
+        // Actually, sortHealthRecords sorts descending by appliedAt. 
+        // If we just unshift, it might be out of order if there are future scheduled vaccines.
+        // It is safer to push and re-sort, OR rely on it being the "final" event effectively.
+        // Let's rely on standard sort to be safe:
+        sortedRecords.sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
+    }
 
     // Inject "Birth" event at the end (oldest)
     if (petBirthDate) {
@@ -42,11 +68,14 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
             createdAt: petBirthDate,
             version: 1
         });
+        // Ensure birth is last
+        sortedRecords.sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
     }
 
     if (isLoading) return <HealthTimelineSkeleton />;
 
     const handleAdd = () => {
+        if (readOnly) return;
         if (onAddRecord) {
             onAddRecord();
         } else {
@@ -60,7 +89,9 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
         <>
             <Group justify="space-between" mb="lg">
                 <Text size="lg" fw={500}>{t('title')}</Text>
-                <Button onClick={handleAdd} size="xs" variant="light" color={identityColor}>Actualizar Libreta</Button>
+                {!readOnly && (
+                    <Button onClick={handleAdd} size="xs" variant="light" color={identityColor}>Actualizar Libreta</Button>
+                )}
             </Group>
 
             {(!sortedRecords || sortedRecords.length === 0) && <Text c="dimmed">{t('noRecords')}</Text>}
@@ -81,6 +112,8 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
                             bullet={
                                 record.type === 'birth_event' ? (
                                     <div style={{ fontSize: 16 }}>🎂</div>
+                                ) : record.type === 'death_event' ? (
+                                    <div style={{ fontSize: 16 }}>🕊️</div>
                                 ) : (
                                     <div
                                         style={{
@@ -103,7 +136,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, limit, onViewA
                             )}
                             <Group gap="xs" mt={4}>
                                 <Badge size="xs" color={typeColor} variant="subtle">
-                                    {record.type === 'birth_event' ? 'Hito' : t(`types.${record.type}`)}
+                                    {(record.type === 'birth_event' || record.type === 'death_event') ? 'Hito' : t(`types.${record.type}`)}
                                 </Badge>
                                 <Text size="xs" c="dimmed">{formatDate(record.appliedAt)}</Text>
                             </Group>
