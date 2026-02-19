@@ -40,9 +40,8 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                     <Paper
                         key={index}
                         radius="md"
-                        overflow="hidden"
                         withBorder
-                        style={{ cursor: 'pointer', position: 'relative' }}
+                        style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
                         onClick={() => {
                             setSelectedPhoto(photo);
                             open();
