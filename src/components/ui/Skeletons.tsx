@@ -1,3 +1,5 @@
+'use client';
+
 import { Skeleton, Card, Group, Stack, Grid, SimpleGrid, Box, Paper } from '@mantine/core';
 import { PageContainer } from '@/components/layout/PageContainer';
 

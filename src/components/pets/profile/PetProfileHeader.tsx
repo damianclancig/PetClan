@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Avatar, Title, Text, Flex, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button, Affix, Transition } from '@mantine/core';
+import { Box, Container, Avatar, Title, Text, Flex, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button, Affix, Transition, Tooltip } from '@mantine/core';
 import { useWindowScroll } from '@mantine/hooks';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { PetSpeciesBadge } from '../PetSpeciesBadge';
@@ -9,10 +9,13 @@ import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { formatAge } from '@/lib/dateUtils';
-import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus } from '@tabler/icons-react';
+import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
+import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
 import { useState } from 'react';
 import { TimeTravelModal } from '@/components/debug/TimeTravelModal';
+import { useUpdatePetPhoto } from '@/hooks/useUpdatePetPhoto';
+import { FileButton, Loader } from '@mantine/core';
 
 interface PetProfileHeaderProps {
     pet: any;
@@ -27,6 +30,8 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
     const tCommon = useTranslations('Common');
     const identityColor = getPetIdentityColor(pet._id);
     const [showTimeTravel, setShowTimeTravel] = useState(false);
+    const isDeceased = pet.status === 'deceased';
+    const { updatePhoto, isUploading } = useUpdatePetPhoto(pet._id);
 
     const [scroll] = useWindowScroll();
     const showSticky = scroll.y > 180;
@@ -306,28 +311,55 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                         align={{ base: 'center', xs: 'flex-start' }} // Center vertically on mobile (for half-color alignment), Top on desktop
                         gap={{ base: 'sm', xs: 'md' }}
                     >
-                        <Avatar
-                            src={pet.photoUrl}
-                            size={120}
-                            radius={120}
-                            style={{
-                                border: '4px solid var(--bg-surface)',
-                                boxShadow: 'var(--mantine-shadow-md)',
-                                background: !pet.photoUrl ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-9))` : undefined,
-                                color: 'white',
-                                fontSize: '3rem',
-                                fontWeight: 700,
-                                flexShrink: 0 // Do not shrink avatar unless absolutely necessary? User asked for resizing if name is long.
-                            }}
-                            styles={{
-                                root: {
-                                    flexShrink: 1, // Allow shrinking on small screens if needed
-                                    minWidth: 80, // Minimum size
-                                }
-                            }}
-                        >
-                            {pet.name.charAt(0).toUpperCase()}
-                        </Avatar>
+                        <Box style={{ position: 'relative', display: 'inline-block' }}>
+                            <Avatar
+                                src={pet.photoUrl}
+                                size={120}
+                                radius={120}
+                                style={{
+                                    border: '4px solid var(--bg-surface)',
+                                    boxShadow: 'var(--mantine-shadow-md)',
+                                    background: !pet.photoUrl ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-9))` : undefined,
+                                    color: 'white',
+                                    fontSize: '3rem',
+                                    fontWeight: 700,
+                                    flexShrink: 0
+                                }}
+                                styles={{
+                                    root: {
+                                        flexShrink: 1,
+                                        minWidth: 80,
+                                    }
+                                }}
+                            >
+                                {pet.name.charAt(0).toUpperCase()}
+                            </Avatar>
+                            {!isDeceased && (
+                                <FileButton onChange={(file) => file && updatePhoto(file)} accept="image/png,image/jpeg,image/webp">
+                                    {(props) => (
+                                        <Tooltip label="Cambiar foto de perfil" withArrow position="right">
+                                            <ActionIcon
+                                                {...props}
+                                                variant="filled"
+                                                color="blue"
+                                                size="lg"
+                                                radius="xl"
+                                                loading={isUploading}
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: 5,
+                                                    right: 5,
+                                                    border: '2px solid var(--bg-surface)',
+                                                    zIndex: 10
+                                                }}
+                                            >
+                                                <IconCamera size={18} />
+                                            </ActionIcon>
+                                        </Tooltip>
+                                    )}
+                                </FileButton>
+                            )}
+                        </Box>
 
                         <Box
                             style={{ flex: 1, minWidth: 0, zIndex: 10 }}
@@ -417,7 +449,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                             mt="xl"
                             color={identityColor}
                         >
-                            <Tabs.List>
+                            <Tabs.List style={{ flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                                 <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
                                     Resumen
                                     {activeTab === 'summary' && <MagicTabBackground />}
@@ -430,12 +462,16 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                     Salud
                                     {activeTab === 'health' && <MagicTabBackground />}
                                 </Tabs.Tab>
+                                <Tabs.Tab value="gallery" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    Galería
+                                    {activeTab === 'gallery' && <MagicTabBackground />}
+                                </Tabs.Tab>
                                 {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
                             </Tabs.List>
                         </Tabs>
                     )}
                 </Container>
-            </Paper>
+            </Paper >
 
             {onAddRecord && (
                 <Affix position={{ bottom: 20, right: 20 }} zIndex={199}>
@@ -463,7 +499,8 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                         )}
                     </Transition>
                 </Affix>
-            )}
+            )
+            }
         </>
     );
 }

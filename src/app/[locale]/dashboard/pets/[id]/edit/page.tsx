@@ -135,6 +135,7 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
                     submitLabel={tCommon('save')}
                     lastRecordDate={lastRecordDate}
                     isEditMode={true}
+                    petId={id}
                 />
             </Paper>
 

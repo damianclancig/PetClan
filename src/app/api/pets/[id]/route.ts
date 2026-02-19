@@ -5,6 +5,7 @@ import dbConnect from '@/lib/mongodb';
 import Pet from '@/models/Pet';
 import User from '@/models/User'; // Import User model
 import { sendPetUpdateEmail } from '@/lib/email';
+import { formatAge } from '@/lib/dateUtils';
 
 async function getAuthenticatedUser() {
     const session = await getServerSession(authOptions);
@@ -57,6 +58,30 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     // If weight is being updated, automatically set lastWeightUpdate
     if (body.weight !== undefined) {
         body.lastWeightUpdate = new Date();
+    }
+
+    // Check for photo update history
+    if (body.photoUrl && body.photoUrl !== existingPet.photoUrl) {
+        // Extract public_id roughly if possible, or just store URL
+        // Cloudinary URL format usually contains public_id, but here simple storage is fine
+        // Ideally frontend sends publicId, but for now we auto-track URL changes
+
+        const ageDescription = existingPet.birthDate
+            ? `Edad: ${formatAge(existingPet.birthDate)}`
+            : 'Foto de perfil actualizada';
+
+        const newPhotoEntry = {
+            url: body.photoUrl,
+            publicId: body.publicId || 'unknown', // Frontend should ideally send this
+            date: new Date(),
+            description: ageDescription
+        };
+
+        // Add to history
+        await Pet.updateOne(
+            { _id: id },
+            { $push: { photos: newPhotoEntry } }
+        );
     }
 
     const updatedPet = await Pet.findByIdAndUpdate(id, body, { new: true });

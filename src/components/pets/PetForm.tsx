@@ -14,6 +14,7 @@ import { SexSelector } from './form/SexSelector';
 import { BirthDatePicker } from './form/BirthDatePicker';
 import { WeightInput } from './form/WeightInput';
 import { ModalDatePicker } from '../ui/ModalDatePicker';
+import { CloudinaryUploadButton } from '../ui/CloudinaryUploadButton';
 import 'dayjs/locale/es';
 
 export type PetFormValues = {
@@ -40,13 +41,13 @@ interface PetFormProps {
     submitLabel?: string;
     lastRecordDate?: Date; // New prop for validation
     isEditMode?: boolean;
+    petId?: string; // Optional, for folder organization
 }
 
-export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastRecordDate, isEditMode }: PetFormProps) {
+export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastRecordDate, isEditMode, petId }: PetFormProps) {
     const t = useTranslations('NewPet'); // Use NewPet translations for labels
     const tCommon = useTranslations('Common');
     const tValidation = useTranslations('Validation');
-    const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(initialValues?.photoUrl || null);
     const resetRef = useRef<() => void>(null);
 
@@ -90,43 +91,12 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
         }
     }, [initialValues, reset]);
 
-    const processImage = (file: File) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target?.result as string;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const size = 200; // Target size 200x200
+    // Manually register photoUrl so it is included in handleSubmit data
+    useEffect(() => {
+        register('photoUrl');
+    }, [register]);
 
-                canvas.width = size;
-                canvas.height = size;
 
-                if (ctx) {
-                    // Center Crop Logic
-                    const minDim = Math.min(img.width, img.height);
-                    const sx = (img.width - minDim) / 2;
-                    const sy = (img.height - minDim) / 2;
-
-                    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
-
-                    // Export as JPEG with 0.8 quality
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    setPreview(dataUrl);
-                    setValue('photoUrl', dataUrl);
-                }
-            };
-        };
-    };
-
-    const handleFileChange = (payload: File | null) => {
-        setFile(payload);
-        if (payload) {
-            processImage(payload);
-        }
-    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -136,18 +106,23 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                     {!preview && (initialValues?.name?.charAt(0) || '?')}
                 </Avatar>
                 <Group gap="xs">
-                    <FileButton onChange={handleFileChange} accept="image/png,image/jpeg">
-                        {(props) => <Button {...props} size="xs" variant="light">
-                            {preview ? 'Cambiar Foto' : 'Subir Foto'}
-                        </Button>}
-                    </FileButton>
+                    <CloudinaryUploadButton
+                        onUploadComplete={(result) => {
+                            setPreview(result.url);
+                            setValue('photoUrl', result.url);
+                            // We can also track photos history here if needed, 
+                            // but usually history is appended on backend or handled separately
+                        }}
+                        label={preview ? 'Cambiar Foto' : 'Subir Foto'}
+                        compact
+                        folder={petId ? `petclan/profiles/${petId}` : 'petclan/profiles/temp'}
+                    />
                     {preview && (
                         <ActionIcon
                             color="red"
                             variant="light"
                             size="md" // matches xs button height roughly
                             onClick={() => {
-                                setFile(null);
                                 setPreview(null);
                                 setValue('photoUrl', '');
                                 resetRef.current?.();

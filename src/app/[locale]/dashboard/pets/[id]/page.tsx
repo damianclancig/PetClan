@@ -13,25 +13,24 @@ import { SharePetModal } from '@/components/pets/SharePetModal';
 import { PetExtraInfoCard } from '@/components/pets/profile/PetExtraInfoCard';
 import { useTranslations } from 'next-intl';
 import { IconPlus } from '@tabler/icons-react';
-import React from 'react';
+import { use, useState, useMemo } from 'react';
 import { WeightControl } from '@/components/pets/WeightControl';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 import { SmartHealthRecordModal } from '@/components/health/SmartHealthRecordModal';
 import { VaccinationCalendar } from '@/components/pets/VaccinationCalendar';
-import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } from '@/utils/vaccinationUtils';
+import { getPetHealthSummary } from '@/utils/vaccinationUtils';
 import { IHealthRecord } from '@/models/HealthRecord';
 import DewormingCard from '@/components/health/DewormingCard';
-
-
+import { PetPhotoGallery } from '@/components/pets/PetPhotoGallery';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = React.use(params);
+    const { id } = use(params);
     const { pet, isLoading, isError } = usePet(id);
     const { records, createRecord, isCreating } = useHealthRecords(id);
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
     const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
-    const [activeTab, setActiveTab] = React.useState<string | null>('summary');
+    const [activeTab, setActiveTab] = useState<string | null>('summary');
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
@@ -39,59 +38,19 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const t = useTranslations('PetDetail');
     const tPets = useTranslations('Pets');
 
-    if (isLoading) return <PageContainer><PetProfileSkeleton /></PageContainer>;
-    if (isError || !pet) return <PageContainer><Text>{t('notFound')}</Text></PageContainer>;
     // Calculate status from client side records using unified logic
     const healthRecords = records as IHealthRecord[] || [];
-    const schedule = pet ? getVaccinationSchedule(pet.species) : DOG_VACCINATION_SCHEDULE;
 
-    const scheduleStatuses = schedule.map(slot => ({
-        slot,
-        ...getVaccineStatus(slot, pet.birthDate, healthRecords)
-    }));
+    const { overdueCount, dueNowCount, upcomingCount, isUpToDate, hasRabies } = useMemo(() => {
+        if (!pet) return { overdueCount: 0, dueNowCount: 0, upcomingCount: 0, isUpToDate: false, hasRabies: false };
+        return getPetHealthSummary(pet, healthRecords);
+    }, [pet, healthRecords]);
 
-    // --- Unified filtering logic (duplicated from Calendar, ideally moved to utils later) ---
-    const getSlotFamily = (id: string) => {
-        if (id.includes('external') || id.includes('pulgas')) return 'external';
-        if (id.includes('deworm')) return 'deworm';
-        if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
-        if (id.includes('rabies')) return 'rabies';
-        return 'other';
-    };
+    if (isLoading) return <PageContainer><PetProfileSkeleton /></PageContainer>;
+    if (isError || !pet) return <PageContainer><Text>{t('notFound')}</Text></PageContainer>;
 
-    const visibleSlotIds = new Set<string>();
-    const families = ['deworm', 'external', 'poly', 'rabies', 'other'];
 
-    families.forEach(family => {
-        const familySlots = scheduleStatuses.filter(s => getSlotFamily(s.slot.id) === family);
-        let foundFirstPending = false;
-        familySlots.forEach(s => {
-            if (s.status === 'completed' || s.status === 'missed_replaced') {
-                // Counts as history, but irrelevant for "Upcoming" badge logic
-            } else {
-                if (!foundFirstPending) {
-                    visibleSlotIds.add(s.slot.id);
-                    foundFirstPending = true;
-                }
-            }
-        });
-    });
 
-    const visibleStatuses = scheduleStatuses.filter(s => visibleSlotIds.has(s.slot.id));
-
-    const overdueCount = visibleStatuses.filter(s => s.status === 'overdue').length;
-    const dueNowCount = visibleStatuses.filter(s => s.status === 'current_due').length;
-    const upcomingCount = visibleStatuses.filter(s => s.status === 'due_soon').length;
-    const isUpToDate = overdueCount === 0 && dueNowCount === 0;
-
-    // Rabies logic
-    const hasOverdueRabies = scheduleStatuses.some((s, idx) =>
-        schedule[idx].vaccineType.includes('rabies') && s.status === 'overdue'
-    );
-    const hasCompletedRabies = scheduleStatuses.some((s, idx) =>
-        schedule[idx].vaccineType.includes('rabies') && s.status === 'completed'
-    );
-    const hasRabies = !hasOverdueRabies && hasCompletedRabies;
 
     // --- Deceased View (In Memoriam) ---
     if (pet.status === 'deceased') {
@@ -295,6 +254,11 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                     </Grid.Col>
                 </Grid>
             )}
+
+            {activeTab === 'gallery' && (
+                <PetPhotoGallery photos={pet.photos || []} />
+            )}
+
 
             <SharePetModal
                 opened={opened}
