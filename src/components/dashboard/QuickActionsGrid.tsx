@@ -1,11 +1,12 @@
 'use client';
 
 import { Paper, Title, SimpleGrid, UnstyledButton, Text, Group, ThemeIcon, Modal, Stack, Avatar } from '@mantine/core';
-import { IconScale, IconVaccine, IconStethoscope, IconPaw, IconChevronRight } from '@tabler/icons-react';
+import { IconScale, IconVaccine, IconStethoscope, IconPaw, IconChevronRight, IconClipboardHeart } from '@tabler/icons-react';
 import { Link, useRouter } from '@/i18n/routing';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import type { DashboardPet } from '@/types/dashboard';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
+import { QuickHealthEntryModal } from '@/components/health/QuickHealthEntryModal';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/es';
@@ -19,8 +20,7 @@ interface QuickActionsGridProps {
 
 const actions = [
     { label: 'Registrar Peso', icon: IconScale, color: 'blue', action: 'weight' },
-    { label: 'Nueva Vacuna', icon: IconVaccine, color: 'teal', link: '/dashboard/pets' },
-    { label: 'Consulta Vet', icon: IconStethoscope, color: 'violet', link: '/dashboard/pets' },
+    { label: 'Actualizar Libreta', icon: IconClipboardHeart, color: 'teal', action: 'health_record' },
     { label: 'Nueva Mascota', icon: IconPaw, color: 'grape', link: '/dashboard/pets/new' },
 ];
 
@@ -29,9 +29,12 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
     const [selectionOpen, setSelectionOpen] = useState(false);
     const [weightModalOpen, setWeightModalOpen] = useState(false);
     const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
+    const [actionType, setActionType] = useState<'weight' | 'health_record' | null>(null);
+    const [healthModalOpen, setHealthModalOpen] = useState(false);
 
     const handleActionClick = (action: typeof actions[0]) => {
-        if (action.action === 'weight') {
+        if (action.action === 'weight' || action.action === 'health_record') {
+            setActionType(action.action as 'weight' | 'health_record');
             setSelectionOpen(true);
         } else if (action.link) {
             router.push(action.link);
@@ -42,7 +45,13 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
         setSelectedPetId(petId);
         setSelectionOpen(false);
         // Small delay to allow modal transition
-        setTimeout(() => setWeightModalOpen(true), 200);
+        setTimeout(() => {
+            if (actionType === 'weight') {
+                setWeightModalOpen(true);
+            } else if (actionType === 'health_record') {
+                setHealthModalOpen(true);
+            }
+        }, 200);
     };
 
     const handleWeightModalClose = () => {
@@ -151,6 +160,24 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
                     petId={selectedPetId}
                     currentWeight={selectedPet?.weight}
                 />
+            )}
+
+            {selectedPetId && selectedPet && (
+                <Suspense fallback={null}>
+                    <QuickHealthEntryModal
+                        opened={healthModalOpen}
+                        onClose={() => {
+                            setHealthModalOpen(false);
+                            setSelectedPetId(null);
+                            setActionType(null);
+                            router.refresh();
+                        }}
+                        petId={selectedPetId}
+                        petSpecies={selectedPet.species}
+                        petBirthDate={new Date(selectedPet.birthDate)}
+                        refreshDashboard={() => router.refresh()}
+                    />
+                </Suspense>
             )}
         </>
     );
