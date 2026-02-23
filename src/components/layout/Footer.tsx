@@ -14,6 +14,7 @@ export function Footer() {
 
     return (
         <Box
+            id="main-footer"
             component="div"
             h="100%"
         >

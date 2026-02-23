@@ -1,6 +1,6 @@
 {
     "HomePage": {
-        "title": "Bienvenido a PetClan 🐾",
+        "title": "Bienvenido a PetClan",
         "subtitle": "Gestiona la salud de tus mascotas, recordatorios de vacunas y más.",
         "start": "Empezar Ahora"
     },
@@ -65,7 +65,7 @@
         "emptyState": "No tienes notificaciones"
     },
     "SettingsNotifications": {
-        "title": "Configuración de Notificaciones 🔔",
+        "title": "Configuración de Notificaciones",
         "description": "Elige cómo quieres recibir las alertas sobre tus mascotas y la comunidad.",
         "email": {
             "label": "Notificaciones por Correo Electrónico",
@@ -171,7 +171,7 @@
         "externalTitleDefault": "Protección contra pulgas y garrapatas"
     },
     "Pets": {
-        "title": "Mis Mascotas 🐾",
+        "title": "Mis Mascotas",
         "badges": {
             "lost": "🚨 PERDIDO",
             "deceased": "En Memoria",
@@ -234,12 +234,12 @@
     "PetDetail": {
         "notFound": "Lo sentimos, no encontramos la mascota solicitada.",
         "badges": {
-            "overdue": "⚠️ Atención: Vacunas vencidas ({count})",
-            "dueNow": "✅ Es el momento ideal ({count})",
-            "upcoming": "⏳ Próximas vacinas ({count})",
-            "upToDate": "✨ Vacunas al día",
-            "rabies": "💉 Antirrábica Vigente",
-            "deceased": "🕊️"
+            "overdue": "Atención: Vacunas vencidas ({count})",
+            "dueNow": "Es el momento ideal ({count})",
+            "upcoming": "Próximas vacinas ({count})",
+            "upToDate": "Vacunas al día",
+            "rabies": "Antirrábica Vigente",
+            "deceased": "En Memoria"
         },
         "tabs": {
             "summary": "Resumen",
@@ -322,9 +322,9 @@
         },
         "Timeline": {
             "milestone": "Hito",
-            "deathTitle": "Hasta siempre 🕊️",
+            "deathTitle": "Hasta siempre",
             "deathDesc": "Siempre en nuestro recuerdo.",
-            "birthTitle": "Nacimiento 🎉",
+            "birthTitle": "Nacimiento",
             "birthDesc": "¡Bienvenido al mundo!",
             "update": "Actualizar Libreta",
             "viewAll": "Ver historial completo ({count})"
@@ -381,7 +381,7 @@
         "initialWeight": "Peso Inicial",
         "initialWeightDesc": "Registrado al crear la mascota",
         "weightModal": {
-            "title": "Registrar Peso ⚖️",
+            "title": "Registrar Peso",
             "currentWeight": "Peso Actual (kg)",
             "notes": "Notas (Opcional)",
             "notesPlaceholder": "Ej: Después de comer...",

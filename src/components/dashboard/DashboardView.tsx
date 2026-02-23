@@ -1,6 +1,7 @@
 'use client';
 
 import { Grid, Stack, Box } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { ActiveAlertsWidget } from '@/components/dashboard/ActiveAlertsWidget';
 import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid';
@@ -15,24 +16,25 @@ interface DashboardViewProps {
 
 export default function DashboardView({ data }: DashboardViewProps) {
     const { userName, pets, alerts } = data;
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     return (
         <PageContainer>
             <DashboardHeader userName={userName} />
 
-            <Box mb="xl" hiddenFrom="sm">
+            <Box mb={{ base: 'md', sm: 'xl' }} hiddenFrom="sm">
                 <TipsCarousel />
             </Box>
 
             {pets.length > 0 && (
-                <Box mb="xl" hiddenFrom="md">
+                <Box mb={{ base: 'md', sm: 'xl' }} hiddenFrom="md">
                     <ActiveAlertsWidget alerts={alerts} />
                 </Box>
             )}
 
-            <Grid gutter="lg">
+            <Grid gutter={{ base: 'md', sm: 'lg' }}>
                 <Grid.Col span={{ base: 12, md: 8 }}>
-                    <Stack gap="xl">
+                    <Stack gap={isMobile ? 'md' : 'xl'}>
                         <Box>
                             <PetSnapshotGrid pets={pets} alerts={alerts} />
                         </Box>

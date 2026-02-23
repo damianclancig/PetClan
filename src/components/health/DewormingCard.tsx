@@ -4,7 +4,7 @@
 import { Text, Button, Badge, Group, Stack, ThemeIcon, Paper, Divider, Box, Tooltip } from '@mantine/core';
 import { IPet } from '@/models/Pet';
 import { IHealthRecord } from '@/models/HealthRecord';
-import { IconScale, IconStethoscope, IconBug, IconBugOff, IconInfoCircle } from '@tabler/icons-react';
+import { IconScale, IconStethoscope, IconBug, IconBugOff, IconInfoCircle, IconShieldCheck, IconShieldHalf, IconDroplet, IconPill } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useState, useEffect } from 'react';
 import { VeterinaryStatusService, UnifiedStatus } from '@/services/VeterinaryStatusService';
@@ -129,13 +129,13 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
             <Stack gap={0}>
                 <DewormingSection
                     title={t('internal')}
-                    icon={<IconBugOff size={18} />}
+                    icon={<IconShieldHalf size={18} />}
                     result={internalStatus}
                 />
                 <Divider my="xs" variant="dashed" />
                 <DewormingSection
                     title={t('external')}
-                    icon={<IconBug size={18} />}
+                    icon={<IconShieldCheck size={18} />}
                     result={externalStatus}
                     isLast
                 />

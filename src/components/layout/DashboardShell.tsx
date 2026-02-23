@@ -104,8 +104,10 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
                     <Group gap="xs" wrap="nowrap">
                         <NotificationBell />
-                        <LanguageToggle />
-                        <ThemeToggle />
+                        <Group gap="xs" visibleFrom="sm" wrap="nowrap">
+                            <LanguageToggle />
+                            <ThemeToggle />
+                        </Group>
                         <Menu shadow="md" width={200} position="bottom-end">
                             <Menu.Target>
                                 <UnstyledButton>
@@ -189,6 +191,15 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                 <Box style={{ position: 'relative', zIndex: 1 }}>
                     <Divider my="sm" />
                     <TipsCarousel />
+                </Box>
+
+                {/* Footer mobile for Language and Theme toggles */}
+                <Box hiddenFrom="sm" mt="md" style={{ position: 'relative', zIndex: 1 }}>
+                    <Divider mb="md" />
+                    <Group justify="center" gap={20}>
+                        <LanguageToggle />
+                        <ThemeToggle />
+                    </Group>
                 </Box>
             </AppShell.Navbar>
 
