@@ -23,6 +23,8 @@ import { motion } from 'framer-motion';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { useDisclosure } from '@mantine/hooks';
 import { TermsOfService } from '@/components/legal/TermsOfService';
+import { useTranslations } from 'next-intl';
+import { TopRightControls } from '@/components/ui/TopRightControls';
 
 function GoogleIcon() {
     return (
@@ -39,6 +41,7 @@ function LoginContent() {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
     const [opened, { open, close }] = useDisclosure(false);
+    const tAuth = useTranslations('Auth');
 
     const handleGoogleLogin = () => {
         signIn('google', { callbackUrl });
@@ -46,11 +49,16 @@ function LoginContent() {
 
     return (
         <Box style={{ minHeight: '100vh', display: 'flex', position: 'relative', overflow: 'hidden' }}>
+            {/* Top Controls */}
+            <Box style={{ position: 'absolute', top: rem(20), right: rem(20), zIndex: 10 }}>
+                <TopRightControls />
+            </Box>
+
             {/* Modal de Términos y Condiciones */}
             <Modal
                 opened={opened}
                 onClose={close}
-                title="Términos y Condiciones"
+                title={tAuth('termsTitle')}
                 size="lg"
                 padding="xl"
                 centered
@@ -100,7 +108,7 @@ function LoginContent() {
                         style={{ width: '100%', maxWidth: '300px', height: 'auto', objectFit: 'contain' }}
                     />
                     <Text size="xl" mt="xl" maw={400} ta="center" style={{ opacity: 0.9 }}>
-                        La mejor forma de cuidar la salud y el bienestar de tus mascotas.
+                        {tAuth('loginSubtitle')}
                     </Text>
                 </motion.div>
 
@@ -160,7 +168,7 @@ function LoginContent() {
                                     style={{ height: '120px', objectFit: 'contain' }}
                                 />
                                 <Text c="dimmed" size="sm" ta="center" mt="sm">
-                                    Ingresa para continuar
+                                    {tAuth('continueMessage')}
                                 </Text>
                             </Stack>
 
@@ -195,11 +203,11 @@ function LoginContent() {
                                     }
                                 }}
                             >
-                                Continuar con Google
+                                {tAuth('continueWithGoogle')}
                             </Button>
 
                             <Text c="dimmed" size="xs" ta="center">
-                                Al continuar, aceptas los<br />
+                                {tAuth('acceptTermsPrefix')}<br />
                                 <Text
                                     span
                                     fw={500}
@@ -207,7 +215,7 @@ function LoginContent() {
                                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
                                     onClick={open}
                                 >
-                                    Términos y Condiciones
+                                    {tAuth('termsTitle')}
                                 </Text>
                                 .
                             </Text>

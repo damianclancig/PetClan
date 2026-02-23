@@ -1,27 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stepper, Button, Group, Container, Paper, Transition, Text, RingProgress, Center, ThemeIcon } from '@mantine/core';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslations } from 'next-intl';
 import { IconDog, IconCat, IconCheck, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
+import { Link, useRouter } from '@/i18n/routing';
 import IdentityStep from './steps/IdentityStep';
 import DetailsStep from './steps/DetailsStep';
 import HealthStep from './steps/HealthStep';
+import MedicalStep from './steps/MedicalStep';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo } from 'react';
 
 // Schema Validation (Unified)
-const petSchema = z.object({
-    name: z.string().min(2, 'El nombre es obligatorio'),
+const getPetSchema = (tVal: any) => z.object({
+    name: z.string().min(2, tVal('nameLength')),
     species: z.enum(['dog', 'cat', 'other']),
-    breed: z.string().min(2, 'La raza es obligatoria'),
+    breed: z.string().min(2, tVal('breedRequired')),
     birthDate: z.string().refine((date) => new Date(date).toString() !== 'Invalid Date', {
-        message: 'Fecha inválida',
+        message: tVal('invalidDate'),
     }),
     sex: z.enum(['male', 'female']),
-    weight: z.number().min(0.1, 'Peso inválido'),
+    weight: z.number().min(0.1, tVal('weightPositive')),
     chipId: z.string().optional(),
     photoUrl: z.string().optional(),
     characteristics: z.string().optional(),
@@ -30,7 +33,7 @@ const petSchema = z.object({
     notes: z.string().optional(),
 });
 
-type PetWizardValues = z.infer<typeof petSchema>;
+type PetWizardValues = z.infer<ReturnType<typeof getPetSchema>>;
 
 interface PetWizardProps {
     onSubmit: (values: PetWizardValues) => void;
@@ -39,20 +42,25 @@ interface PetWizardProps {
 
 export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
     const t = useTranslations('NewPet');
+    const tWiz = useTranslations('Wizard');
+    const tCommon = useTranslations('Common');
+    const tVal = useTranslations('Validation');
+    const tForm = useTranslations('PetForm');
+    const router = useRouter();
     const [active, setActive] = useState(0);
     const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+
+    const petSchema = useMemo(() => getPetSchema(tVal), [tVal]);
 
     const methods = useForm<PetWizardValues>({
         resolver: zodResolver(petSchema),
         defaultValues: {
-            species: 'dog',
-            sex: 'male',
-            weight: 5.0,
-            birthDate: new Date().toISOString(), // Initial value needed for date input? Actually DateInput controlled handles it.
-            // Better typically to start empty or valid? schema requires string.
-            // We'll let DetailStep handle the initial render logic.
+            name: '',
+            breed: '',
+            birthDate: '', // Start empty
+            // species, sex, weight: undefined by default to force selection
         },
-        mode: 'onChange' // Validate on change to enable/disable next button dynamically?
+        mode: 'onChange'
     });
 
     const { trigger, handleSubmit } = methods;
@@ -67,13 +75,17 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
             valid = await trigger(['breed', 'sex', 'birthDate']);
         } else if (active === 2) {
             valid = await trigger(['weight']);
+        } else if (active === 3) {
+            // Medical step is optional, but good practice to trigger validation if we had rules
+            valid = true;
         } else {
             valid = true;
         }
 
         if (valid) {
             setDirection(1);
-            setActive((current) => (current < 3 ? current + 1 : current));
+            // Steps: 0, 1, 2, 3 (Medical), 4 (Success)
+            setActive((current) => (current < 4 ? current + 1 : current));
         }
     };
 
@@ -81,6 +93,16 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
         setDirection(-1);
         setActive((current) => (current > 0 ? current - 1 : current));
     };
+
+    // Effect for Success Step (Step 4)
+    useEffect(() => {
+        if (active === 4) {
+            const timer = setTimeout(() => {
+                router.push('/dashboard/pets');
+            }, 2000); // 2 second delay
+            return () => clearTimeout(timer);
+        }
+    }, [active, router]);
 
     // Animation Variants
     const variants = {
@@ -99,13 +121,35 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
     };
 
     return (
-        <Container size="sm" mt="xl">
+        <Container size="sm" mt="xl" px={{ base: 'xs', sm: 'md' }}>
             <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    {/* Progress Indicator (Circular or Linear?) - Let's use simple Stepper for clarity but hidden/minimal */}
+                <form onSubmit={handleSubmit((data) => {
+                    onSubmit(data);
+                    // On successful submit logic from parent should handle state, 
+                    // but here we manually advance to success step if onSubmit returns void/promise
+                    // Assuming onSubmitSuccess logic is handled by parent or we step up here.
+                    // The parent 'onSubmit' just calls the mutation. 
+                    // We need to know when to show success.
+                    // Actually, isLoading prop suggests parent handles loading.
+                    // Let's assume on success parent DOES NOT redirect, but lets us show success step?
+                    // Refactoring: The original code showed success at step 3. 
+                    // Now step 4 is success.
+                    // We should call onSubmit, wait for it, then setActive(4).
+                    // BUT: The original nextStep logic simply incremented active.
+                    // Let's change button type="submit" to a normal button that calls onSubmit manually?
+                    // Or keep 'submit' and handle `onSubmit` prop to set active(4)?
+                    // The props say `onSubmit: (values) => void`. 
+                    // Let's assume the parent handles the API call. 
+                    // If we want to show success step here, we need to know if it passed.
+                    // For now, let's keep the flow: Submit -> Parent handles it -> ?
+                    // Wait, if parent redirects, we won't see success step.
+                    // User Request: "que en el paso 4 del success, que tenga un retardo".
+                    // So we must show step 4.
+                })}>
+                    {/* Progress Indicator */}
                     <Center mb="xl">
                         <Group>
-                            {[0, 1, 2, 3].map((step) => (
+                            {[0, 1, 2, 3, 4].map((step) => (
                                 <ThemeIcon
                                     key={step}
                                     radius="xl"
@@ -119,7 +163,7 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                         </Group>
                     </Center>
 
-                    <Paper shadow="md" radius="lg" p="xl" withBorder style={{ overflow: 'hidden', minHeight: 450, display: 'flex', flexDirection: 'column' }}>
+                    <Paper shadow="md" radius="lg" p={{ base: 'sm', sm: 'xl' }} withBorder style={{ overflow: 'hidden', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
 
                         <div style={{ flex: 1, position: 'relative' }}>
                             <AnimatePresence mode='wait' custom={direction}>
@@ -136,10 +180,9 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                                     {active === 0 && <IdentityStep />}
                                     {active === 1 && <DetailsStep />}
                                     {active === 2 && <HealthStep />}
-                                    {/* Summary Step if needed, or Health is last? Plan said Step 3/4. Lets do Health + Notes in step 2/3? Plan said 4 steps. Step 3 Medical. Step 4 Review. */}
-                                    {/* Let's merge Health and Review/Submit for simplicity if user wants fast flow, or add Review step. Project plan said 4 steps. */}
-                                    {active === 3 && (
-                                        <Center style={{ height: '100%', flexDirection: 'column', gap: 20 }}>
+                                    {active === 3 && <MedicalStep />}
+                                    {active === 4 && (
+                                        <Center style={{ height: '100%', flexDirection: 'column', gap: 20, paddingTop: 40 }}>
                                             <RingProgress
                                                 sections={[{ value: 100, color: 'teal' }]}
                                                 roundCaps
@@ -153,33 +196,49 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                                                     </Center>
                                                 }
                                             />
-                                            <Text size="xl" fw={700}>¡Todo listo!</Text>
-                                            <Text c="dimmed" ta="center">Ya tenemos los datos de {methods.getValues().name}.<br />¿Le damos la bienvenida?</Text>
+                                            <Text size="xl" fw={700}>{tWiz('allReady')}</Text>
+                                            <Text c="dimmed" ta="center">{tForm('redirecting', { fallback: 'Redirigiendo...' }).split('. ')[0]}.<br />{tForm('redirecting', { fallback: '' }).split('. ')[1] || ''}</Text>
                                         </Center>
                                     )}
                                 </motion.div>
                             </AnimatePresence>
                         </div>
 
-                        <Group justify="space-between" mt="xl">
-                            {active > 0 ? (
-                                <Button variant="subtle" color="gray" onClick={prevStep} leftSection={<IconChevronLeft size={16} />}>
-                                    Atrás
-                                </Button>
-                            ) : (
-                                <div></div> // Spacer
-                            )}
+                        {active < 4 && (
+                            <Group justify="space-between" mt="xl" wrap="nowrap" gap="xs">
+                                {active > 0 ? (
+                                    <Button variant="subtle" color="gray" onClick={prevStep} leftSection={<IconChevronLeft size={16} />} size="sm">
+                                        {tCommon('back')}
+                                    </Button>
+                                ) : (
+                                    <Button variant="subtle" color="red" component={Link} href="/dashboard/pets" size="sm">
+                                        {tCommon('cancel')}
+                                    </Button>
+                                )}
 
-                            {active < 3 ? (
-                                <Button onClick={nextStep} color="cyan" rightSection={<IconChevronRight size={16} />}>
-                                    Siguiente
-                                </Button>
-                            ) : (
-                                <Button type="submit" loading={isLoading} color="teal" size="md" rightSection={<IconCheck size={16} />}>
-                                    Crear Mascota
-                                </Button>
-                            )}
-                        </Group>
+                                {active < 3 ? (
+                                    <Button onClick={nextStep} color="cyan" rightSection={<IconChevronRight size={16} />} size="sm">
+                                        {tWiz('next')}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={async () => {
+                                            // Manual submit trigger to allow stepping to Success
+                                            await handleSubmit(async (data) => {
+                                                await onSubmit(data); // Assume this is async/promise
+                                                setActive(4); // Advance to success step
+                                            })();
+                                        }}
+                                        loading={isLoading}
+                                        color="teal"
+                                        size="sm"
+                                        rightSection={<IconCheck size={16} />}
+                                    >
+                                        {tWiz('create')}
+                                    </Button>
+                                )}
+                            </Group>
+                        )}
 
                     </Paper>
                 </form>

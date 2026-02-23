@@ -1,6 +1,7 @@
 'use client';
 
-import { Container, Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button } from '@mantine/core';
+import { Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button } from '@mantine/core';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { PetProfileSkeleton } from '@/components/ui/Skeletons';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIconMotion } from '@/components/ui/MotionWrappers';
@@ -12,25 +13,24 @@ import { SharePetModal } from '@/components/pets/SharePetModal';
 import { PetExtraInfoCard } from '@/components/pets/profile/PetExtraInfoCard';
 import { useTranslations } from 'next-intl';
 import { IconPlus } from '@tabler/icons-react';
-import React from 'react';
+import { use, useState, useMemo } from 'react';
 import { WeightControl } from '@/components/pets/WeightControl';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 import { SmartHealthRecordModal } from '@/components/health/SmartHealthRecordModal';
 import { VaccinationCalendar } from '@/components/pets/VaccinationCalendar';
-import { DOG_VACCINATION_SCHEDULE, getVaccineStatus, getVaccinationSchedule } from '@/utils/vaccinationUtils';
+import { getPetHealthSummary } from '@/utils/vaccinationUtils';
 import { IHealthRecord } from '@/models/HealthRecord';
 import DewormingCard from '@/components/health/DewormingCard';
-
-
+import { PetPhotoGallery } from '@/components/pets/PetPhotoGallery';
 
 export default function PetDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = React.use(params);
+    const { id } = use(params);
     const { pet, isLoading, isError } = usePet(id);
     const { records, createRecord, isCreating } = useHealthRecords(id);
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
     const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
-    const [activeTab, setActiveTab] = React.useState<string | null>('summary');
+    const [activeTab, setActiveTab] = useState<string | null>('summary');
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
@@ -38,64 +38,52 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const t = useTranslations('PetDetail');
     const tPets = useTranslations('Pets');
 
-    if (isLoading) return <PetProfileSkeleton />;
-    if (isError || !pet) return <Container><Text>{t('notFound')}</Text></Container>;
     // Calculate status from client side records using unified logic
     const healthRecords = records as IHealthRecord[] || [];
-    const schedule = pet ? getVaccinationSchedule(pet.species) : DOG_VACCINATION_SCHEDULE;
 
-    const scheduleStatuses = schedule.map(slot => ({
-        slot,
-        ...getVaccineStatus(slot, pet.birthDate, healthRecords)
-    }));
+    const { overdueCount, dueNowCount, upcomingCount, isUpToDate, hasRabies } = useMemo(() => {
+        if (!pet) return { overdueCount: 0, dueNowCount: 0, upcomingCount: 0, isUpToDate: false, hasRabies: false };
+        return getPetHealthSummary(pet, healthRecords);
+    }, [pet, healthRecords]);
 
-    // --- Unified filtering logic (duplicated from Calendar, ideally moved to utils later) ---
-    const getSlotFamily = (id: string) => {
-        if (id.includes('external') || id.includes('pulgas')) return 'external';
-        if (id.includes('deworm')) return 'deworm';
-        if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
-        if (id.includes('rabies')) return 'rabies';
-        return 'other';
-    };
-
-    const visibleSlotIds = new Set<string>();
-    const families = ['deworm', 'external', 'poly', 'rabies', 'other'];
-
-    families.forEach(family => {
-        const familySlots = scheduleStatuses.filter(s => getSlotFamily(s.slot.id) === family);
-        let foundFirstPending = false;
-        familySlots.forEach(s => {
-            if (s.status === 'completed' || s.status === 'missed_replaced') {
-                // Counts as history, but irrelevant for "Upcoming" badge logic
-            } else {
-                if (!foundFirstPending) {
-                    visibleSlotIds.add(s.slot.id);
-                    foundFirstPending = true;
-                }
-            }
-        });
-    });
-
-    const visibleStatuses = scheduleStatuses.filter(s => visibleSlotIds.has(s.slot.id));
-
-    const overdueCount = visibleStatuses.filter(s => s.status === 'overdue').length;
-    const dueNowCount = visibleStatuses.filter(s => s.status === 'current_due').length;
-    const upcomingCount = visibleStatuses.filter(s => s.status === 'due_soon').length;
-    const isUpToDate = overdueCount === 0 && dueNowCount === 0;
-
-    // Rabies logic
-    const hasOverdueRabies = scheduleStatuses.some((s, idx) =>
-        schedule[idx].vaccineType.includes('rabies') && s.status === 'overdue'
-    );
-    const hasCompletedRabies = scheduleStatuses.some((s, idx) =>
-        schedule[idx].vaccineType.includes('rabies') && s.status === 'completed'
-    );
-    const hasRabies = !hasOverdueRabies && hasCompletedRabies;
+    if (isLoading) return <PageContainer><PetProfileSkeleton /></PageContainer>;
+    if (isError || !pet) return <PageContainer><Text>{t('notFound')}</Text></PageContainer>;
 
 
+
+
+    // --- Deceased View (In Memoriam) ---
+    if (pet.status === 'deceased') {
+        return (
+            <PageContainer>
+                <PetProfileHeader
+                    pet={pet}
+                    activeTab="timeline"
+                    onTabChange={() => { }}
+                    onShare={() => { }}
+                    onAddRecord={undefined}
+                />
+
+                <Stack gap="xl">
+                    <Paper withBorder p="md" radius="md">
+                        <Title order={4} mb="md">{t('Deceased.memories')}</Title>
+                        <HealthTimeline
+                            petId={pet._id as unknown as string}
+                            petSpecies={pet.species}
+                            petBirthDate={pet.birthDate}
+                            petDeathDate={pet.deathDate}
+                            readOnly={true}
+                        />
+                    </Paper>
+
+                    <PetExtraInfoCard pet={pet as any} />
+                </Stack>
+            </PageContainer>
+        );
+    }
 
     return (
-        <Container size="lg" px={{ base: 5, xs: 'md' }}>
+        <PageContainer>
             <PetProfileHeader
                 pet={pet}
                 activeTab={activeTab || 'summary'}
@@ -124,7 +112,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                     <Grid.Col span={{ base: 12, md: 4 }}>
                         <Stack>
                             <Paper withBorder p="md" radius="md">
-                                <Title order={4} mb="md">Estado de Salud</Title>
+                                <Title order={4} mb="md">{t('Summary.healthStatus')}</Title>
                                 <Stack gap="xs">
                                     {overdueCount > 0 && (
                                         <Badge
@@ -135,7 +123,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ⚠️ Atención: Vacunas vencidas ({overdueCount})
+                                            {t('badges.overdue', { count: overdueCount })}
                                         </Badge>
                                     )}
                                     {dueNowCount > 0 && (
@@ -147,7 +135,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ✅ Es el momento ideal ({dueNowCount})
+                                            {t('badges.dueNow', { count: dueNowCount })}
                                         </Badge>
                                     )}
                                     {upcomingCount > 0 && (
@@ -159,7 +147,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ⏳ Próximas vacunas ({upcomingCount})
+                                            {t('badges.upcoming', { count: upcomingCount })}
                                         </Badge>
                                     )}
                                     {isUpToDate && (
@@ -171,7 +159,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ✨ Vacunas al día
+                                            {t('badges.upToDate')}
                                         </Badge>
                                     )}
                                     {hasRabies && (
@@ -183,7 +171,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            💉 Antirábica Vigente
+                                            {t('badges.rabies')}
                                         </Badge>
                                     )}
                                 </Stack>
@@ -197,7 +185,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
                             <Paper withBorder p="md" radius="md">
                                 <Group justify="space-between" mb="xs">
-                                    <Title order={4}>{tPets('weight')}</Title>
+                                    <Title order={4}>{t('Summary.weightTitle')}</Title>
                                     <ActionIconMotion onClick={openWeightModal}>
                                         <ActionIcon variant="subtle" color="blue">
                                             <IconPlus size={16} />
@@ -211,7 +199,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                     fullWidth
                                     onClick={() => setActiveTab('health')}
                                 >
-                                    Ver gráfico e historial
+                                    {t('Summary.viewChart')}
                                 </Button>
                             </Paper>
                         </Stack>
@@ -221,7 +209,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         <Stack>
                             <PetExtraInfoCard pet={pet as any} />
                             <Paper withBorder p="md" radius="md">
-                                <Title order={4} mb="md">Últimos Eventos</Title>
+                                <Title order={4} mb="md">{t('Summary.latestEvents')}</Title>
                                 <HealthTimeline
                                     petId={pet._id as unknown as string}
                                     petSpecies={pet.species}
@@ -267,6 +255,11 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                 </Grid>
             )}
 
+            {activeTab === 'gallery' && (
+                <PetPhotoGallery photos={pet.photos || []} />
+            )}
+
+
             <SharePetModal
                 opened={opened}
                 onClose={close}
@@ -294,6 +287,6 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                     openWeightModal();
                 }}
             />
-        </Container >
+        </PageContainer>
     );
 }

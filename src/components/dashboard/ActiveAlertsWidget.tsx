@@ -4,12 +4,14 @@ import { Box, Paper, Title, Text, Group, Stack, ThemeIcon, Button, Badge } from 
 import { IconAlertTriangle, IconCheck, IconCalendarEvent, IconArrowRight } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
 import type { DashboardAlert } from '@/types/dashboard';
+import { useTranslations } from 'next-intl';
 
 interface ActiveAlertsWidgetProps {
     alerts: DashboardAlert[];
 }
 
 export function ActiveAlertsWidget({ alerts }: ActiveAlertsWidgetProps) {
+    const t = useTranslations('DashboardView.Alerts');
     // Show top 3 alerts
     const displayAlerts = alerts.slice(0, 3);
     const hasMore = alerts.length > 3;
@@ -22,8 +24,8 @@ export function ActiveAlertsWidget({ alerts }: ActiveAlertsWidgetProps) {
                         <IconCheck size={20} />
                     </ThemeIcon>
                     <Box>
-                        <Text fw={500}>Todo en orden</Text>
-                        <Text size="sm" c="dimmed">No tienes alertas pendientes para tus mascotas.</Text>
+                        <Text fw={500}>{t('allGood')}</Text>
+                        <Text size="sm" c="dimmed">{t('noAlerts')}</Text>
                     </Box>
                 </Group>
             </Paper>
@@ -33,7 +35,7 @@ export function ActiveAlertsWidget({ alerts }: ActiveAlertsWidgetProps) {
     return (
         <Paper withBorder p="md" radius="md">
             <Group justify="space-between" mb="md">
-                <Title order={4}>Alertas Activas</Title>
+                <Title order={4}>{t('activeAlerts')}</Title>
                 <Badge color="red" variant="light">{alerts.length}</Badge>
             </Group>
 
@@ -65,7 +67,7 @@ export function ActiveAlertsWidget({ alerts }: ActiveAlertsWidgetProps) {
                                     px="xs"
                                     rightSection={<IconArrowRight size={12} />}
                                 >
-                                    Ver detalles
+                                    {t('viewDetails')}
                                 </Button>
                             </Box>
                         </Group>
@@ -74,7 +76,7 @@ export function ActiveAlertsWidget({ alerts }: ActiveAlertsWidgetProps) {
 
                 {hasMore && (
                     <Button variant="subtle" size="xs" color="gray" fullWidth>
-                        Ver {alerts.length - 3} alertas más
+                        {t('viewMore', { count: alerts.length - 3 })}
                     </Button>
                 )}
             </Stack>

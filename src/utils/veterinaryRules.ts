@@ -16,6 +16,7 @@ export interface VaccineSlot {
     maxAgeWeeks: number;
     vaccineType: string[];
     isCore: boolean;
+    isAnnual?: boolean; // Marca explícita para no depender de texto
     replacesPrevious?: string[];
 }
 
@@ -136,6 +137,7 @@ export const CAT_VACCINATION_SCHEDULE: VaccineSlot[] = [
         maxAgeWeeks: 1000,
         vaccineType: ['triple', 'felina', 'panleucopenia', 'rinotraqueitis', 'calicivirus'],
         isCore: true,
+        isAnnual: true,
         replacesPrevious: ['cat_triple_1', 'cat_triple_2', 'cat_triple_3']
     },
     {
@@ -146,6 +148,7 @@ export const CAT_VACCINATION_SCHEDULE: VaccineSlot[] = [
         maxAgeWeeks: 1000,
         vaccineType: ['rabia', 'antirrabica', 'rabies'],
         isCore: true,
+        isAnnual: true,
         replacesPrevious: ['cat_rabies']
     },
     {
@@ -155,7 +158,8 @@ export const CAT_VACCINATION_SCHEDULE: VaccineSlot[] = [
         minAgeWeeks: 26,
         maxAgeWeeks: 1000,
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
-        isCore: true
+        isCore: true,
+        isAnnual: true
     },
     {
         id: 'cat_external',
@@ -278,33 +282,36 @@ export const DOG_VACCINATION_SCHEDULE: VaccineSlot[] = [
         isCore: true
     },
     {
-        id: 'adult_annual_poly',
-        label: 'Polivalente Anual',
+        id: 'pup_sext_annual',
+        label: 'Séxtuple Anual',
         ageLabel: 'Anual',
         minAgeWeeks: 52,
         maxAgeWeeks: 1000,
-        vaccineType: ['polivalente', 'sextuple', 'quintuple'],
+        vaccineType: ['sextuple', 'quintuple', 'polivalente', 'triple', 'distemper', 'parvo'],
         isCore: true,
+        isAnnual: true,
         replacesPrevious: ['pup_poly_1', 'pup_poly_2', 'pup_poly_3']
     },
     {
-        id: 'adult_annual_rabies',
+        id: 'pup_rabies_annual',
         label: 'Antirrábica Anual',
         ageLabel: 'Anual',
         minAgeWeeks: 52,
         maxAgeWeeks: 1000,
         vaccineType: ['rabia', 'antirrabica', 'rabies'],
         isCore: true,
+        isAnnual: true,
         replacesPrevious: ['pup_rabies']
     },
     {
-        id: 'adult_deworm_trimestral',
+        id: 'pup_deworm_trimestral',
         label: 'Desparasitación Adultos',
         ageLabel: 'Cada 3-4 Meses',
         minAgeWeeks: 26,
         maxAgeWeeks: 1000,
         vaccineType: ['desparasitacion', 'deworming', 'antiparasitario'],
-        isCore: true
+        isCore: true,
+        isAnnual: true
     },
     {
         id: 'pup_external',
@@ -470,14 +477,19 @@ export const VeterinaryRules = {
 
             // Deworming Specific Logic
             if (r.type === 'deworming') {
-                // If slot is external, accept explicit external type
-                if (isSlotExternal && r.dewormingType === 'external') return true;
-                // If slot is internal, reject explicit external type
-                if (!isSlotExternal && r.dewormingType === 'external') return false;
-                // If slot is external, reject explicit internal type
-                if (isSlotExternal && r.dewormingType === 'internal') return false;
-                // If slot is internal, accept explicit internal type
-                if (!isSlotExternal && r.dewormingType === 'internal') return true;
+                // 1. If slot is External Deworming -> Only accept External records
+                if (isSlotExternal) {
+                    return r.dewormingType === 'external';
+                }
+
+                // 2. If slot is Internal Deworming -> Only accept Internal records
+                // (undefined dewormingType is treated as internal for legacy compatibility)
+                if (isDeworming) {
+                    return r.dewormingType === 'internal' || !r.dewormingType;
+                }
+
+                // 3. If slot is neither (e.g. Vaccine) -> Reject deworming records
+                return false;
             }
 
             // Fallback to text matching (Title or VaccineType string)
@@ -496,24 +508,25 @@ export const VeterinaryRules = {
                 return { status: 'overdue', dueDate: today.toDate() }; // Should have one
             }
 
-            // Validity Duration Logic
-            const titleLower = lastRecord.title.toLowerCase();
-            const noteLower = (lastRecord.description || '').toLowerCase();
-            // Actually getSlotStatus receives IHealthRecord which has notes? Let's check IHealthRecord definition. 
-            // Assuming title checks for now.
-
             let durationDays = 30; // Default
-            if (
-                titleLower.includes('bravecto') ||
-                titleLower.includes('90 dias') ||
-                titleLower.includes('90 días') ||
-                titleLower.includes('3 meses') ||
-                titleLower.includes('trimestral')
-            ) {
-                durationDays = 90;
+            // 1. Prioridad: campo numérico del registro (independiente del idioma)
+            if (lastRecord.durationDays && lastRecord.durationDays > 0) {
+                durationDays = lastRecord.durationDays;
+                // 2. Fallback: texto del título para registros antiguos sin durationDays
+            } else {
+                const titleLower = lastRecord.title.toLowerCase();
+                if (
+                    titleLower.includes('bravecto') ||
+                    titleLower.includes('90') ||
+                    titleLower.includes('3 meses') ||
+                    titleLower.includes('trimestral') ||
+                    titleLower.includes('3 months')
+                ) {
+                    durationDays = 90;
+                }
+                else if (titleLower.includes('simparica')) durationDays = 35;
+                else if (titleLower.includes('seresto')) durationDays = 240;
             }
-            else if (titleLower.includes('simparica')) durationDays = 35;
-            else if (titleLower.includes('seresto')) durationDays = 240;
 
             const nextDueDate = dayjs(lastRecord.appliedAt).add(durationDays, 'days');
 
@@ -534,8 +547,8 @@ export const VeterinaryRules = {
         });
 
         // 4. Recurrence / Annual Logic
-        // If this slot is "Annual" (recurrent), any record after minAge counts, BUT we must check if it's expired.
-        const isAnnual = slot.label.toLowerCase().includes('anual') || slot.ageLabel.toLowerCase().includes('anual') || slot.ageLabel.toLowerCase().includes('cada');
+        // Use explicit isAnnual flag instead of text matching to be language-independent
+        const isAnnual = slot.isAnnual === true;
 
         if (isAnnual) {
             // For annual, we look at the LATEST record (relevantRecords[0])

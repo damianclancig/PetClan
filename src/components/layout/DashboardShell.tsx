@@ -6,6 +6,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { signOut } from 'next-auth/react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { IconHome, IconPaw, IconLogout, IconSettings, IconUser, IconChevronRight } from '@tabler/icons-react';
 import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used for general layout, might be useful later
@@ -79,28 +80,31 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                 <Group h="100%" px={{ base: 'xs', sm: 'md' }} justify="space-between" wrap="nowrap">
                     <Group wrap="nowrap" gap="xs">
                         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-                        <Group gap="xs">
-                            {/* Isotype */}
-                            <Box w={34} h={34} style={{ position: 'relative' }}>
-                                <img
-                                    src="/assets/logo-icon.png"
-                                    alt="PetClan Isotype"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
-                            </Box>
-                            {/* Full Logo Text */}
-                            <Box w={{ base: 110, sm: 160 }} h={55} style={{ position: 'relative' }}>
-                                <img
-                                    src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
-                                    alt="PetClan"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
-                                />
-                            </Box>
-                        </Group>
+                        <UnstyledButton component={Link} href="/dashboard">
+                            <Group gap="xs">
+                                {/* Isotype */}
+                                <Box w={34} h={34} style={{ position: 'relative' }}>
+                                    <img
+                                        src="/assets/logo-icon.png"
+                                        alt="PetClan Isotype"
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    />
+                                </Box>
+                                {/* Full Logo Text */}
+                                <Box w={{ base: 110, sm: 160 }} h={55} style={{ position: 'relative' }}>
+                                    <img
+                                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
+                                        alt="PetClan"
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
+                                    />
+                                </Box>
+                            </Group>
+                        </UnstyledButton>
                     </Group>
 
                     <Group gap="xs" wrap="nowrap">
                         <NotificationBell />
+                        <LanguageToggle />
                         <ThemeToggle />
                         <Menu shadow="md" width={200} position="bottom-end">
                             <Menu.Target>
@@ -118,7 +122,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                             </Menu.Target>
 
                             <Menu.Dropdown>
-                                <Menu.Label>Cuenta</Menu.Label>
+                                <Menu.Label>{t('account')}</Menu.Label>
                                 <Menu.Item leftSection={<IconUser size={14} />} disabled>
                                     {t('profile')}
                                 </Menu.Item>
@@ -127,7 +131,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                                     href="/dashboard/settings/notifications"
                                     leftSection={<IconSettings size={14} />}
                                 >
-                                    Notificaciones
+                                    {t('notifications')}
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item

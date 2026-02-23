@@ -10,6 +10,12 @@ export interface IPet {
     weight: number;
     chipId?: string;
     photoUrl?: string; // Base64 optimised image
+    photos?: {
+        url: string;
+        publicId: string;
+        date: Date;
+        description?: string;
+    }[];
     characteristics?: string;
     diseases?: string;
     treatments?: string;
@@ -19,6 +25,7 @@ export interface IPet {
     riskLevel: 'low' | 'medium' | 'high';
     status: 'active' | 'lost' | 'deceased' | 'archived';
     owners: Types.ObjectId[];
+    deathDate?: Date; // New field for deceased pets
     createdAt: Date;
     updatedAt: Date;
 }
@@ -43,6 +50,12 @@ const PetSchema = new Schema<IPet>({
     },
     chipId: { type: String },
     photoUrl: { type: String },
+    photos: [{
+        url: { type: String, required: true },
+        publicId: { type: String, required: true },
+        date: { type: Date, default: Date.now },
+        description: { type: String }
+    }],
     characteristics: { type: String },
     diseases: { type: String },
     treatments: { type: String },
@@ -53,6 +66,7 @@ const PetSchema = new Schema<IPet>({
         default: 'active',
         required: true
     },
+    deathDate: { type: Date }, // Optional
     owners: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

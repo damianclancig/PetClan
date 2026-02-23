@@ -7,6 +7,7 @@ import User from '@/models/User';
 import Pet from '@/models/Pet';
 import HealthRecord from '@/models/HealthRecord';
 import { HealthAnalysisService } from '@/services/HealthAnalysisService';
+import { getTranslations } from 'next-intl/server';
 
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
@@ -31,6 +32,7 @@ export async function GET(req: Request) {
     let healthAlerts: any[] = [];
 
     try {
+        const tAlerts = await getTranslations('DashboardView.Alerts');
         const pets = await Pet.find({ owners: currentUser._id, status: 'active' });
 
         for (const pet of pets) {
@@ -40,7 +42,7 @@ export async function GET(req: Request) {
                 type: { $in: ['vaccine', 'deworming'] }
             }).sort({ appliedAt: -1 });
 
-            const petAlerts = HealthAnalysisService.analyzePetHealth(pet, records);
+            const petAlerts = HealthAnalysisService.analyzePetHealth(pet, records, tAlerts);
 
             // Map to Notification interface shape for frontend consistency
             const mappedAlerts = petAlerts.map(alert => ({

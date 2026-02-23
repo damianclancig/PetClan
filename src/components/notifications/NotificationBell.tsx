@@ -6,6 +6,7 @@ import { ActionIcon, Indicator, Popover, Text, Stack, ScrollArea, Group, Button,
 import { IconBell } from '@tabler/icons-react';
 import NotificationItem from './NotificationItem';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface NotificationBellProps extends React.ComponentPropsWithoutRef<typeof ActionIcon> { }
 
@@ -13,6 +14,7 @@ export default function NotificationBell(props: NotificationBellProps) {
     const [opened, setOpened] = useState(false);
     const queryClient = useQueryClient();
     const router = useRouter();
+    const t = useTranslations('NotificationsCenter');
 
     const { data, isLoading } = useQuery({
         queryKey: ['notifications'],
@@ -38,7 +40,7 @@ export default function NotificationBell(props: NotificationBellProps) {
                         size="lg"
                         {...props}
                         onClick={() => setOpened((o) => !o)}
-                        aria-label="Notificaciones"
+                        aria-label={t('title')}
                     >
                         <IconBell size={20} />
                     </ActionIcon>
@@ -53,7 +55,7 @@ export default function NotificationBell(props: NotificationBellProps) {
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <Text fw={600} size="sm">Alertas de Salud</Text>
+                    <Text fw={600} size="sm">{t('title')}</Text>
                 </div>
 
                 <ScrollArea.Autosize mah={400} type="scroll">
@@ -62,7 +64,7 @@ export default function NotificationBell(props: NotificationBellProps) {
                     ) : notifications.length === 0 ? (
                         <Stack align="center" justify="center" p="xl" style={{ opacity: 0.5 }}>
                             <IconBell size={32} />
-                            <Text size="sm">No tienes notificaciones</Text>
+                            <Text size="sm">{t('emptyState')}</Text>
                         </Stack>
                     ) : (
                         <Box>

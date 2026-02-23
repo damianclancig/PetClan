@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Container, Paper, Title, Checkbox, Button, Stack, Text, LoadingOverlay, Group } from '@mantine/core';
+import { Paper, Checkbox, Button, Stack, Text, LoadingOverlay, Group } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { PageContainer } from '@/components/layout/PageContainer';
+import { useTranslations } from 'next-intl';
 
 export default function NotificationSettingsPage() {
+    const t = useTranslations('SettingsNotifications');
     const [preferences, setPreferences] = useState({ email: true, inApp: true });
     const [initialPreferences, setInitialPreferences] = useState({ email: true, inApp: true });
     const [loading, setLoading] = useState(true);
@@ -25,8 +28,8 @@ export default function NotificationSettingsPage() {
             } catch (error) {
                 console.error('Error fetching preferences:', error);
                 notifications.show({
-                    title: 'Error',
-                    message: 'No se pudieron cargar las preferencias.',
+                    title: t('errorTitle'),
+                    message: t('errorLoadMsg'),
                     color: 'red',
                 });
             } finally {
@@ -59,8 +62,8 @@ export default function NotificationSettingsPage() {
             setInitialPreferences(data);
 
             notifications.show({
-                title: 'Cambios guardados',
-                message: 'Tus preferencias de notificaciones han sido actualizadas.',
+                title: t('savedTitle'),
+                message: t('savedMsg'),
                 color: 'green',
                 icon: <IconCheck size={16} />,
             });
@@ -68,8 +71,8 @@ export default function NotificationSettingsPage() {
             router.refresh(); // Refresh server components if needed
         } catch (error) {
             notifications.show({
-                title: 'Error',
-                message: 'No se pudieron guardar los cambios.',
+                title: t('errorTitle'),
+                message: t('errorSaveMsg'),
                 color: 'red',
             });
         } finally {
@@ -78,28 +81,26 @@ export default function NotificationSettingsPage() {
     };
 
     return (
-        <Container size="sm" py="xl">
+        <PageContainer size="sm" title={t('title')}>
             <Paper radius="md" p="xl" withBorder pos="relative">
                 <LoadingOverlay visible={loading} overlayProps={{ radius: 'md', blur: 2 }} />
 
-                <Title order={2} mb="lg">Configuración de Notificaciones 🔔</Title>
-
                 <Text c="dimmed" mb="xl">
-                    Elige cómo quieres recibir las alertas sobre tus mascotas y la comunidad.
+                    {t('description')}
                 </Text>
 
                 <Stack gap="lg">
                     <Checkbox
-                        label="Notificaciones por Correo Electrónico"
-                        description="Recibe alertas importantes, recordatorios y solicitudes en tu email."
+                        label={t('email.label')}
+                        description={t('email.description')}
                         checked={preferences.email}
                         onChange={(e) => handleChange('email', e.currentTarget.checked)}
                         size="md"
                     />
 
                     <Checkbox
-                        label="Notificaciones en la Aplicación"
-                        description="Recibe alertas visuales (campana) y mensajes emergentes mientras usas PetClan."
+                        label={t('inApp.label')}
+                        description={t('inApp.description')}
                         checked={preferences.inApp}
                         onChange={(e) => handleChange('inApp', e.currentTarget.checked)}
                         size="md"
@@ -112,11 +113,11 @@ export default function NotificationSettingsPage() {
                             disabled={!hasChanges}
                             loading={saving}
                         >
-                            Guardar Cambios
+                            {t('save')}
                         </Button>
                     </Group>
                 </Stack>
             </Paper>
-        </Container>
+        </PageContainer>
     );
 }

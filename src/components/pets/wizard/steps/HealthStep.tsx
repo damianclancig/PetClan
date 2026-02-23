@@ -1,60 +1,35 @@
 'use client';
 
-import { TextInput, Stack, Text, Slider, NumberInput, Group, Textarea, Paper } from '@mantine/core';
+import { TextInput, Stack, Text, Group, Textarea, Paper } from '@mantine/core';
 import { useFormContext, Controller } from 'react-hook-form';
-import { IconScale, IconId, IconClipboardText } from '@tabler/icons-react';
+import { IconScale, IconId } from '@tabler/icons-react';
+import { WeightInput } from '../../form/WeightInput';
+import { useTranslations } from 'next-intl';
 
 export default function HealthStep() {
     const { register, control, watch, setValue, formState: { errors } } = useFormContext();
+    const t = useTranslations('NewPet');
     const name = watch('name');
 
     return (
-        <Stack gap="xl">
-            <Text size="xl" fw={800} ta="center">Datos de Salud de {name}</Text>
+        <Stack gap="sm">
+            <Text size="md" fw={700} ta="center">{t('healthData', { name: name || '' })}</Text>
 
-            <Paper p="lg" radius="md" withBorder>
+            <Paper p={{ base: 'md', sm: 'lg' }} radius="md" withBorder>
                 <Stack gap="md">
-                    <Group justify="space-between">
-                        <Group gap="xs">
-                            <IconScale size={20} />
-                            <Text fw={600}>Peso Actual (kg)</Text>
-                        </Group>
-                        <Controller
-                            name="weight"
-                            control={control}
-                            render={({ field }) => (
-                                <NumberInput
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    min={0.1}
-                                    max={100}
-                                    step={0.1}
-                                    w={100}
-                                    size="sm"
-                                    suffix=" kg"
-                                    error={errors.weight?.message as string}
-                                />
-                            )}
-                        />
+                    <Group justify="center" gap="xs">
+                        <IconScale size={20} />
+                        <Text fw={600}>{t('weight')}</Text>
                     </Group>
 
                     <Controller
                         name="weight"
                         control={control}
                         render={({ field }) => (
-                            <Slider
-                                value={typeof field.value === 'number' ? field.value : 0}
-                                onChange={field.onChange}
-                                min={0.5}
-                                max={60}
-                                step={0.5}
-                                marks={[
-                                    { value: 5, label: '5kg' },
-                                    { value: 20, label: '20kg' },
-                                    { value: 40, label: '40kg' },
-                                ]}
-                                color="cyan"
-                                label={(val) => `${val} kg`}
+                            <WeightInput
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                                error={errors.weight?.message as string}
                             />
                         )}
                     />
@@ -62,8 +37,8 @@ export default function HealthStep() {
             </Paper>
 
             <TextInput
-                label="Identificación (Chip)"
-                placeholder="Opcional"
+                label={t('chipId')}
+                placeholder={t('optional')}
                 leftSection={<IconId size={18} />}
                 size="md"
                 radius="md"
@@ -71,8 +46,8 @@ export default function HealthStep() {
             />
 
             <Textarea
-                label="Características / Señas Particulares"
-                placeholder="Mancha en la oreja, cola corta..."
+                label={t('characteristics')}
+                placeholder={t('placeholders.characteristics')}
                 minRows={3}
                 radius="md"
                 {...register('characteristics')}

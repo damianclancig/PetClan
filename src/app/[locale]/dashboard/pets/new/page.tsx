@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Title, Text } from '@mantine/core';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { notifications } from '@mantine/notifications';
@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function NewPetPage() {
     const t = useTranslations('NewPet');
+    const tNotifications = useTranslations('Notifications');
     const router = useRouter();
     const queryClient = useQueryClient();
 
@@ -24,28 +25,28 @@ export default function NewPetPage() {
         },
         onSuccess: () => {
             notifications.show({
-                title: '¡Mascota Creada! 🎉',
-                message: 'Tu mascota ha sido registrada exitosamente.',
+                title: '🎉',
+                message: tNotifications('petCreated'),
                 color: 'green',
             });
             queryClient.invalidateQueries({ queryKey: ['pets'] });
-            router.push('/dashboard/pets');
+            // router.push('/dashboard/pets'); // Redirection handled by Wizard Success Step
         },
         onError: () => {
             notifications.show({
-                title: 'Error',
-                message: 'No se pudo crear la mascota.',
+                title: tNotifications('error'),
+                message: tNotifications('petCreationFailed'),
                 color: 'red',
             });
         }
     });
 
     return (
-        <Container size="md" py="xl">
+        <PageContainer size="md" title={t('title')}>
             <PetWizard
                 onSubmit={(values) => createPet.mutate(values)}
                 isLoading={createPet.isPending}
             />
-        </Container>
+        </PageContainer>
     );
 }

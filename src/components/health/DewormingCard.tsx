@@ -8,6 +8,7 @@ import { IconScale, IconStethoscope, IconBug, IconBugOff, IconInfoCircle } from 
 import dayjs from 'dayjs';
 import { useState, useEffect } from 'react';
 import { VeterinaryStatusService, UnifiedStatus } from '@/services/VeterinaryStatusService';
+import { useTranslations } from 'next-intl';
 
 interface DewormingCardProps {
     pet: IPet;
@@ -16,6 +17,7 @@ interface DewormingCardProps {
 }
 
 const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => {
+    const t = useTranslations('PetDetail.Deworming');
     const [internalStatus, setInternalStatus] = useState<UnifiedStatus | null>(null);
     const [externalStatus, setExternalStatus] = useState<UnifiedStatus | null>(null);
 
@@ -38,8 +40,8 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
                 <Stack gap="xs" mt="sm">
                     <AlertIconMessage
                         icon={<IconStethoscope size={16} />}
-                        title="Recomendación"
-                        message="Consultá con tu veterinario qué producto aplicar."
+                        title={t('vetRecommendation')}
+                        message={t('vetRecommendationDesc')}
                         color={color}
                     />
                 </Stack>
@@ -57,7 +59,7 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
                     fullWidth
                     mt="sm"
                 >
-                    Actualizar Peso
+                    {t('updateWeight')}
                 </Button>
             );
         }
@@ -67,8 +69,8 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
                 <Box mt="sm">
                     <AlertIconMessage
                         icon={<IconStethoscope size={16} />}
-                        title="Atención"
-                        message="Consulta a tu veterinario para indicaciones específicas."
+                        title={t('vetAttention')}
+                        message={t('vetAttentionDesc')}
                         color={color}
                     />
                 </Box>
@@ -118,21 +120,21 @@ const DewormingCard = ({ pet, records, onUpdateWeight }: DewormingCardProps) => 
     return (
         <Paper withBorder p="md" radius="md">
             <Group justify="space-between" mb="xs">
-                <Text fw={600} size="md">Control de Parásitos</Text>
-                <Tooltip label="Calendario inteligente basado en peso y edad">
+                <Text fw={600} size="md">{t('title')}</Text>
+                <Tooltip label={t('tooltip')}>
                     <IconInfoCircle size={16} style={{ opacity: 0.5 }} />
                 </Tooltip>
             </Group>
 
             <Stack gap={0}>
                 <DewormingSection
-                    title="Desparasitación Interna"
+                    title={t('internal')}
                     icon={<IconBugOff size={18} />}
                     result={internalStatus}
                 />
                 <Divider my="xs" variant="dashed" />
                 <DewormingSection
-                    title="Desparasitación Externa"
+                    title={t('external')}
                     icon={<IconBug size={18} />}
                     result={externalStatus}
                     isLast

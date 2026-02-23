@@ -1,18 +1,21 @@
 'use client';
 
-import { Box, Container, Avatar, Title, Text, Flex, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button, Affix, Transition } from '@mantine/core';
+import { Box, Container, Avatar, Title, Text, Flex, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button, Affix, Transition, Tooltip } from '@mantine/core';
 import { useWindowScroll } from '@mantine/hooks';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
 import { MagicParticles } from '@/components/ui/MagicWrappers';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import dayjs from 'dayjs';
-import { formatAge } from '@/lib/dateUtils';
-import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus } from '@tabler/icons-react';
+import { getPetAge } from '@/lib/dateUtils';
+import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
+import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
 import { useState } from 'react';
 import { TimeTravelModal } from '@/components/debug/TimeTravelModal';
+import { useUpdatePetPhoto } from '@/hooks/useUpdatePetPhoto';
+import { FileButton, Loader } from '@mantine/core';
 
 interface PetProfileHeaderProps {
     pet: any;
@@ -25,8 +28,12 @@ interface PetProfileHeaderProps {
 export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRecord }: PetProfileHeaderProps) {
     const t = useTranslations('PetDetail');
     const tCommon = useTranslations('Common');
+    const tPets = useTranslations('DashboardView.Pets');
+    const format = useFormatter();
     const identityColor = getPetIdentityColor(pet._id);
     const [showTimeTravel, setShowTimeTravel] = useState(false);
+    const isDeceased = pet.status === 'deceased';
+    const { updatePhoto, isUploading } = useUpdatePetPhoto(pet._id);
 
     const [scroll] = useWindowScroll();
     const showSticky = scroll.y > 180;
@@ -106,7 +113,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                     leftSection={<IconPlus size={14} />}
                                     onClick={onAddRecord}
                                 >
-                                    Actualizar Libreta
+                                    {t('Header.updateRecord')}
                                 </Button>
                             )}
                         </Box>
@@ -155,15 +162,14 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                         />
                     </svg>
 
-                    {/* Name Positioning */}
-                    <Container size="lg" h="100%">
+                    {/* Name Positioning - DESKTOP ONLY */}
+                    <Container size="lg" h="100%" display={{ base: 'none', xs: 'block' }}>
                         <Flex
                             h="100%"
-                            align={{ base: 'flex-start', xs: 'flex-end' }}
-                            justify={{ base: 'center', xs: 'flex-start' }}
-                            pb={{ base: 0, xs: 16 }}
-                            pl={{ base: 0, xs: 160 }}
-                            pt={{ base: 20, xs: 0 }}
+                            align="flex-end"
+                            justify="flex-start"
+                            pb={16}
+                            pl={160}
                         >
                             <Title
                                 order={1}
@@ -192,73 +198,106 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 leftSection={<IconArrowBackUp size={18} />}
                                 style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
                             >
-                                Volver
+                                {t('Header.back')}
                             </Button>
                         </MagicParticles>
                     </HoverScale>
 
                     {/* Actions Top Right */}
                     <Flex style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }} gap="xs" align="center">
-                        {onAddRecord && (
+                        {/* Only show actions if NOT deceased */}
+                        {pet.status !== 'deceased' && (
+                            <>
+                                {onAddRecord && (
+                                    <MagicParticles color="white">
+                                        <Button
+                                            variant="white"
+                                            color={identityColor}
+                                            radius="xl"
+                                            leftSection={<IconPlus size={18} />}
+                                            onClick={onAddRecord}
+                                            style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)', fontWeight: 600 }}
+                                            className="shiny-button"
+                                            display={{ base: 'none', xs: 'flex' }}
+                                        >
+                                            {t('Header.updateRecord')}
+                                        </Button>
+                                    </MagicParticles>
+                                )}
+                                <MagicParticles onClick={onShare} color="white">
+                                    <ActionIconMotion>
+                                        <ActionIcon
+                                            variant="white"
+                                            color={identityColor}
+                                            size="lg"
+                                            radius="xl"
+                                            aria-label={t('Header.share')}
+                                            style={{ pointerEvents: 'none' }} // Click handled by wrapper
+                                        >
+                                            <IconShare size={18} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
+                                </MagicParticles>
+
+                                <MagicParticles color="white">
+                                    <ActionIconMotion>
+                                        <ActionIcon
+                                            component={Link}
+                                            href={`/dashboard/pets/${pet._id}/edit`}
+                                            variant="white"
+                                            color={identityColor}
+                                            size="lg"
+                                            radius="xl"
+                                            aria-label={t('Header.edit')}
+                                        >
+                                            <IconPencil size={18} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
+                                </MagicParticles>
+                                <MagicParticles color="white">
+                                    <ActionIconMotion>
+                                        <ActionIcon
+                                            variant="white"
+                                            color={identityColor}
+                                            size="lg"
+                                            radius="xl"
+                                            aria-label={t('Header.timeTravel')}
+                                            onClick={() => setShowTimeTravel(true)}
+                                        >
+                                            <IconHistory size={18} />
+                                        </ActionIcon>
+                                    </ActionIconMotion>
+                                </MagicParticles>
+                            </>
+                        )}
+
+                        {/* If deceased, maybe show only edit to allow restoring/deleting? 
+                            User said "neither share nor update record". 
+                            Usually one wants to be able to edit (to fix the date or delete).
+                            Let's keep Edit button but hide others?
+                            User said: "tampoco se podrá compartir, ni actualizar libreta". 
+                            Did not explicitly forbid "Edit". 
+                            However, the prompt implies a read-only view.
+                            But if I hide Edit, they can never change it back if they made a mistake or want to delete.
+                            I will SHOW Edit but HIDE Share/Add/TimeTravel. 
+                        */}
+                        {pet.status === 'deceased' && (
                             <MagicParticles color="white">
-                                <Button
-                                    variant="white"
-                                    color={identityColor}
-                                    radius="xl"
-                                    leftSection={<IconPlus size={18} />}
-                                    onClick={onAddRecord}
-                                    style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)', fontWeight: 600 }}
-                                    className="shiny-button"
-                                    display={{ base: 'none', xs: 'flex' }}
-                                >
-                                    Actualizar Libreta
-                                </Button>
+                                <ActionIconMotion>
+                                    <ActionIcon
+                                        component={Link}
+                                        href={`/dashboard/pets/${pet._id}/edit`}
+                                        variant="white"
+                                        color={identityColor}
+                                        size="lg"
+                                        radius="xl"
+                                        aria-label={t('Header.edit')}
+                                    >
+                                        <IconPencil size={18} />
+                                    </ActionIcon>
+                                </ActionIconMotion>
                             </MagicParticles>
                         )}
-                        <MagicParticles onClick={onShare} color="white">
-                            <ActionIconMotion>
-                                <ActionIcon
-                                    variant="white"
-                                    color={identityColor}
-                                    size="lg"
-                                    radius="xl"
-                                    aria-label="Compartir"
-                                    style={{ pointerEvents: 'none' }} // Click handled by wrapper
-                                >
-                                    <IconShare size={18} />
-                                </ActionIcon>
-                            </ActionIconMotion>
-                        </MagicParticles>
-
-                        <MagicParticles color="white">
-                            <ActionIconMotion>
-                                <ActionIcon
-                                    component={Link}
-                                    href={`/dashboard/pets/${pet._id}/edit`}
-                                    variant="white"
-                                    color={identityColor}
-                                    size="lg"
-                                    radius="xl"
-                                    aria-label="Editar"
-                                >
-                                    <IconPencil size={18} />
-                                </ActionIcon>
-                            </ActionIconMotion>
-                        </MagicParticles>
-                        <MagicParticles color="white">
-                            <ActionIconMotion>
-                                <ActionIcon
-                                    variant="white"
-                                    color={identityColor}
-                                    size="lg"
-                                    radius="xl"
-                                    aria-label="Simular Tiempo"
-                                    onClick={() => setShowTimeTravel(true)}
-                                >
-                                    <IconHistory size={18} />
-                                </ActionIcon>
-                            </ActionIconMotion>
-                        </MagicParticles>
                     </Flex>
                 </Box>
 
@@ -270,91 +309,178 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
 
                 <Container size="lg" style={{ marginTop: -60, paddingBottom: 16, position: 'relative' }}>
                     <Flex
-                        direction={{ base: 'column', xs: 'row' }}
-                        align={{ base: 'center', xs: 'flex-start' }} // Align top to start badges below name visual
+                        direction="row" // Always row for mobile and desktop (Mobile: Avatar left, Name right)
+                        align={{ base: 'center', xs: 'flex-start' }} // Center vertically on mobile (for half-color alignment), Top on desktop
                         gap={{ base: 'sm', xs: 'md' }}
                     >
-                        <Avatar
-                            src={pet.photoUrl}
-                            size={120}
-                            radius={120}
-                            style={{
-                                border: '4px solid var(--bg-surface)',
-                                boxShadow: 'var(--mantine-shadow-md)',
-                                background: !pet.photoUrl ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-9))` : undefined,
-                                color: 'white',
-                                fontSize: '3rem',
-                                fontWeight: 700,
-                                flexShrink: 0
-                            }}
-                        >
-                            {pet.name.charAt(0).toUpperCase()}
-                        </Avatar>
+                        <Box style={{ position: 'relative', display: 'inline-block' }}>
+                            <Avatar
+                                src={pet.photoUrl}
+                                size={120}
+                                radius={120}
+                                style={{
+                                    border: '4px solid var(--bg-surface)',
+                                    boxShadow: 'var(--mantine-shadow-md)',
+                                    background: !pet.photoUrl ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-5), var(--mantine-color-${identityColor}-9))` : undefined,
+                                    color: 'white',
+                                    fontSize: '3rem',
+                                    fontWeight: 700,
+                                    flexShrink: 0
+                                }}
+                                styles={{
+                                    root: {
+                                        flexShrink: 1,
+                                        minWidth: 80,
+                                    }
+                                }}
+                            >
+                                {pet.name.charAt(0).toUpperCase()}
+                            </Avatar>
+                            {!isDeceased && (
+                                <FileButton onChange={(file) => file && updatePhoto(file)} accept="image/png,image/jpeg,image/webp">
+                                    {(props) => (
+                                        <Tooltip label={t('Header.changePhoto')} withArrow position="right">
+                                            <ActionIcon
+                                                {...props}
+                                                variant="filled"
+                                                color="blue"
+                                                size="lg"
+                                                radius="xl"
+                                                loading={isUploading}
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: 5,
+                                                    right: 5,
+                                                    border: '2px solid var(--bg-surface)',
+                                                    zIndex: 10
+                                                }}
+                                            >
+                                                <IconCamera size={18} />
+                                            </ActionIcon>
+                                        </Tooltip>
+                                    )}
+                                </FileButton>
+                            )}
+                        </Box>
 
                         <Box
-                            style={{ flex: 1 }}
-                            mt={{ base: 0, xs: 72 }} // Push badges down on desktop to clear overlapped area
-                            ta={{ base: 'center', xs: 'left' }}
+                            style={{ flex: 1, minWidth: 0, zIndex: 10 }}
+                            mt={{ base: 0, xs: 72 }} // Display badges below separate title on Desktop
+                            ta="left"
+                            h={{ base: 130, xs: 'auto' }} // Fix height in mobile (slightly > 120 for spacing)
+                            display={{ base: 'flex', xs: 'block' }} // Flex col in mobile
                         >
-                            <Flex gap={8} justify={{ base: 'center', xs: 'flex-start' }} wrap="wrap" align="center">
-                                <PetSpeciesBadge
-                                    species={pet.species}
-                                    sex={pet.sex}
-                                    color={identityColor}
-                                    size="lg"
-                                />
-
-                                <Badge
-                                    size="lg"
-                                    radius="md"
-                                    variant="light" // Light variant looks good on surface
-                                    color={identityColor} // Use identity color for consistency
-                                    leftSection={<IconDna size={16} style={{ marginTop: 4 }} />}
-                                    style={{ textTransform: 'none' }}
+                            <Flex
+                                direction="column"
+                                justify={{ base: 'space-between', xs: 'flex-start' }}
+                                h="100%"
+                                w="100%"
+                            >
+                                {/* MOBILE TITLE: Visible only on mobile, right next to avatar */}
+                                <Title
+                                    order={1}
+                                    fw={800}
+                                    c="white"
+                                    display={{ base: 'block', xs: 'none' }} // Mobile Only
+                                    style={{
+                                        textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                        lineHeight: 1.1,
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        paddingTop: 20 // Increased padding to lower the name
+                                    }}
+                                    fz={28}
                                 >
-                                    {pet.breed}
-                                </Badge>
+                                    {pet.name}
+                                </Title>
 
-                                <Badge
-                                    size="lg"
-                                    radius="md"
-                                    variant="light"
-                                    color="gray" // Gray for date
-                                    leftSection={<IconCake size={16} style={{ marginTop: 2 }} />}
-                                    style={{ textTransform: 'none' }}
-                                >
-                                    {dayjs(pet.birthDate).utc().format('DD/MM/YY')} ({formatAge(pet.birthDate)})
-                                </Badge>
+                                <Flex gap={8} justify="flex-start" wrap="wrap" align="center" pb={{ base: 4, xs: 0 }}>
+                                    <PetSpeciesBadge
+                                        species={pet.species}
+                                        sex={pet.sex}
+                                        color={identityColor}
+                                        size="md"
+                                    />
+
+                                    <Badge
+                                        size="md"
+                                        radius="md"
+                                        variant="light" // Light variant looks good on surface
+                                        color={identityColor} // Use identity color for consistency
+                                        leftSection={<IconDna size={14} style={{ marginTop: 4 }} />}
+                                        style={{ textTransform: 'none' }}
+                                    >
+                                        {pet.breed}
+                                    </Badge>
+
+                                    {pet.status === 'deceased' ? (
+                                        <Badge
+                                            size="md"
+                                            radius="md"
+                                            variant="light"
+                                            color="gray"
+                                            leftSection={<Text size="xs">🕊️</Text>}
+                                            style={{ textTransform: 'none' }}
+                                        >
+                                            {dayjs(pet.birthDate).utc().format('YYYY')} - {pet.deathDate ? dayjs(pet.deathDate).utc().format('YYYY') : '...'}
+                                        </Badge>
+                                    ) : (
+                                        <Badge
+                                            size="md"
+                                            radius="md"
+                                            variant="light"
+                                            color="gray" // Gray for date
+                                            leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
+                                            style={{ textTransform: 'none' }}
+                                        >
+                                            {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({
+                                                (() => {
+                                                    const age = getPetAge(pet.birthDate);
+                                                    if (age.years >= 1) return tPets('ageYears', { count: age.years });
+                                                    if (age.months >= 2) return tPets('ageMonths', { count: age.months });
+                                                    return tPets('ageDays', { count: age.days === 0 ? 1 : age.days });
+                                                })()
+                                            })
+                                        </Badge>
+                                    )}
+                                </Flex>
                             </Flex>
                         </Box>
                     </Flex>
 
-                    <Tabs
-                        value={activeTab}
-                        onChange={onTabChange}
-                        variant="outline"
-                        radius="md"
-                        mt="xl"
-                        color={identityColor}
-                    >
-                        <Tabs.List>
-                            <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                Resumen
-                                {activeTab === 'summary' && <MagicTabBackground />}
-                            </Tabs.Tab>
-                            <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                Línea de tiempo
-                                {activeTab === 'timeline' && <MagicTabBackground />}
-                            </Tabs.Tab>
-                            <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                Salud
-                                {activeTab === 'health' && <MagicTabBackground />}
-                            </Tabs.Tab>
-                            {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
-                        </Tabs.List>
-                    </Tabs>
+                    {pet.status !== 'deceased' && (
+                        <Tabs
+                            value={activeTab}
+                            onChange={onTabChange}
+                            variant="outline"
+                            radius="md"
+                            mt="xl"
+                            color={identityColor}
+                        >
+                            <Tabs.List style={{ flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                                <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    {t('tabs.summary')}
+                                    {activeTab === 'summary' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    {t('tabs.timeline')}
+                                    {activeTab === 'timeline' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    {t('tabs.health')}
+                                    {activeTab === 'health' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                <Tabs.Tab value="gallery" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
+                                    {t('tabs.gallery')}
+                                    {activeTab === 'gallery' && <MagicTabBackground />}
+                                </Tabs.Tab>
+                                {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
+                            </Tabs.List>
+                        </Tabs>
+                    )}
                 </Container>
-            </Paper>
+            </Paper >
 
             {onAddRecord && (
                 <Affix position={{ bottom: 20, right: 20 }} zIndex={199}>
@@ -377,12 +503,13 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 onClick={onAddRecord}
                                 display={{ base: 'flex', xs: 'none' }}
                             >
-                                Actualizar
+                                {t('Header.updateRecord')}
                             </Button>
                         )}
                     </Transition>
                 </Affix>
-            )}
+            )
+            }
         </>
     );
 }

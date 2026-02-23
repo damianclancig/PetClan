@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link } from '@/i18n/routing';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface SharePetModalProps {
     opened: boolean;
@@ -23,6 +24,9 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
     const { data: session } = useSession();
     const router = useRouter();
     const queryClient = useQueryClient();
+    const tModalShare = useTranslations('ModalSharePet');
+    const tCommon = useTranslations('Common');
+    const tNotifications = useTranslations('Notifications');
 
     const handleShare = async () => {
         if (!email) return;
@@ -38,12 +42,12 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || 'Error al enviar invitación');
+                throw new Error(data.error || tModalShare('notifications.inviteErrorTitle'));
             }
 
             notifications.show({
-                title: 'Invitación enviada',
-                message: `Se ha invitado a ${email} a colaborar con ${petName}`,
+                title: tModalShare('notifications.inviteSentTitle'),
+                message: tModalShare('notifications.inviteSentMsg', { email, name: petName }),
                 color: 'green',
                 icon: <IconCheck size={16} />,
             });
@@ -51,7 +55,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
             setEmail('');
         } catch (error: any) {
             notifications.show({
-                title: 'Error',
+                title: tNotifications('error'),
                 message: error.message,
                 color: 'red',
                 icon: <IconAlertCircle size={16} />,
@@ -63,24 +67,24 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
 
     const handleLeave = () => {
         modals.openConfirmModal({
-            title: 'Dejar mascota',
+            title: tModalShare('leavePetTitle'),
             centered: true,
             children: (
                 <Text size="sm">
-                    ¿Estás seguro que deseas dejar de compartir la mascota <strong>{petName}</strong>? Ya no podrás verla ni gestionarla.
+                    {tModalShare('leavePetConfirmMessage')} <strong>{petName}</strong>{tModalShare('leavePetConfirmMessage2')}
                 </Text>
             ),
-            labels: { confirm: 'Salir de la mascota', cancel: 'Cancelar' },
+            labels: { confirm: tModalShare('btnLeavePet'), cancel: tModalShare('btnCancel') },
             confirmProps: { color: 'red' },
             onConfirm: async () => {
                 try {
                     const res = await fetch(`/api/pets/${petId}/owners/leave`, { method: 'POST' });
                     if (!res.ok) {
                         const data = await res.json();
-                        throw new Error(data.error || 'Error al salir');
+                        throw new Error(data.error || tNotifications('error'));
                     }
 
-                    notifications.show({ title: 'Has dejado la mascota', message: 'Ya no tienes acceso.', color: 'blue' });
+                    notifications.show({ title: tNotifications('leftPetTitle'), message: tNotifications('leftPetMessage'), color: 'blue' });
                     onClose();
                     router.push('/dashboard/pets');
                     queryClient.invalidateQueries({ queryKey: ['pets'] });
@@ -93,14 +97,14 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
 
     const handleRequestRemove = (targetUserId: string, targetName: string) => {
         modals.openConfirmModal({
-            title: 'Solicitar baja',
+            title: tModalShare('removeModal.title'),
             centered: true,
             children: (
                 <Text size="sm">
-                    ¿Solicitar a <strong>{targetName}</strong> que deje de ser dueño? Se enviará una notificación para que acepte.
+                    {tModalShare('removeModal.description', { name: targetName })}
                 </Text>
             ),
-            labels: { confirm: 'Enviar solicitud', cancel: 'Cancelar' },
+            labels: { confirm: tModalShare('removeModal.btnConfirm'), cancel: tModalShare('removeModal.btnCancel') },
             confirmProps: { color: 'blue' },
             onConfirm: async () => {
                 try {
@@ -112,12 +116,12 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
 
                     if (!res.ok) {
                         const data = await res.json();
-                        throw new Error(data.error || 'Error al solicitar baja');
+                        throw new Error(data.error || tModalShare('notifications.removeRequestErrorTitle'));
                     }
 
-                    notifications.show({ title: 'Solicitud enviada', message: 'Se ha notificado al usuario.', color: 'green' });
+                    notifications.show({ title: tModalShare('notifications.removeRequestSentTitle'), message: tModalShare('notifications.removeRequestSentMsg'), color: 'green' });
                 } catch (error: any) {
-                    notifications.show({ title: 'Error', message: error.message, color: 'red' });
+                    notifications.show({ title: tNotifications('error'), message: error.message, color: 'red' });
                 }
             }
         });
@@ -139,28 +143,28 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
     };
 
     return (
-        <Modal opened={opened} onClose={() => { onClose(); setEmail(''); }} title={`Compartir a ${petName}`} centered size="md">
+        <Modal opened={opened} onClose={() => { onClose(); setEmail(''); }} title={tModalShare('title', { name: petName })} centered size="md">
             <Tabs defaultValue="owners">
                 <Tabs.List grow>
                     <Tabs.Tab value="owners" leftSection={<IconUsers size={16} />}>
-                        Dueños
+                        {tModalShare('tabs.owners')}
                     </Tabs.Tab>
                     <Tabs.Tab value="qr" leftSection={<IconQrcode size={16} />}>
-                        QR / Público
+                        {tModalShare('tabs.qr')}
                     </Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="owners" pt="md">
                     <Stack>
                         <Text size="sm" c="dimmed">
-                            Agrega a otros usuarios para que puedan ver y gestionar a {petName}.
+                            {tModalShare('ownersTab.description', { name: petName })}
                         </Text>
 
                         <Group align="flex-end">
                             <TextInput
                                 style={{ flex: 1 }}
-                                label="Email del usuario"
-                                placeholder="usuario@email.com"
+                                label={tModalShare('ownersTab.emailLabel')}
+                                placeholder={tModalShare('ownersTab.emailPlaceholder')}
                                 leftSection={<IconMail size={16} />}
                                 value={email}
                                 onChange={(e) => setEmail(e.currentTarget.value)}
@@ -169,11 +173,11 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                 }}
                             />
                             <Button onClick={handleShare} loading={loading} disabled={!email}>
-                                Invitar
+                                {tModalShare('ownersTab.btnInvite')}
                             </Button>
                         </Group>
 
-                        <Text fw={500} size="sm" mt="md">Dueños actuales:</Text>
+                        <Text fw={500} size="sm" mt="md">{tModalShare('ownersTab.currentOwners')}</Text>
                         <Stack gap="sm">
                             {owners && owners.map((owner: any) => {
                                 const isMe = isCurrentUser(owner);
@@ -184,14 +188,14 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                                 {owner.name?.charAt(0)}
                                             </Avatar>
                                             <div style={{ flex: 1 }}>
-                                                <Text size="sm" fw={500}>{owner.name} {isMe && '(Tú)'}</Text>
+                                                <Text size="sm" fw={500}>{owner.name} {isMe && tModalShare('ownersTab.you')}</Text>
                                                 <Text size="xs" c="dimmed">{owner.email}</Text>
                                             </div>
                                         </Group>
 
                                         {isMe ? (
                                             owners.length === 1 ? (
-                                                <Tooltip label="Eres el único dueño. Gestiona el estado desde Editar.">
+                                                <Tooltip label={tModalShare('ownersTab.onlyOwnerTooltip')}>
                                                     <span style={{ cursor: 'not-allowed', display: 'inline-block' }}>
                                                         <ActionIcon color="gray" variant="subtle" disabled>
                                                             <IconLogout size={16} />
@@ -199,14 +203,14 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                                     </span>
                                                 </Tooltip>
                                             ) : (
-                                                <Tooltip label="Dejar mascota">
+                                                <Tooltip label={tModalShare('leavePetTooltip')}>
                                                     <ActionIcon color="red" variant="subtle" onClick={handleLeave}>
                                                         <IconLogout size={16} />
                                                     </ActionIcon>
                                                 </Tooltip>
                                             )
                                         ) : (
-                                            <Tooltip label="Solicitar baja">
+                                            <Tooltip label={tModalShare('ownersTab.requestRemoveTooltip')}>
                                                 <ActionIcon color="orange" variant="transparent" onClick={() => handleRequestRemove(owner._id, owner.name)}>
                                                     <IconUserMinus size={16} />
                                                 </ActionIcon>
@@ -222,11 +226,11 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                 <Tabs.Panel value="qr" pt="md">
                     <Stack align="center">
                         <Text size="sm" ta="center" mb="md">
-                            Compartí este código QR para que otros puedan ver la ficha básica de <strong>{petName}</strong>.
+                            {tModalShare('qrTab.description')} <strong>{petName}</strong>.
                         </Text>
                         <PetQRCode petId={petId} petName={petName} />
                         <Button component={Link} href={`/public/pets/${petId}`} target="_blank" variant="subtle" size="xs" mt="md">
-                            Abrir enlace directo
+                            {tModalShare('qrTab.btnOpenLink')}
                         </Button>
                     </Stack>
                 </Tabs.Panel>

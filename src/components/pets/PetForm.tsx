@@ -1,6 +1,6 @@
 'use client';
 
-import { TextInput, NumberInput, Select, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid } from '@mantine/core';
+import { TextInput, Button, Group, FileButton, Avatar, Text, Stack, Box, ActionIcon, Textarea, SimpleGrid, Select, Alert } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +8,13 @@ import { z } from 'zod';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useState, useRef, useEffect } from 'react';
-import { IconTrash, IconGenderMale, IconGenderFemale } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
+import { SpeciesSelector } from './form/SpeciesSelector';
+import { SexSelector } from './form/SexSelector';
+import { BirthDatePicker } from './form/BirthDatePicker';
+import { WeightInput } from './form/WeightInput';
+import { ModalDatePicker } from '../ui/ModalDatePicker';
+import { CloudinaryUploadButton } from '../ui/CloudinaryUploadButton';
 import 'dayjs/locale/es';
 
 export type PetFormValues = {
@@ -24,20 +30,25 @@ export type PetFormValues = {
     diseases?: string;
     treatments?: string;
     notes?: string;
+    status: 'active' | 'lost' | 'deceased' | 'archived';
+    deathDate?: string;
 };
 
 interface PetFormProps {
     initialValues?: Partial<PetFormValues>;
-    onSubmit: (values: PetFormValues) => void;
-    isLoading: boolean;
+    onSubmit: (data: PetFormValues) => void;
+    isLoading?: boolean;
     submitLabel?: string;
+    lastRecordDate?: Date; // New prop for validation
+    isEditMode?: boolean;
+    petId?: string; // Optional, for folder organization
 }
 
-export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: PetFormProps) {
-    const t = useTranslations('NewPet');
+export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastRecordDate, isEditMode, petId }: PetFormProps) {
+    const t = useTranslations('NewPet'); // Use NewPet translations for labels
     const tCommon = useTranslations('Common');
     const tValidation = useTranslations('Validation');
-    const [file, setFile] = useState<File | null>(null);
+    const tForm = useTranslations('PetForm');
     const [preview, setPreview] = useState<string | null>(initialValues?.photoUrl || null);
     const resetRef = useRef<() => void>(null);
 
@@ -56,6 +67,8 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         diseases: z.string().optional(),
         treatments: z.string().optional(),
         notes: z.string().optional(),
+        status: z.enum(['active', 'lost', 'deceased', 'archived']),
+        deathDate: z.string().optional(),
     });
 
     const { register, handleSubmit, formState: { errors }, setValue, watch, control, reset } = useForm<PetFormValues>({
@@ -63,6 +76,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         defaultValues: {
             species: 'dog',
             sex: 'male',
+            status: 'active',
             ...initialValues,
         },
     });
@@ -78,43 +92,12 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
         }
     }, [initialValues, reset]);
 
-    const processImage = (file: File) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target?.result as string;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const size = 200; // Target size 200x200
+    // Manually register photoUrl so it is included in handleSubmit data
+    useEffect(() => {
+        register('photoUrl');
+    }, [register]);
 
-                canvas.width = size;
-                canvas.height = size;
 
-                if (ctx) {
-                    // Center Crop Logic
-                    const minDim = Math.min(img.width, img.height);
-                    const sx = (img.width - minDim) / 2;
-                    const sy = (img.height - minDim) / 2;
-
-                    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
-
-                    // Export as JPEG with 0.8 quality
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    setPreview(dataUrl);
-                    setValue('photoUrl', dataUrl);
-                }
-            };
-        };
-    };
-
-    const handleFileChange = (payload: File | null) => {
-        setFile(payload);
-        if (payload) {
-            processImage(payload);
-        }
-    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -124,23 +107,26 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                     {!preview && (initialValues?.name?.charAt(0) || '?')}
                 </Avatar>
                 <Group gap="xs">
-                    <FileButton onChange={handleFileChange} accept="image/png,image/jpeg">
-                        {(props) => <Button {...props} size="xs" variant="light">
-                            {preview ? 'Cambiar Foto' : 'Subir Foto'}
-                        </Button>}
-                    </FileButton>
+                    <CloudinaryUploadButton
+                        onUploadComplete={(result) => {
+                            setPreview(result.url);
+                            setValue('photoUrl', result.url);
+                        }}
+                        label={preview ? tForm('photo.change') : tForm('photo.upload')}
+                        compact
+                        folder={petId ? `petclan/profiles/${petId}` : 'petclan/profiles/temp'}
+                    />
                     {preview && (
                         <ActionIcon
                             color="red"
                             variant="light"
                             size="md" // matches xs button height roughly
                             onClick={() => {
-                                setFile(null);
                                 setPreview(null);
                                 setValue('photoUrl', '');
                                 resetRef.current?.();
                             }}
-                            title="Eliminar Foto"
+                            title={tForm('photo.delete')}
                         >
                             <IconTrash size={16} />
                         </ActionIcon>
@@ -153,89 +139,67 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                 placeholder={t('placeholders.name')}
                 {...register('name')}
                 error={errors.name?.message}
-                mb={{ base: 'xs', md: 'md' }}
+                mb={{ base: 'md', md: 'lg' }}
                 withAsterisk
             />
 
-            <Controller
-                name="birthDate"
-                control={control}
-                render={({ field }) => (
-                    <DateInput
-                        label={t('birthDate')}
-                        placeholder="DD/MM/AAAA"
-                        error={errors.birthDate?.message}
-                        mb={{ base: 'xs', md: 'md' }}
-                        withAsterisk
-                        value={field.value ? new Date(field.value) : null}
-                        onChange={(date: any) => field.onChange(date ? date.toISOString() : '')}
-                        valueFormat="DD/MM/YYYY"
-                        clearable
-                        locale="es"
-                        maxDate={new Date()}
-                        popoverProps={{ withinPortal: true, zIndex: 10000 }}
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb={{ base: 'md', md: 'lg' }}>
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>{t('species')} <Text span c="red">*</Text></Text>
+                    <Controller
+                        name="species"
+                        control={control}
+                        render={({ field }) => (
+                            <SpeciesSelector
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                            />
+                        )}
                     />
-                )}
-            />
+                </Stack>
 
-            <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>
-                <Select
-                    label={t('species')}
-                    data={[
-                        { value: 'dog', label: tCommon('species.dog') },
-                        { value: 'cat', label: tCommon('species.cat') },
-                        { value: 'other', label: tCommon('species.other') },
-                    ]}
-                    defaultValue={initialValues?.species || 'dog'}
-                    onChange={(val) => setValue('species', val as 'dog' | 'cat' | 'other')}
-                    error={errors.species?.message}
-                    withAsterisk
-                />
-                <TextInput
-                    label={t('breed')}
-                    placeholder={t('placeholders.breed')}
-                    {...register('breed')}
-                    error={errors.breed?.message}
-                    withAsterisk
-                />
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>{t('sex')} <Text span c="red">*</Text></Text>
+                    <Controller
+                        name="sex"
+                        control={control}
+                        render={({ field }) => (
+                            <SexSelector
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                            />
+                        )}
+                    />
+                </Stack>
             </SimpleGrid>
 
-            <SimpleGrid cols={2} spacing={{ base: 'xs', md: 'md' }} mb={{ base: 'xs', md: 'md' }}>
-                <Select
-                    label={t('sex')}
-                    data={[
-                        { value: 'male', label: tCommon('sex.male') },
-                        { value: 'female', label: tCommon('sex.female') },
-                    ]}
-                    defaultValue={initialValues?.sex || 'male'}
-                    onChange={(val) => setValue('sex', val as 'male' | 'female')}
-                    error={errors.sex?.message}
-                    withAsterisk
-                    leftSection={
-                        watch('sex') === 'male'
-                            ? <IconGenderMale size={16} color="var(--mantine-color-blue-5)" />
-                            : <IconGenderFemale size={16} color="var(--mantine-color-pink-5)" />
-                    }
-                    renderOption={({ option }) => (
-                        <Group gap="xs">
-                            {option.value === 'male'
-                                ? <IconGenderMale size={16} color="var(--mantine-color-blue-5)" />
-                                : <IconGenderFemale size={16} color="var(--mantine-color-pink-5)" />
-                            }
-                            <Text fz="sm">{option.label}</Text>
-                        </Group>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb={{ base: 'md', md: 'lg' }}>
+                <Controller
+                    name="birthDate"
+                    control={control}
+                    render={({ field }) => (
+                        <BirthDatePicker
+                            value={field.value}
+                            onChange={(val) => field.onChange(val)}
+                            error={errors.birthDate?.message}
+                        />
                     )}
                 />
-                <NumberInput
-                    label={t('weight')}
-                    placeholder="5.5"
-                    min={0}
-                    step={0.1}
-                    defaultValue={initialValues?.weight}
-                    onChange={(val) => setValue('weight', Number(val))}
-                    error={errors.weight?.message}
-                    withAsterisk
-                />
+
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>{t('weight')} <Text span c="red">*</Text></Text>
+                    <Controller
+                        name="weight"
+                        control={control}
+                        render={({ field }) => (
+                            <WeightInput
+                                value={field.value}
+                                onChange={(val) => field.onChange(val)}
+                                error={errors.weight?.message}
+                            />
+                        )}
+                    />
+                </Stack>
             </SimpleGrid>
 
             <TextInput
@@ -273,6 +237,66 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel }: Pet
                 minRows={2}
                 mb={{ base: 'xs', md: 'md' }}
             />
+
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb={{ base: 'md', md: 'lg' }}>
+                <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            label={tForm('status.label')}
+                            data={[
+                                { value: 'active', label: tForm('status.active') },
+                                { value: 'lost', label: tForm('status.lost') },
+                                { value: 'deceased', label: tForm('status.deceased') },
+                                { value: 'archived', label: tForm('status.archived') },
+                            ]}
+                            value={field.value}
+                            onChange={(val) => field.onChange(val)}
+                        />
+                    )}
+                />
+
+                {watch('status') === 'deceased' && (
+                    <Controller
+                        name="deathDate"
+                        control={control}
+                        render={({ field }) => (
+                            <div>
+                                <ModalDatePicker
+                                    label={tForm('deathDate.label')}
+                                    placeholder={tForm('deathDate.placeholder')}
+                                    value={field.value || ''}
+                                    onChange={(val) => field.onChange(val)}
+                                    maxDate={new Date()}
+                                    minDate={lastRecordDate}
+                                />
+                                {lastRecordDate && (
+                                    <Text size="xs" c="dimmed" mt={4} style={{ lineHeight: 1.2 }}>
+                                        {tForm('deathDate.minDateHint', { date: lastRecordDate.toLocaleDateString() })}
+                                    </Text>
+                                )}
+                            </div>
+                        )}
+                    />
+                )}
+            </SimpleGrid>
+
+            {watch('status') === 'lost' && (
+                <Stack mb="lg">
+                    <Alert variant="light" color="red" title={tForm('lostAlertTitle')}>
+                        {tForm('lostAlertBody')}
+                    </Alert>
+                </Stack>
+            )}
+
+            {watch('status') === 'deceased' && (
+                <Stack mb="lg">
+                    <Alert variant="light" color="gray" title={tForm('deceasedAlertTitle')}>
+                        {tForm('deceasedAlertBody')}
+                    </Alert>
+                </Stack>
+            )}
 
             {/* Mobile Buttons: Full width, side by side */}
             <Box hiddenFrom="xs" mt="xl">

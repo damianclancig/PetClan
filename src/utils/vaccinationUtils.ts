@@ -53,3 +53,54 @@ export function calculateNextDueDate(slot: VaccineSlot, appliedDate: Date): Date
 
     return undefined;
 }
+
+export function getPetHealthSummary(pet: { species: string; birthDate: Date }, records: IHealthRecord[]) {
+    const schedule = getVaccinationSchedule(pet.species);
+    const scheduleStatuses = schedule.map(slot => ({
+        slot,
+        ...getVaccineStatus(slot, pet.birthDate, records)
+    }));
+
+    const getSlotFamily = (id: string) => {
+        if (id.includes('external') || id.includes('pulgas')) return 'external';
+        if (id.includes('deworm')) return 'deworm';
+        if (id.includes('poly') || id.includes('triple') || id.includes('sextuple')) return 'poly';
+        if (id.includes('rabies')) return 'rabies';
+        return 'other';
+    };
+
+    const visibleSlotIds = new Set<string>();
+    const families = ['deworm', 'external', 'poly', 'rabies', 'other'];
+
+    families.forEach(family => {
+        const familySlots = scheduleStatuses.filter(s => getSlotFamily(s.slot.id) === family);
+        let foundFirstPending = false;
+        familySlots.forEach(s => {
+            if (s.status === 'completed' || s.status === 'missed_replaced') {
+                // skip
+            } else {
+                if (!foundFirstPending) {
+                    visibleSlotIds.add(s.slot.id);
+                    foundFirstPending = true;
+                }
+            }
+        });
+    });
+
+    const visibleStatuses = scheduleStatuses.filter(s => visibleSlotIds.has(s.slot.id));
+
+    const overdueCount = visibleStatuses.filter(s => s.status === 'overdue').length;
+    const dueNowCount = visibleStatuses.filter(s => s.status === 'current_due').length;
+    const upcomingCount = visibleStatuses.filter(s => s.status === 'due_soon').length;
+    const isUpToDate = overdueCount === 0 && dueNowCount === 0;
+
+    const hasOverdueRabies = scheduleStatuses.some((s) =>
+        s.slot.vaccineType.includes('rabies') && s.status === 'overdue'
+    );
+    const hasCompletedRabies = scheduleStatuses.some((s) =>
+        s.slot.vaccineType.includes('rabies') && s.status === 'completed'
+    );
+    const hasRabies = !hasOverdueRabies && hasCompletedRabies;
+
+    return { overdueCount, dueNowCount, upcomingCount, isUpToDate, hasRabies };
+}

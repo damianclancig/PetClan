@@ -56,13 +56,40 @@
         "myPets": "Mis Mascotas",
         "logout": "Cerrar Sesión",
         "profile": "Perfil",
+        "account": "Cuenta",
+        "notifications": "Notificaciones",
         "greeting": "Hola, {name}!"
+    },
+    "NotificationsCenter": {
+        "title": "Notificaciones",
+        "emptyState": "No tienes notificaciones"
+    },
+    "SettingsNotifications": {
+        "title": "Configuración de Notificaciones 🔔",
+        "description": "Elige cómo quieres recibir las alertas sobre tus mascotas y la comunidad.",
+        "email": {
+            "label": "Notificaciones por Correo Electrónico",
+            "description": "Recibe alertas importantes, recordatorios y solicitudes en tu email."
+        },
+        "inApp": {
+            "label": "Notificaciones en la Aplicación",
+            "description": "Recibe alertas visuales (campana) y mensajes emergentes mientras usas PetClan."
+        },
+        "save": "Guardar Cambios",
+        "savedTitle": "Cambios guardados",
+        "savedMsg": "Tus preferencias de notificaciones han sido actualizadas.",
+        "errorTitle": "Error",
+        "errorLoadMsg": "No se pudieron cargar las preferencias.",
+        "errorSaveMsg": "No se pudieron guardar los cambios."
     },
     "Theme": {
         "title": "Tema",
         "light": "Modo Claro",
         "dark": "Modo Oscuro",
         "auto": "Sistema"
+    },
+    "Navigation": {
+        "language": "Idioma"
     },
     "Common": {
         "cancel": "Cancelar",
@@ -75,20 +102,93 @@
             "dog_female": "Perra 🐶",
             "cat": "Gato 🐱",
             "cat_female": "Gata 🐱",
-            "other": "Otro"
+            "other": "Otro",
+            "internal": "Interna",
+            "external": "Externa",
+            "polyvalent": "Polivalente / Múltiple",
+            "rabies": "Antirrábica",
+            "flea": "Pulgas / Garrapatas"
         },
         "sex": {
             "male": "Macho",
             "female": "Hembra"
         }
     },
+    "SmartRecord": {
+        "stepTitle": "¿Qué registramos hoy?",
+        "stepDetails": "Detalles del Registro",
+        "types": {
+            "vaccine": "Vacuna",
+            "deworming": "Desp. Interna",
+            "externalDeworming": "Desp. Externa",
+            "consultation": "Consulta",
+            "weight": "Peso",
+            "other": "Otro"
+        },
+        "suggestions": {
+            "one": "Recomendado para hoy:",
+            "many": "Opciones recomendadas:"
+        },
+        "external": {
+            "productConfig": "Configuración del Producto",
+            "productType": "Tipo de Producto",
+            "productTypePlaceholder": "Ej: Spray, Talco, Baño...",
+            "duration": "Duración",
+            "durationCustom": "Duración Personalizada",
+            "durationDays": "días",
+            "protection": "Protección",
+            "methodPipette": "Pipeta",
+            "methodTablet": "Compri.",
+            "methodCollar": "Collar",
+            "methodOther": "Otro",
+            "durationOther": "Otro",
+            "targetFleas": "Pulgas",
+            "targetTicks": "Garrapatas",
+            "targetMosquitoes": "Mosquitos",
+            "titleTemplate": "{method} ({days} días)",
+            "descTemplate": "Protección contra: {targets}",
+            "defaultProduct": "Producto"
+        },
+        "form": {
+            "title": "Título",
+            "titlePlaceholder": "Ej: Triple Felina",
+            "appliedAt": "Fecha Aplicación",
+            "appliedAtPlaceholder": "DD/MM/AAAA",
+            "nextDue": "Vencimiento / Próxima Dosis",
+            "nextDuePlaceholder": "Calculado autom.",
+            "weightKg": "Peso (kg)",
+            "vetClinic": "Veterinario / Clínica",
+            "optional": "Opcional",
+            "notes": "Notas / Observaciones",
+            "notesPlaceholder": "Detalles adicionales...",
+            "validationTitle": "Título requerido",
+            "validationDate": "Fecha requerida"
+        },
+        "btn": {
+            "back": "Volver",
+            "save": "Guardar Registro"
+        },
+        "externalTitleDefault": "Protección contra pulgas y garrapatas"
+    },
     "Pets": {
         "title": "Mis Mascotas 🐾",
+        "badges": {
+            "lost": "🚨 PERDIDO",
+            "deceased": "En Memoria",
+            "archived": "Archivado"
+        },
         "addPet": "Registrar Mascota",
+        "newPet": "Nueva Mascota",
         "noPets": "No tienes mascotas registradas aún.",
         "breed": "Raza",
         "weight": "Peso",
-        "viewHealthRecord": "Ver Libreta Sanitaria"
+        "viewHealthRecord": "Ver Libreta Sanitaria",
+        "errorLoading": "Error al cargar las mascotas.",
+        "noMemories": "No hay memorias para mostrar.",
+        "tabs": {
+            "active": "Activas",
+            "history": "Memorias"
+        }
     },
     "NewPet": {
         "title": "Registrar Nueva Mascota",
@@ -103,16 +203,97 @@
         "diseases": "Enfermedades Crónicas",
         "treatments": "Tratamientos Activos",
         "notes": "Notas Adicionales",
+        "whoJoins": "¿Quién se une a la familia?",
+        "tapToAddPhoto": "Toca para agregar foto",
+        "aboutPet": "Un poco sobre {name}...",
+        "healthData": "Datos de Salud de {name}",
+        "medicalHistory": "Antecedentes Médicos de {name}",
+        "medicalHistoryDesc": "Esta información es opcional, pero ayuda a mantener un mejor historial.",
+        "optional": "Opcional",
+        "selectDate": "Selecciona una fecha",
+        "selectDateTitle": "Selecciona fecha de nacimiento",
+        "ageTitle": "Edad:",
+        "decreaseWeight": "Disminuir peso",
+        "increaseWeight": "Aumentar peso",
         "placeholders": {
             "name": "Firulais",
             "breed": "Mestizo",
-            "chipId": "123456789"
+            "chipId": "123456789",
+            "characteristics": "Mancha en la oreja, cola corta...",
+            "diseases": "Ej. Alergia al pollo, Displasia de cadera...",
+            "treatments": "Ej. Medicación diaria, Fisioterapia...",
+            "notes": "Cualquier otro detalle importante..."
         },
         "submit": "Guardar Mascota"
     },
+    "Wizard": {
+        "allReady": "¡Todo listo!",
+        "next": "Siguiente",
+        "create": "Crear Mascota"
+    },
     "PetDetail": {
-        "notFound": "Mascota no encontrada.",
-        "birthDate": "Nacimiento"
+        "notFound": "Lo sentimos, no encontramos la mascota solicitada.",
+        "badges": {
+            "overdue": "⚠️ Atención: Vacunas vencidas ({count})",
+            "dueNow": "✅ Es el momento ideal ({count})",
+            "upcoming": "⏳ Próximas vacinas ({count})",
+            "upToDate": "✨ Vacunas al día",
+            "rabies": "💉 Antirrábica Vigente",
+            "deceased": "🕊️"
+        },
+        "tabs": {
+            "summary": "Resumen",
+            "timeline": "Línea de tiempo",
+            "health": "Salud",
+            "gallery": "Galería"
+        },
+        "Header": {
+            "back": "Volver",
+            "updateRecord": "Actualizar Libreta",
+            "share": "Compartir",
+            "edit": "Editar",
+            "timeTravel": "Simular Tiempo",
+            "changePhoto": "Cambiar foto de perfil"
+        },
+        "Summary": {
+            "healthStatus": "Estado de Salud",
+            "weightTitle": "Peso",
+            "weightCurrent": "Peso Actual",
+            "viewChart": "Ver gráfico e historial",
+            "latestEvents": "Últimos Eventos"
+        },
+        "ExtraInfo": {
+            "title": "Información Adicional",
+            "characteristics": "Características",
+            "diseases": "Enfermedades / Condiciones",
+            "treatments": "Tratamientos",
+            "notes": "Notas"
+        },
+        "Deworming": {
+            "title": "Control de Parásitos",
+            "tooltip": "Calendario inteligente basado en peso y edad",
+            "internal": "Desparasitación Interna",
+            "external": "Desparasitación Externa",
+            "updateWeight": "Actualizar Peso",
+            "vetRecommendation": "Recomendación",
+            "vetRecommendationDesc": "Consultá con tu veterinario qué producto aplicar.",
+            "vetAttention": "Atención",
+            "vetAttentionDesc": "Consulta a tu veterinario para indicaciones específicas."
+        },
+        "WeightControl": {
+            "title": "Peso Actual",
+            "hideHistory": "Ocultar Historial",
+            "showHistory": "Ver Historial Completo",
+            "noPrevious": "No hay registros previos."
+        },
+        "Gallery": {
+            "empty": "Aún no hay fotos en el historial. ¡Sube algunas para ver su crecimiento! 📸",
+            "altThumb": "Foto de mascota",
+            "altFull": "Visualización de foto"
+        },
+        "Deceased": {
+            "memories": "Recuerdos y Eventos"
+        }
     },
     "Health": {
         "title": "Historia Clínica",
@@ -138,6 +319,15 @@
             "deworming": "Desparasitación",
             "consultation": "Consulta",
             "weight": "Peso"
+        },
+        "Timeline": {
+            "milestone": "Hito",
+            "deathTitle": "Hasta siempre 🕊️",
+            "deathDesc": "Siempre en nuestro recuerdo.",
+            "birthTitle": "Nacimiento 🎉",
+            "birthDesc": "¡Bienvenido al mundo!",
+            "update": "Actualizar Libreta",
+            "viewAll": "Ver historial completo ({count})"
         }
     },
     "Validation": {
@@ -147,5 +337,322 @@
         "weightPositive": "El peso debe ser mayor a 0",
         "titleRequired": "Título requerido",
         "descriptionRequired": "Descripción requerida"
+    },
+    "Notifications": {
+        "success": "Éxito",
+        "error": "Error",
+        "petCreated": "Tu mascota ha sido registrada exitosamente.",
+        "petCreationFailed": "No se pudo crear la mascota.",
+        "petUpdated": "Los datos se han guardado correctamente",
+        "petUpdateFailed": "No se pudo actualizar la mascota",
+        "petArchived": "La mascota se ha movido al historial.",
+        "petDeleted": "La mascota ha sido eliminada permanentemente.",
+        "petArchiveOrDeleteFailed": "No se pudo eliminar/archivar la mascota",
+        "leftPetTitle": "Has dejado la mascota",
+        "leftPetMessage": "Ya no tienes acceso."
+    },
+    "PetEdit": {
+        "dangerZoneTitle": "Zona de Peligro",
+        "dangerZoneArchivedContent": "Esta acción eliminará permanentemente todos los datos de la mascota, incluyendo historial médico. No se puede deshacer.",
+        "dangerZoneActiveContent": "Archivar la mascota la ocultará de tu lista principal, pero conservará sus datos en el historial.",
+        "permanentlyDelete": "Eliminar Permanentemente",
+        "archivePet": "Archivar Mascota",
+        "confirmDeleteTitle": "Confirmar Eliminación",
+        "confirmArchiveTitle": "Confirmar Archivo",
+        "confirmDeleteMessage": "¿Estás seguro que deseas eliminar permanentemente a ",
+        "confirmArchiveMessage": "¿Estás seguro que deseas archivar a ",
+        "buttonYesDelete": "Sí, eliminar",
+        "buttonYesArchive": "Sí, archivar"
+    },
+    "EmptyStates": {
+        "noPetsDashboard": "No tienes mascotas registradas. Registra una ",
+        "here": "aquí",
+        "noAlerts": "No tienes alertas pendientes para tus mascotas.",
+        "emptyPetsTitle": "Aún no tienes mascotas registradas. Agrega a tus compañeros peludos para comenzar a disfrutar de todos los beneficios.",
+        "emptyPetsDetail": "Tener todos los datos de tu mascota organizados.",
+        "emptyPetsBtn": "Registrar mi primera mascota"
+    },
+    "PetForm": {
+        "lostAlertTitle": "⚠️ Alerta de Mascota Perdida",
+        "lostAlertBody": "Al marcar como perdido, la mascota se destacará en rojo en tu panel para facilitar su identificación.",
+        "deceasedAlertTitle": "🕊️ Mascota Fallecida",
+        "deceasedAlertBody": "La mascota se moverá al historial, conservando sus registros médicos como recuerdo.",
+        "redirecting": "Mascota creada correctamente. Redirigiendo...",
+        "initialWeight": "Peso Inicial",
+        "initialWeightDesc": "Registrado al crear la mascota",
+        "weightModal": {
+            "title": "Registrar Peso ⚖️",
+            "currentWeight": "Peso Actual (kg)",
+            "notes": "Notas (Opcional)",
+            "notesPlaceholder": "Ej: Después de comer...",
+            "recordTitle": "Control de Peso",
+            "successTitle": "Peso registrado",
+            "successMsg": "El peso se ha actualizado correctamente.",
+            "errorTitle": "Error",
+            "errorMsg": "No se pudo guardar el peso."
+        },
+        "photo": {
+            "upload": "Subir Foto",
+            "change": "Cambiar Foto",
+            "delete": "Eliminar Foto"
+        },
+        "status": {
+            "label": "Estado",
+            "active": "Activo",
+            "lost": "Perdido",
+            "deceased": "Fallecido",
+            "archived": "Archivado"
+        },
+        "deathDate": {
+            "label": "Fecha de Fallecimiento",
+            "placeholder": "DD/MM/AAAA",
+            "minDateHint": "Debe ser posterior al último registro ({date})"
+        }
+    },
+    "ModalSharePet": {
+        "title": "Compartir a {name}",
+        "tabs": {
+            "owners": "Dueños",
+            "qr": "QR / Público"
+        },
+        "ownersTab": {
+            "description": "Agrega a otros usuarios para que puedan ver y gestionar a {name}.",
+            "emailLabel": "Email del usuario",
+            "emailPlaceholder": "usuario@email.com",
+            "btnInvite": "Invitar",
+            "currentOwners": "Dueños actuales:",
+            "you": "(Tú)",
+            "onlyOwnerTooltip": "Eres el único dueño. Gestiona el estado desde Editar.",
+            "requestRemoveTooltip": "Solicitar baja"
+        },
+        "qrTab": {
+            "description": "Compartí este código QR para que otros puedan ver la ficha básica de",
+            "btnOpenLink": "Abrir enlace directo"
+        },
+        "notifications": {
+            "inviteSentTitle": "Invitación enviada",
+            "inviteSentMsg": "Se ha invitado a {email} a colaborar con {name}",
+            "inviteErrorTitle": "Error al enviar invitación",
+            "removeRequestSentTitle": "Solicitud enviada",
+            "removeRequestSentMsg": "Se ha notificado al usuario.",
+            "removeRequestErrorTitle": "Error al solicitar baja"
+        },
+        "removeModal": {
+            "title": "Solicitar baja",
+            "description": "¿Solicitar a {name} que deje de ser dueño? Se enviará una notificación para que acepte.",
+            "btnConfirm": "Enviar solicitud",
+            "btnCancel": "Cancelar"
+        },
+        "leavePetTitle": "Dejar mascota",
+        "leavePetTooltip": "Dejar mascota",
+        "leavePetConfirmMessage": "¿Estás seguro que deseas dejar de compartir la mascota",
+        "leavePetConfirmMessage2": "? Ya no podrás verla ni gestionarla.",
+        "btnLeavePet": "Salir de la mascota",
+        "btnCancel": "Cancelar"
+    },
+    "Auth": {
+        "loginSubtitle": "Gestiona la salud de tus mascotas, recordatorios de vacunas y más. Todo en un solo lugar.",
+        "continueMessage": "Continúa con",
+        "continueWithGoogle": "Continuar con Google",
+        "acceptTermsPrefix": "Al continuar, aceptas nuestros",
+        "termsTitle": "Términos y Condiciones de Uso",
+        "termsContent1": "Los presentes Términos y Condiciones regulan el uso de la aplicación PetClan (en adelante, 'la Aplicación'). Al acceder y utilizar la Aplicación, el usuario (en adelante, 'el Usuario') acepta quedar vinculado por estos Términos. Si no está de acuerdo con alguno de los términos, no debe utilizar la Aplicación."
+    },
+    "Terms": {
+        "section2Title": "2. Descargo de Responsabilidad Médica y Veterinaria",
+        "section2Important": "IMPORTANTE: PETCLAN NO SUSTITUYE EL ASESORAMIENTO VETERINARIO PROFESIONAL.",
+        "section2Body": "La Aplicación es una herramienta de gestión y registro de información. Bajo ninguna circunstancia la información proporcionada por PetClan (incluyendo alertas, recordatorios, o cálculos de fechas) debe considerarse como un diagnóstico, tratamiento o prescripción médica.",
+        "consultationsTitle": "Consultas Profesionales:",
+        "consultationsBody": "Siempre busque el consejo de su médico veterinario calificado ante cualquier duda sobre la salud de su mascota.",
+        "emergenciesTitle": "Emergencias:",
+        "emergenciesBody": "Si cree que su mascota tiene una emergencia médica, contacte a su veterinario inmediatamente. No confíe en la Aplicación para situaciones de vida o muerte.",
+        "variabilityTitle": "Variabilidad Biológica:",
+        "variabilityBody": "Los recordatorios de desparasitación y vacunación son estimaciones basadas en pautas generales. Cada animal es único y puede requerir protocolos diferentes según su estado de salud, raza, edad y entorno.",
+        "section3Title": "3. Responsabilidad del Usuario",
+        "section3Body": "El Usuario es el único responsable de la veracidad, exactitud y actualización de los datos ingresados en la Aplicación.",
+        "healthDataTitle": "Datos de Salud:",
+        "healthDataBody": "Usted es responsable de registrar correctamente las fechas de vacunación, pesos y dosis administradas. Errores en la carga de datos resultarán en recordatorios incorrectos.",
+        "accountSecurityTitle": "Seguridad de la Cuenta:",
+        "accountSecurityBody": "Usted es responsable de mantener la confidencialidad de sus credenciales de acceso y de todas las actividades que ocurran bajo su cuenta.",
+        "section4Title": "4. Limitación de Responsabilidad",
+        "section4Body": "En la máxima medida permitida por la ley aplicable, los desarrolladores y propietarios de PetClan no serán responsables por ningún daño directo, indirecto, incidental, especial o consecuente, incluyendo pero no limitado a:",
+        "liability1": "Daños a la salud o fallecimiento de mascotas derivados del uso o mal uso de la información de la Aplicación.",
+        "liability2": "Pérdida de datos, interrupciones del servicio o fallos técnicos.",
+        "liability3": "Costos de servicios veterinarios incurridos o no incurridos basados en los recordatorios de la Aplicación.",
+        "section5Title": "5. Propiedad Intelectual",
+        "section5Body": "Todo el contenido, diseño, código fuente y logotipos de PetClan son propiedad intelectual exclusiva de sus desarrolladores, salvo que se indique lo contrario (como bibliotecas de código abierto). Queda prohibida la reproducción, distribución o modificación no autorizada.",
+        "section6Title": "6. Privacidad y Datos",
+        "section6Body": "Respetamos su privacidad. Los datos recopilados se utilizan exclusivamente para el funcionamiento de la Aplicación (gestión de perfiles de mascotas). No vendemos ni compartimos sus datos personales con terceros con fines publicitarios.",
+        "section7Title": "7. Ley Aplicable y Jurisdicción",
+        "section7Body": "Estos Términos se regirán e interpretarán de acuerdo con las leyes de la República Argentina. Cualquier disputa relacionada con estos Términos estará sujeta a la jurisdicción exclusiva de los tribunales competentes de la Ciudad Autónoma de Buenos Aires."
+    },
+    "TermsPage": {
+        "title": "Términos y Condiciones de Uso",
+        "backDefault": "Volver al Dashboard",
+        "lastUpdated": "Última actualización: Enero 2026",
+        "questions": "Si tiene alguna pregunta sobre estos términos, por favor contáctenos a través de los canales de soporte."
+    },
+    "Layout": {
+        "Footer": {
+            "rights": "© 2025 Todos los derechos reservados - Licencia MIT",
+            "design": "Diseño y desarrollo por",
+            "termsPrefix": "Al navegar por el sitio aceptas nuestros",
+            "termsLink": "Términos y Condiciones"
+        },
+        "Support": {
+            "title": "Apoyá el Proyecto",
+            "description": "PetClan es un proyecto gratuito y de código abierto, \\nhecho con ❤ desde Argentina.",
+            "share": "Si esta app te resulta útil, considerá compartirla con tus amigos y familiares. ¡Ayuda un montón!",
+            "help": "Si deseás colaborar con su mantenimiento y futuras mejoras, podés hacerlo desde los siguientes enlaces.",
+            "copyLink": "Copiar Enlace",
+            "linkCopied": "Enlace Copiado",
+            "cafecito": "Invitame un Cafecito",
+            "paypal": "Colaborar con PayPal",
+            "portfolio": "Visitar mi Portfolio",
+            "github": "Ver en GitHub"
+        }
+    },
+    "PuppyCalendar": {
+        "title": "Calendario de Vacunación",
+        "loading": "Cargando calendario...",
+        "update": "Actualizar Libreta",
+        "unavailableTitle": "Calendario no disponible",
+        "unavailableDesc1": "Por el momento, no tenemos un calendario automático para",
+        "thisSpecies": "esta especie",
+        "unavailableDesc2": "Te recomendamos consultar con tu veterinario para armar el plan de salud ideal.",
+        "unavailableDesc3": "Próximamente agregaremos soporte para más especies (tortugas, aves, conejos, etc.).",
+        "status": {
+            "pending": "Pendiente",
+            "completed": "Completada",
+            "overdue": "Vencida",
+            "consultVet": "Consultar Vet",
+            "upcoming": "Próxima",
+            "schedule": "Agendar turno",
+            "replaced": "Reemplazada",
+            "covered": "Cubierta por dosis posterior",
+            "dueNow": "Es hora de vacunar",
+            "visitVet": "Visita a tu veterinario"
+        },
+        "dewormingOvr": {
+            "title": "Desparasitación",
+            "desc": "Administrar ahora"
+        },
+        "ageLabels": {
+            "2-3 Semanas": "2-3 Semanas",
+            "4-5 Semanas": "4-5 Semanas",
+            "6-7 Semanas": "6-7 Semanas",
+            "6-8 Semanas": "6-8 Semanas",
+            "8-9 Semanas": "8-9 Semanas",
+            "8 Semanas": "8 Semanas",
+            "10-12 Semanas": "10-12 Semanas",
+            "14-16 Semanas": "14-16 Semanas",
+            "3 Meses": "3 Meses",
+            "3-4 Meses": "3-4 Meses",
+            "4 Meses": "4 Meses",
+            "5 Meses": "5 Meses",
+            "6 Meses": "6 Meses",
+            "Cada 3-4 Meses": "Cada 3-4 Meses",
+            "Mensual / Según Producto": "Mensual / Según Producto",
+            "Anual": "Anual"
+        }
+    },
+    "DashboardView": {
+        "Header": {
+            "greeting": "Hola,",
+            "summary": "Aquí tienes el resumen de tu manada hoy."
+        },
+        "Pets": {
+            "ageYears": "{count, plural, =0 {0 años} one {1 año} other {# años}}",
+            "ageMonths": "{count, plural, =0 {0 meses} one {1 mes} other {# meses}}",
+            "ageDays": "{count, plural, =0 {0 días} one {1 día} other {# días}}",
+            "healthOk": "Salud Ok",
+            "lostHelp": "PERDIDO - AYÚDAME",
+            "attention": "Atención",
+            "pending": "Pendientes",
+            "speciesDog": "Perro",
+            "speciesCat": "Gato",
+            "speciesOther": "Mascota",
+            "lastWeightPrefix": "Último:"
+        },
+        "Alerts": {
+            "allGood": "Todo en orden",
+            "noAlerts": "No tienes alertas pendientes para tus mascotas.",
+            "activeAlerts": "Alertas Activas",
+            "viewDetails": "Ver detalles",
+            "viewMore": "Ver {count} alertas más",
+            "weightMissingTitle": "Actualización de Peso: {name}",
+            "weightMissingMessage": "No tenemos registrado cuándo fue el último control de peso de {name}. Mantenlo actualizado.",
+            "weightOverdueTitle": "¡Es hora de pesar a {name}!",
+            "weightOverdueMessage": "Hace {days} días fue su último control. Como es {stage}, recomendamos pesarlo cada {interval} días.",
+            "weightUpcomingTitle": "Próximo Control de Peso",
+            "weightUpcomingMessage": "En {days} días le toca control de peso a {name}.",
+            "actionRequiredWeight": "Acción Requerida: Pesar a {name}",
+            "actionRequiredWeightDesc": "Toca {label}, pero necesitamos peso actualizado.",
+            "attentionOverdue": "¡Atención! {label} Vencida",
+            "successDueToday": "¡Es hoy! {label}",
+            "upcomingDue": "Próximamente: {label}"
+        },
+        "Actions": {
+            "quickActionsTitle": "Acciones Rápidas",
+            "actionWeight": "Registrar Peso",
+            "actionHealth": "Actualizar Libreta",
+            "actionNewPet": "Nueva Mascota",
+            "selectPetTitle": "Selecciona una mascota 🐾"
+        },
+        "Tips": [
+            "Mantén las vacunas al día para prevenir enfermedades graves.",
+            "El ejercicio diario es vital para la salud mental de tu mascota. Un paseo de 30 minutos hace la diferencia.",
+            "Lava los platos de comida y agua diariamente para evitar bacterias.",
+            "El chocolate es tóxico para perros y gatos. Evita dárselo incluso en pequeñas cantidades.",
+            "Usa placa de identificación con tu número, incluso si tu mascota tiene microchip.",
+            "Cepilla a tu mascota regularmente para reducir la caída de pelo y mantener su piel sana.",
+            "Visita al veterinario al menos una vez al año para un chequeo general.",
+            "Mantén a tu mascota libre de pulgas y garrapatas todo el año.",
+            "El agua fresca y limpia debe estar siempre disponible.",
+            "Evita darle huesos cocidos, ya que pueden astillarse y causar daños internos.",
+            "La obesidad reduce la esperanza de vida de tu mascota. Controla sus porciones.",
+            "Socializa a tu cachorro desde temprano con otros perros y personas.",
+            "Revisa las almohadillas de sus patas después de paseos largos o en terrenos difíciles.",
+            "Nunca dejes a tu mascota encerrada en el auto, especialmente en días calurosos.",
+            "Limpia sus dientes regularmente para prevenir enfermedades periodontales.",
+            "Observa cambios en su comportamiento; pueden ser señal de enfermedad.",
+            "Mantén productos de limpieza y medicamentos fuera de su alcance.",
+            "Proporciona juguetes interactivos para estimular su mente.",
+            "La comida de humanos con mucha grasa o condimentos puede causar pancreatitis.",
+            "Establece una rutina de alimentación y paseos para darle seguridad.",
+            "Revisa sus oídos semanalmente para detectar infecciones o suciedad.",
+            "Si tienes gato, mantén su arenero limpio diariamente.",
+            "El entrenamiento con refuerzo positivo fortalece el vínculo y mejora el comportamiento.",
+            "Conoce las plantas tóxicas para mascotas y evítalas en tu hogar.",
+            "Corta sus uñas regularmente para evitar dolor y problemas al caminar.",
+            "El ejercicio mental es tan importante como el físico; enséñale trucos nuevos.",
+            "No automediques a tu mascota con fármacos para humanos.",
+            "Usa cinturón de seguridad o transportadora al viajar en auto.",
+            "Desparasita internamente cada 3-6 meses según indique tu veterinario.",
+            "El xilitol (edulcorante) es extremadamente tóxico para los perros.",
+            "Cepilla a tu gato para evitar bolas de pelo en su estómago.",
+            "Identifica lugares 'pet-friendly' antes de salir de vacaciones.",
+            "Dale un espacio propio y tranquilo donde pueda descansar sin ser molestado.",
+            "El golpe de calor es una emergencia médica; manténlo fresco en verano.",
+            "La esterilización previene problemas de salud y comportamiento, y ayuda al control poblacional.",
+            "Jugar a 'buscar y traer' es excelente ejercicio cardiovascular.",
+            "Si tu perro come muy rápido, usa comederos lentos o 'slow feeders'.",
+            "Los gatos necesitan rascadores para marcar territorio y cuidar sus uñas.",
+            "Limpia las lagañas de sus ojos con una gasa húmeda suavemente.",
+            "Protege a tu mascota de los fuegos artificiales; el ruido les causa ansiedad.",
+            "Mantén la basura cerrada para evitar que coman algo indebido.",
+            "Recompensa el buen comportamiento inmediatamente para que lo asocie.",
+            "La natación es un gran ejercicio de bajo impacto para perros con problemas articulares.",
+            "Evita pasear en asfalto caliente; si te quema la mano, le quema sus patas.",
+            "Los gatos pueden beber menos agua de la necesaria; considera fuentes de agua.",
+            "Revisa su pelaje tras paseos en el campo buscando espigas o parásitos.",
+            "La cebolla y el ajo son tóxicos para perros y gatos.",
+            "El enriquecimiento ambiental previene el aburrimiento y la destrucción en casa.",
+            "Consulta al veterinario sobre la mejor dieta para la edad y raza de tu mascota.",
+            "El amor y la atención son tan importantes como la comida y el refugio."
+        ],
+        "TipLabel": "Tip del día",
+        "StagePuppy": "cachorro",
+        "StageAdult": "adulto"
     }
 }

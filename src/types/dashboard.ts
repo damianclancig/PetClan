@@ -12,6 +12,7 @@ export interface DashboardPet {
     ageLabel: string;
     identityColor: string;
     lastWeightDate?: string; // ISO String of last weight record
+    status: 'active' | 'lost' | 'deceased' | 'archived';
 }
 
 export interface DashboardAlert {

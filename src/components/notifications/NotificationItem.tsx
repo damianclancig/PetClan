@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import 'dayjs/locale/en';
+import 'dayjs/locale/pt';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useLocale } from 'next-intl';
 
 dayjs.extend(relativeTime);
-dayjs.locale('es');
 
 interface NotificationItemProps {
     notification: {
@@ -28,6 +30,8 @@ interface NotificationItemProps {
 export default function NotificationItem({ notification, onClose }: NotificationItemProps) {
     const router = useRouter();
     const queryClient = useQueryClient();
+    const locale = useLocale();
+    dayjs.locale(locale);
 
     const handleClick = () => {
         if (notification.link) {

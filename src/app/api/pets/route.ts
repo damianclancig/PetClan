@@ -5,6 +5,15 @@ import dbConnect from '@/lib/mongodb';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
 import HealthRecord from '@/models/HealthRecord';
+import { getTranslations } from 'next-intl/server';
+
+// Helper para extraer el locale del request
+function getLocaleFromRequest(req: Request): string {
+    const acceptLanguage = req.headers.get('Accept-Language') || '';
+    const locale = acceptLanguage.split(',')[0]?.split('-')[0]?.trim();
+    const supported = ['es', 'en', 'pt'];
+    return supported.includes(locale) ? locale : 'es';
+}
 
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
@@ -37,7 +46,7 @@ export async function GET(req: Request) {
     }
 
     // Buscar mascotas donde el usuario sea owner y cumplan el filtro de estado
-    const pets = await Pet.find(filter).sort({ createdAt: -1 });
+    const pets = await Pet.find(filter).sort({ name: 1 });
 
     return NextResponse.json(pets);
 }
@@ -72,13 +81,15 @@ export async function POST(req: Request) {
 
         // If weight provided, create initial HealthRecord
         if (body.weight && body.weight > 0) {
+            const locale = getLocaleFromRequest(req);
+            const tForm = await getTranslations({ locale, namespace: 'PetForm' });
             await HealthRecord.create({
                 petId: pet._id,
                 type: 'weight',
-                title: 'Peso Inicial',
+                title: tForm('initialWeight'),
                 appliedAt: new Date(),
                 weightValue: body.weight,
-                description: 'Registrado al crear la mascota',
+                description: tForm('initialWeightDesc'),
                 createdBy: user._id
             });
         }
