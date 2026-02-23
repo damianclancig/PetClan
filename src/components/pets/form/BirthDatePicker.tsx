@@ -2,7 +2,7 @@ import { Stack, TextInput, Modal, Center, Text } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { IconCake } from '@tabler/icons-react';
-import { parseDate, formatDate, getPetAge, dayjs } from '@/lib/dateUtils';
+import { parseDate, formatDate, getPetAge, formatAgeTranslated, dayjs } from '@/lib/dateUtils';
 import { useTranslations } from 'next-intl';
 
 interface BirthDatePickerProps {
@@ -66,12 +66,7 @@ export function BirthDatePicker({ value, onChange, error }: BirthDatePickerProps
             {value && (
                 <Text size="sm" c="dimmed" ta="right">
                     {t('ageTitle')} <Text span fw={700} c="cyan">
-                        {(() => {
-                            const age = getPetAge(value);
-                            if (age.years >= 1) return tDashboardPets('ageYears', { count: age.years });
-                            if (age.months >= 2) return tDashboardPets('ageMonths', { count: age.months });
-                            return tDashboardPets('ageDays', { count: age.days === 0 ? 1 : age.days });
-                        })()}
+                        {formatAgeTranslated(value, tDashboardPets)}
                     </Text>
                 </Text>
             )}

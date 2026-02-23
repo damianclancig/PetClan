@@ -590,7 +590,9 @@
             "actionRequiredWeightDesc": "Aviso de {label} pendente, mas precisamos de peso atualizado.",
             "attentionOverdue": "Atenção! {label} Vencida",
             "successDueToday": "É hoje! {label}",
-            "upcomingDue": "Em breve: {label}"
+            "upcomingDue": "Em breve: {label}",
+            "stagePuppy": "filhote",
+            "stageAdult": "adulto"
         },
         "Actions": {
             "quickActionsTitle": "Ações Rápidas",
@@ -651,8 +653,6 @@
             "Consulte o veterinário sobre a melhor dieta para a idade e raça do seu pet.",
             "Amor e atenção são tão importantes quanto comida e abrigo."
         ],
-        "TipLabel": "Dica do dia",
-        "StagePuppy": "filhote",
-        "StageAdult": "adulto"
+        "TipLabel": "Dica do dia"
     }
 }

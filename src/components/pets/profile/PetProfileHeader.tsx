@@ -9,7 +9,7 @@ import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/u
 import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations, useFormatter } from 'next-intl';
 import dayjs from 'dayjs';
-import { getPetAge } from '@/lib/dateUtils';
+import { getPetAge, formatAgeTranslated } from '@/lib/dateUtils';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
 import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
@@ -481,14 +481,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
                                             style={{ textTransform: 'none' }}
                                         >
-                                            {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({
-                                                (() => {
-                                                    const age = getPetAge(pet.birthDate);
-                                                    if (age.years >= 1) return tPets('ageYears', { count: age.years });
-                                                    if (age.months >= 2) return tPets('ageMonths', { count: age.months });
-                                                    return tPets('ageDays', { count: age.days === 0 ? 1 : age.days });
-                                                })()
-                                            })
+                                            {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({formatAgeTranslated(pet.birthDate, tPets)})
                                         </Badge>
                                     )}
                                 </Flex>

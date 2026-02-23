@@ -3,7 +3,7 @@ import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw, IconGhost,
 import { Link } from '@/i18n/routing';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { MagicTap } from '@/components/ui/MagicWrappers';
-import { getPetAge } from '@/lib/dateUtils';
+import { getPetAge, formatAgeTranslated } from '@/lib/dateUtils';
 import { PetSpeciesBadge } from './PetSpeciesBadge';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
@@ -108,13 +108,7 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                             style={{ backdropFilter: 'blur(4px)' }}
                                         />
                                         <Text size="xs" c="white" style={{ opacity: 0.9 }}>
-                                            {(() => {
-                                                if (!pet.birthDate) return '';
-                                                const age = getPetAge(pet.birthDate);
-                                                if (age.years >= 1) return tDashboardPets('ageYears', { count: age.years });
-                                                if (age.months >= 2) return tDashboardPets('ageMonths', { count: age.months });
-                                                return tDashboardPets('ageDays', { count: age.days === 0 ? 1 : age.days });
-                                            })()}
+                                            {pet.birthDate && formatAgeTranslated(pet.birthDate, tDashboardPets)}
                                         </Text>
                                     </Group>
                                 </Box>

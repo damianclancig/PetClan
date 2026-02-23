@@ -236,7 +236,7 @@
         "badges": {
             "overdue": "Atención: Vacunas vencidas ({count})",
             "dueNow": "Es el momento ideal ({count})",
-            "upcoming": "Próximas vacinas ({count})",
+            "upcoming": "Próximas vacunas ({count})",
             "upToDate": "Vacunas al día",
             "rabies": "Antirrábica Vigente",
             "deceased": "En Memoria"
@@ -590,7 +590,9 @@
             "actionRequiredWeightDesc": "Toca {label}, pero necesitamos peso actualizado.",
             "attentionOverdue": "¡Atención! {label} Vencida",
             "successDueToday": "¡Es hoy! {label}",
-            "upcomingDue": "Próximamente: {label}"
+            "upcomingDue": "Próximamente: {label}",
+            "stagePuppy": "cachorro",
+            "stageAdult": "adulto"
         },
         "Actions": {
             "quickActionsTitle": "Acciones Rápidas",
@@ -651,8 +653,6 @@
             "Consulta al veterinario sobre la mejor dieta para la edad y raza de tu mascota.",
             "El amor y la atención son tan importantes como la comida y el refugio."
         ],
-        "TipLabel": "Tip del día",
-        "StagePuppy": "cachorro",
-        "StageAdult": "adulto"
+        "TipLabel": "Tip del día"
     }
 }

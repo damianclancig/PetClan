@@ -5,7 +5,7 @@ import HealthRecord from '@/models/HealthRecord';
 import User from '@/models/User';
 import { HealthAnalysisService } from '@/services/HealthAnalysisService';
 import { DashboardData, DashboardPet, DashboardAlert } from '@/types/dashboard';
-import { getPetAge } from '@/lib/dateUtils';
+import { formatAgeTranslated } from '@/lib/dateUtils';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { getTranslations } from 'next-intl/server';
 
@@ -55,8 +55,7 @@ export class DashboardService {
             allAlerts = [...allAlerts, ...dtoAlerts];
 
             // Map Pet to DashboardPet (DTO)
-            const age = getPetAge(pet.birthDate);
-            const ageLabel = age.years > 0 ? tPets('ageYears', { count: age.years }) : tPets('ageMonths', { count: age.months });
+            const ageLabel = formatAgeTranslated(pet.birthDate, tPets);
 
             // Find last weight record
             const lastWeightRecord = plainRecords

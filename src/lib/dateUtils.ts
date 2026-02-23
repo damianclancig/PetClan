@@ -51,10 +51,10 @@ export function calculateAge(birthDate: string | Date) {
 }
 
 /**
- * Formats age dynamically:
+ * Formats age dynamically (Fallback for backend/non-translated context):
  * - >= 1 year: "X años"
- * - >= 2 months & < 1 year: "X meses"
- * - < 2 months: "X días"
+ * - >= 1 month & < 1 year: "X meses"
+ * - < 1 month: "X días"
  */
 export function formatAge(birthDate: string | Date | undefined) {
     if (!birthDate) return '';
@@ -65,11 +65,27 @@ export function formatAge(birthDate: string | Date | undefined) {
         return years === 1 ? '1 año' : `${years} años`;
     }
 
-    if (months >= 2) {
-        return `${months} meses`;
+    if (months >= 1) {
+        return months === 1 ? '1 mes' : `${months} meses`;
     }
 
     return days === 1 ? '1 día' : `${days} días`;
+}
+
+/**
+ * Formats age dynamically using provided translation function:
+ * - >= 1 year: Translated "(Count) years"
+ * - >= 1 month & < 1 year: Translated "(Count) months"
+ * - < 1 month: Translated "(Count) days"
+ */
+export function formatAgeTranslated(birthDate: string | Date | undefined, t: (key: string, values?: any) => string) {
+    if (!birthDate) return '';
+
+    const { days, months, years } = getPetAge(birthDate);
+
+    if (years >= 1) return t('ageYears', { count: years });
+    if (months >= 1) return t('ageMonths', { count: months }); // Changed from >= 2 to >= 1 per prompt request (less than 1 month = days)
+    return t('ageDays', { count: days === 0 ? 1 : days });
 }
 
 /**

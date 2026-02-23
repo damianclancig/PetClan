@@ -590,7 +590,9 @@
             "actionRequiredWeightDesc": "Due for {label}, but we need an updated weight.",
             "attentionOverdue": "Attention! {label} Overdue",
             "successDueToday": "It's today! {label}",
-            "upcomingDue": "Upcoming: {label}"
+            "upcomingDue": "Upcoming: {label}",
+            "stagePuppy": "puppy",
+            "stageAdult": "adult"
         },
         "Actions": {
             "quickActionsTitle": "Quick Actions",
@@ -651,8 +653,6 @@
             "Consult your vet about the best diet for your pet's age and breed.",
             "Love and attention are as important as food and shelter."
         ],
-        "TipLabel": "Tip of the day",
-        "StagePuppy": "puppy",
-        "StageAdult": "adult"
+        "TipLabel": "Tip of the day"
     }
 }
