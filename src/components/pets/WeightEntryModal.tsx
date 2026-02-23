@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query'; // Or equivalent hook
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface WeightEntryModalProps {
     opened: boolean;
@@ -18,6 +19,8 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
     const [loading, setLoading] = useState(false);
     const [weight, setWeight] = useState<number | string>(currentWeight || '');
     const [notes, setNotes] = useState('');
+    const t = useTranslations('PetForm.weightModal');
+    const tCommon = useTranslations('Common');
     // const queryClient = useQueryClient(); // If using react-query context
 
     const handleSubmit = async () => {
@@ -31,7 +34,7 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
                 body: JSON.stringify({
                     petId,
                     type: 'weight',
-                    title: 'Control de Peso',
+                    title: t('recordTitle'),
                     description: notes,
                     appliedAt: new Date(),
                     weightValue: Number(weight),
@@ -41,8 +44,8 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
             if (!res.ok) throw new Error('Failed to save weight');
 
             notifications.show({
-                title: 'Peso registrado',
-                message: 'El peso se ha actualizado correctamente.',
+                title: t('successTitle'),
+                message: t('successMsg'),
                 color: 'green',
             });
 
@@ -55,8 +58,8 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
             onClose();
         } catch (error) {
             notifications.show({
-                title: 'Error',
-                message: 'No se pudo guardar el peso.',
+                title: t('errorTitle'),
+                message: t('errorMsg'),
                 color: 'red',
             });
         } finally {
@@ -65,10 +68,10 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
     };
 
     return (
-        <Modal opened={opened} onClose={onClose} title="Registrar Peso ⚖️" centered>
+        <Modal opened={opened} onClose={onClose} title={t('title')} centered>
             <Stack>
                 <Stack gap={5}>
-                    <Text size="sm" fw={500}>Peso Actual (kg)</Text>
+                    <Text size="sm" fw={500}>{t('currentWeight')}</Text>
                     <WeightInput
                         value={weight}
                         onChange={setWeight}
@@ -76,15 +79,15 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
                 </Stack>
 
                 <Textarea
-                    label="Notas (Opcional)"
-                    placeholder="Ej: Después de comer..."
+                    label={t('notes')}
+                    placeholder={t('notesPlaceholder')}
                     value={notes}
                     onChange={(e) => setNotes(e.currentTarget.value)}
                 />
 
                 <Group justify="flex-end" mt="md">
-                    <Button variant="default" onClick={onClose}>Cancelar</Button>
-                    <Button onClick={handleSubmit} loading={loading} disabled={!weight}>Guardar</Button>
+                    <Button variant="default" onClick={onClose}>{tCommon('cancel')}</Button>
+                    <Button onClick={handleSubmit} loading={loading} disabled={!weight}>{tCommon('save')}</Button>
                 </Group>
             </Stack>
         </Modal>

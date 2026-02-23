@@ -5,9 +5,11 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { IconPaw, IconCamera, IconTrash } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { SpeciesSelector } from '../../form/SpeciesSelector';
+import { useTranslations } from 'next-intl';
 
 export default function IdentityStep() {
     const { register, control, watch, setValue, formState: { errors } } = useFormContext();
+    const t = useTranslations('NewPet');
     const species = watch('species');
     const photoUrl = watch('photoUrl');
     const name = watch('name');
@@ -55,7 +57,7 @@ export default function IdentityStep() {
     return (
         <Stack gap="sm" align="center">
             <Text size="md" fw={700} ta="center" lh={1.1}>
-                ¿Quién se une a la familia?
+                {t('whoJoins')}
             </Text>
 
             {/* Photo Avatar */}
@@ -105,14 +107,14 @@ export default function IdentityStep() {
                     )}
                 </div>
                 {!preview && (
-                    <Text size="xs" c="dimmed" mt={4}>Toca para agregar foto</Text>
+                    <Text size="xs" c="dimmed" mt={4}>{t('tapToAddPhoto')}</Text>
                 )}
             </div>
 
             {/* Name Input - Compacted */}
             <TextInput
                 disabled={false} // Mantine bug check
-                placeholder="Nombre"
+                placeholder={t('placeholders.name')}
                 size="md"
                 variant="filled"
                 radius="md"
@@ -125,7 +127,7 @@ export default function IdentityStep() {
 
             {/* Species Selector - Visual Cards */}
             <Stack gap="xs" align="center" w="100%">
-                <Text size="sm" c="dimmed" fw={600}>ESPECIE</Text>
+                <Text size="sm" c="dimmed" fw={600}>{t('species').toUpperCase()}</Text>
                 <Controller
                     name="species"
                     control={control}

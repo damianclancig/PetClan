@@ -5,10 +5,12 @@ import { IconHeart } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { SupportProjectModal } from './SupportProjectModal';
 
 export function Footer() {
     const [opened, { open, close }] = useDisclosure(false);
+    const t = useTranslations('Layout.Footer');
 
     return (
         <Box
@@ -26,20 +28,20 @@ export function Footer() {
                 {/* Column 1: Copyright & Credits */}
                 <Box>
                     <Text size="xs" c="dimmed">
-                        &copy; 2025 Todos los derechos reservados - Licencia MIT
+                        {t('rights')}
                     </Text>
                     <Text size="xs" c="dimmed">
-                        Diseño y desarrollo por <Anchor href="https://clancig.com.ar" target="_blank" size="xs" c="dimmed" td="underline">clancig.com.ar</Anchor>
+                        {t('design')} <Anchor href="https://clancig.com.ar" target="_blank" size="xs" c="dimmed" td="underline">clancig.com.ar</Anchor>
                     </Text>
                 </Box>
 
                 {/* Column 2: Legal Disclaimer */}
                 <Stack gap={0} align="center" mt={{ base: 'md', sm: 0 }}>
                     <Text size="xs" c="dimmed">
-                        Al navegar por el sitio aceptas nuestros
+                        {t('termsPrefix')}
                     </Text>
                     <Anchor component={Link} href="/terms" size="xs" c="dimmed" td="underline">
-                        Términos y Condiciones
+                        {t('termsLink')}
                     </Anchor>
                 </Stack>
                 {/* Mobile version for Legal Disclaimer (hidden on desktop to avoid clutter or handled via responsive props) 

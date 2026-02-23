@@ -7,10 +7,14 @@ import { HealthAnalysisService } from '@/services/HealthAnalysisService';
 import { DashboardData, DashboardPet, DashboardAlert } from '@/types/dashboard';
 import { getPetAge } from '@/lib/dateUtils';
 import { getPetIdentityColor } from '@/utils/pet-identity';
+import { getTranslations } from 'next-intl/server';
 
 export class DashboardService {
 
     static async getDashboardData(userId: string): Promise<DashboardData> {
+        const tPets = await getTranslations('DashboardView.Pets');
+        const tAlerts = await getTranslations('DashboardView.Alerts');
+
         await dbConnect();
 
         // 1. Fetch User (for name)
@@ -35,7 +39,7 @@ export class DashboardService {
             const plainRecords = JSON.parse(JSON.stringify(records));
 
             // Analyze Alerts
-            const analysisAlerts = HealthAnalysisService.analyzePetHealth(pet, plainRecords);
+            const analysisAlerts = HealthAnalysisService.analyzePetHealth(pet, plainRecords, tAlerts);
 
             // Map AnalysisAlerts to DashboardAlerts (DTO)
             const dtoAlerts: DashboardAlert[] = analysisAlerts.map(alert => ({
@@ -52,7 +56,7 @@ export class DashboardService {
 
             // Map Pet to DashboardPet (DTO)
             const age = getPetAge(pet.birthDate);
-            const ageLabel = age.years > 0 ? `${age.years} años` : `${age.months} meses`;
+            const ageLabel = age.years > 0 ? tPets('ageYears', { count: age.years }) : tPets('ageMonths', { count: age.months });
 
             // Find last weight record
             const lastWeightRecord = plainRecords

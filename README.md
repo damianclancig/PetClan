@@ -31,11 +31,13 @@
 - **📊 Dashboard Inteligente**: Vista consolidada con análisis automático de salud, alertas activas y acciones rápidas
 
 #### 🐾 Gestión de Mascotas
-- **👤 Perfiles Detallados**: Información completa de cada mascota (nombre, especie, raza, fecha de nacimiento, género, foto)
-- **🎨 Avatares Dinámicos**: Generación automática de avatares únicos basados en el nombre de la mascota
-- **🆔 Código QR**: Generación de códigos QR para identificación y acceso rápido al perfil público
-- **👥 Co-tutores**: Sistema de invitaciones para compartir la gestión de mascotas entre múltiples usuarios
-- **📸 Galería de Fotos**: Almacenamiento de fotos de tu mascota con integración Cloudinary
+- **👤 Perfiles Detallados**: Información completa de cada mascota (nombre, especie, raza, fecha de nacimiento, sexo, status)
+- **🎨 Avatares Dinámicos**: Generación automática de avatares únicos y responsivos basados en la mascota.
+- **🆔 Código QR**: Generación de códigos QR de emergencia para rápida identificación y acceso al perfil público.
+- **👥 Co-tutores**: Sistema de invitaciones y tokens para compartir la gestión de la libreta sanitaria entre familiares.
+- **📸 Línea de Tiempo Visual**: Galería cronológica integrada con Cloudinary para inmortalizar el crecimiento de la mascota.
+- **🕊️ Modo "In Memoriam"**: Un diseño conmemorativo y respetuoso para mascotas fallecidas, adaptando la UI para preservar su legado como un hermoso tributo.
+- **⚡ Carga Rápida (Smart Entry)**: Modales inteligentes y pre-completados que interpretan la intención del usuario desde el dashboard, reduciendo clics al añadir peso o vacunas.
 
 #### 🔔 Sistema de Notificaciones
 - **⏰ Recordatorios Inteligentes**: Alertas automáticas para vacunas, desparasitaciones y eventos importantes
@@ -60,6 +62,8 @@
 - **🛡️ Protección de Datos**: Control de acceso basado en roles y relaciones (owner, co-owner)
 - **🔑 Tokens Seguros**: Sistema de invitaciones y compartición con tokens encriptados
 - **📜 Términos de Servicio**: Páginas legales integradas (Términos y Condiciones, Privacidad)
+
+---
 
 ---
 
@@ -257,9 +261,6 @@ PetClan/
 ├── 📁 public/                           # Archivos estáticos
 │   └── assets/
 │       └── images/                       # Imágenes públicas
-├── 📁 scripts/                          # Scripts de utilidad
-│   ├── seed-notifications.ts             # Seed de notificaciones
-│   └── verify_external.ts                # Verificación externa
 ├── 📄 next.config.mjs                   # Configuración Next.js
 ├── 📄 tsconfig.json                     # Configuración TypeScript
 ├── 📄 postcss.config.cjs                # Configuración PostCSS
@@ -447,15 +448,6 @@ yarn dev
 
 Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
 
-### 🗄️ 5. Configurar Base de Datos (Opcional)
-
-Si necesitas datos de prueba, puedes ejecutar los scripts de seed:
-
-```bash
-# Seed de notificaciones de prueba
-npx tsx scripts/seed-notifications.ts
-```
-
 ---
 
 ## 📜 Scripts Disponibles
@@ -470,10 +462,6 @@ npm run start        # Inicia servidor de producción
 
 # 🧹 Linting
 npm run lint         # Ejecuta ESLint para verificar código
-
-# 🧪 Scripts Personalizados
-npx tsx scripts/seed-notifications.ts    # Seed de notificaciones
-npx tsx scripts/verify_external.ts       # Verificación de dependencias externas
 ```
 
 ---
@@ -565,10 +553,6 @@ PetClan es compatible con cualquier plataforma que soporte Node.js:
 - ✅ **Control de acceso** basado en roles (owner, co-owner)
 - ✅ **Conexión segura** a MongoDB con SSL/TLS
 - ✅ **Variables de entorno** nunca expuestas al cliente
-
-### Reportar Vulnerabilidades
-
-Si encuentras una vulnerabilidad de seguridad, por favor NO abras un issue público. Envía un email a: security@libretasanitaria.app
 
 ---
 

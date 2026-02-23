@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { Box, Text, Group, ThemeIcon } from '@mantine/core';
 import { IconBulb } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
-
-import { PET_TIPS } from '@/data/petTips';
-
+import { useTranslations } from 'next-intl';
 
 export function TipsCarousel() {
+    const t = useTranslations('DashboardView');
+    const tipsArray = t.raw('Tips') as string[];
     const [page, setPage] = useState(0);
     const [activeFace, setActiveFace] = useState<'front' | 'back'>('front');
 
@@ -29,7 +29,7 @@ export function TipsCarousel() {
     };
 
     const rotation = page * 180;
-    const len = PET_TIPS.length;
+    const len = tipsArray.length;
 
     // Final Stable Content Logic:
     // Front Face (Even Rotations): Updates only when HIDDEN (transitioning In).
@@ -71,7 +71,7 @@ export function TipsCarousel() {
                         transform: 'rotateY(0deg)'
                     }}
                 >
-                    <TipCard content={PET_TIPS[frontIndex]} />
+                    <TipCard content={tipsArray[frontIndex]} label={t('TipLabel')} />
                 </Box>
 
                 {/* Back Face */}
@@ -86,14 +86,14 @@ export function TipsCarousel() {
                         zIndex: 1
                     }}
                 >
-                    <TipCard content={PET_TIPS[backIndex]} />
+                    <TipCard content={tipsArray[backIndex]} label={t('TipLabel')} />
                 </Box>
             </motion.div>
         </Box>
     );
 }
 
-function TipCard({ content }: { content: string }) {
+function TipCard({ content, label }: { content: string, label: string }) {
     return (
         <Box
             p="md"
@@ -108,7 +108,7 @@ function TipCard({ content }: { content: string }) {
                 <ThemeIcon color="yellow" variant="light" size="md" radius="xl">
                     <IconBulb size={16} />
                 </ThemeIcon>
-                <Text size="sm" fw={700}>Tip del día</Text>
+                <Text size="sm" fw={700}>{label}</Text>
             </Group>
             <Text size="xs" c="dimmed">
                 {content}

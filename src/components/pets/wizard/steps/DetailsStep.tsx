@@ -4,15 +4,17 @@ import { TextInput, Stack, Text } from '@mantine/core';
 import { useFormContext, Controller } from 'react-hook-form';
 import { SexSelector } from '../../form/SexSelector';
 import { BirthDatePicker } from '../../form/BirthDatePicker';
+import { useTranslations } from 'next-intl';
 
 export default function DetailsStep() {
     const { register, control, watch, formState: { errors } } = useFormContext();
+    const t = useTranslations('NewPet');
     const birthDate = watch('birthDate');
     const name = watch('name');
 
     return (
         <Stack gap="sm">
-            <Text size="md" fw={700} ta="center">Un poco sobre {name}...</Text>
+            <Text size="md" fw={700} ta="center">{t('aboutPet', { name: name || '' })}</Text>
 
             <Controller
                 name="sex"
@@ -26,8 +28,8 @@ export default function DetailsStep() {
             />
 
             <TextInput
-                label="Raza"
-                placeholder="Ej. Golden Retriever, Mestizo..."
+                label={t('breed')}
+                placeholder={t('placeholders.breed')}
                 size="md"
                 radius="md"
                 withAsterisk

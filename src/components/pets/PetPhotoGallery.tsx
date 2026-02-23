@@ -3,8 +3,7 @@
 import { SimpleGrid, Image, Text, Paper, Center, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
-import dayjs from 'dayjs';
-import 'dayjs/locale/es';
+import { useTranslations, useFormatter } from 'next-intl';
 
 interface Photo {
     url: string;
@@ -17,13 +16,15 @@ interface PetPhotoGalleryProps {
 }
 
 export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
+    const t = useTranslations('PetDetail.Gallery');
+    const format = useFormatter();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
     if (!photos || photos.length === 0) {
         return (
             <Text c="dimmed" ta="center" py="xl">
-                Aún no hay fotos en el historial. ¡Sube algunas para ver su crecimiento! 📸
+                {t('empty')}
             </Text>
         );
     }
@@ -51,7 +52,7 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                             src={photo.url}
                             h={160}
                             fit="cover"
-                            alt="Foto de mascota"
+                            alt={t('altThumb')}
                         />
                         <div style={{
                             position: 'absolute',
@@ -62,7 +63,7 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                             padding: '4px 8px'
                         }}>
                             <Text size="xs" c="white" ta="center">
-                                {dayjs(photo.date).format('DD MMM YYYY')}
+                                {format.dateTime(new Date(photo.date), { year: 'numeric', month: 'short', day: '2-digit' })}
                             </Text>
                         </div>
                     </Paper>
@@ -76,7 +77,7 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                             src={selectedPhoto.url}
                             fit="contain"
                             w="100%"
-                            alt="Visualización de foto"
+                            alt={t('altFull')}
                         />
                         <div style={{
                             position: 'absolute',
@@ -88,7 +89,7 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                             color: 'white'
                         }}>
                             <Text ta="center" fw={500}>
-                                {dayjs(selectedPhoto.date).format('DD [de] MMMM [de] YYYY')}
+                                {format.dateTime(new Date(selectedPhoto.date), { dateStyle: 'long' })}
                             </Text>
                             {selectedPhoto.description && (
                                 <Text size="sm" ta="center" c="dimmed">

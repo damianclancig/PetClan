@@ -48,6 +48,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
     const t = useTranslations('NewPet'); // Use NewPet translations for labels
     const tCommon = useTranslations('Common');
     const tValidation = useTranslations('Validation');
+    const tForm = useTranslations('PetForm');
     const [preview, setPreview] = useState<string | null>(initialValues?.photoUrl || null);
     const resetRef = useRef<() => void>(null);
 
@@ -110,10 +111,8 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                         onUploadComplete={(result) => {
                             setPreview(result.url);
                             setValue('photoUrl', result.url);
-                            // We can also track photos history here if needed, 
-                            // but usually history is appended on backend or handled separately
                         }}
-                        label={preview ? 'Cambiar Foto' : 'Subir Foto'}
+                        label={preview ? tForm('photo.change') : tForm('photo.upload')}
                         compact
                         folder={petId ? `petclan/profiles/${petId}` : 'petclan/profiles/temp'}
                     />
@@ -127,7 +126,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                                 setValue('photoUrl', '');
                                 resetRef.current?.();
                             }}
-                            title="Eliminar Foto"
+                            title={tForm('photo.delete')}
                         >
                             <IconTrash size={16} />
                         </ActionIcon>
@@ -245,12 +244,12 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                     control={control}
                     render={({ field }) => (
                         <Select
-                            label="Estado"
+                            label={tForm('status.label')}
                             data={[
-                                { value: 'active', label: 'Activo' },
-                                { value: 'lost', label: 'Perdido' },
-                                { value: 'deceased', label: 'Fallecido' },
-                                { value: 'archived', label: 'Archivado' },
+                                { value: 'active', label: tForm('status.active') },
+                                { value: 'lost', label: tForm('status.lost') },
+                                { value: 'deceased', label: tForm('status.deceased') },
+                                { value: 'archived', label: tForm('status.archived') },
                             ]}
                             value={field.value}
                             onChange={(val) => field.onChange(val)}
@@ -265,8 +264,8 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                         render={({ field }) => (
                             <div>
                                 <ModalDatePicker
-                                    label="Fecha de Fallecimiento"
-                                    placeholder="DD/MM/AAAA"
+                                    label={tForm('deathDate.label')}
+                                    placeholder={tForm('deathDate.placeholder')}
                                     value={field.value || ''}
                                     onChange={(val) => field.onChange(val)}
                                     maxDate={new Date()}
@@ -274,7 +273,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
                                 />
                                 {lastRecordDate && (
                                     <Text size="xs" c="dimmed" mt={4} style={{ lineHeight: 1.2 }}>
-                                        Debe ser posterior al último registro ({lastRecordDate.toLocaleDateString()})
+                                        {tForm('deathDate.minDateHint', { date: lastRecordDate.toLocaleDateString() })}
                                     </Text>
                                 )}
                             </div>
@@ -285,16 +284,16 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
 
             {watch('status') === 'lost' && (
                 <Stack mb="lg">
-                    <Alert variant="light" color="red" title="⚠️ Alerta de Mascota Perdida">
-                        Al marcar como perdido, la mascota se destacará en rojo en tu panel para facilitar su identificación.
+                    <Alert variant="light" color="red" title={tForm('lostAlertTitle')}>
+                        {tForm('lostAlertBody')}
                     </Alert>
                 </Stack>
             )}
 
             {watch('status') === 'deceased' && (
                 <Stack mb="lg">
-                    <Alert variant="light" color="gray" title="🕊️ En Memoria">
-                        La mascota se moverá al historial, conservando sus registros médicos como recuerdo.
+                    <Alert variant="light" color="gray" title={tForm('deceasedAlertTitle')}>
+                        {tForm('deceasedAlertBody')}
                     </Alert>
                 </Stack>
             )}

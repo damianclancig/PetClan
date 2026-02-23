@@ -30,11 +30,11 @@ export default function PetsPage() {
     const { pets, isLoading, isError } = usePets('all');
     const t = useTranslations('Pets');
 
-    if (isError) return <PageContainer><Text c="red">Error al cargar las mascotas.</Text></PageContainer>;
+    if (isError) return <PageContainer><Text c="red">{t('errorLoading')}</Text></PageContainer>;
 
     const actionButton = (
         <Button component={Link} href="/dashboard/pets/new" variant="filled" color="cyan" leftSection={<IconPlus size={16} />}>
-            Nueva Mascota
+            {t('newPet')}
         </Button>
     );
 
@@ -51,8 +51,8 @@ export default function PetsPage() {
             {showHistoryTab && (
                 <Tabs value={activeTab} onChange={setActiveTab} mb="xl">
                     <Tabs.List>
-                        <Tabs.Tab value="active">Mis Mascotas</Tabs.Tab>
-                        <Tabs.Tab value="history">Memorias</Tabs.Tab>
+                        <Tabs.Tab value="active">{t('tabs.active')}</Tabs.Tab>
+                        <Tabs.Tab value="history">{t('tabs.history')}</Tabs.Tab>
                     </Tabs.List>
                 </Tabs>
             )}
@@ -64,7 +64,7 @@ export default function PetsPage() {
                     <EmptyPetsState />
                 ) : (
                     <Text c="dimmed" fs="italic" ta="center" py="xl">
-                        No hay memorias para mostrar.
+                        {t('noMemories')}
                     </Text>
                 )
             ) : (
