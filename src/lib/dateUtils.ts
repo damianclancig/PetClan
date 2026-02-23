@@ -65,7 +65,7 @@ export function formatAge(birthDate: string | Date | undefined) {
         return years === 1 ? '1 año' : `${years} años`;
     }
 
-    if (months >= 1) {
+    if (days > 60) {
         return months === 1 ? '1 mes' : `${months} meses`;
     }
 
@@ -84,7 +84,7 @@ export function formatAgeTranslated(birthDate: string | Date | undefined, t: (ke
     const { days, months, years } = getPetAge(birthDate);
 
     if (years >= 1) return t('ageYears', { count: years });
-    if (months >= 1) return t('ageMonths', { count: months }); // Changed from >= 2 to >= 1 per prompt request (less than 1 month = days)
+    if (days > 60) return t('ageMonths', { count: months });
     return t('ageDays', { count: days === 0 ? 1 : days });
 }
 
