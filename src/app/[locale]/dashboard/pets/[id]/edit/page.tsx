@@ -20,6 +20,8 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
     const router = useRouter();
     const t = useTranslations('NewPet');
     const tCommon = useTranslations('Common');
+    const tNotifications = useTranslations('Notifications');
+    const tPetEdit = useTranslations('PetEdit');
 
     // Calculate last record date for validation
     const lastRecordDate = React.useMemo(() => {
@@ -76,16 +78,16 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
             }
 
             notifications.show({
-                title: 'Mascota actualizada',
-                message: 'Los datos se han guardado correctamente',
+                title: tNotifications('success'),
+                message: tNotifications('petUpdated'),
                 color: 'green',
             });
             router.push(`/dashboard/pets/${id}`);
         } catch (error) {
             console.error(error);
             notifications.show({
-                title: 'Error',
-                message: 'No se pudo actualizar la mascota',
+                title: tNotifications('error'),
+                message: tNotifications('petUpdateFailed'),
                 color: 'red',
             });
         }
@@ -97,15 +99,15 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
 
             if (result.isArchived) {
                 notifications.show({
-                    title: 'Mascota Archivada',
-                    message: 'La mascota se ha movido al historial.',
+                    title: tNotifications('success'),
+                    message: tNotifications('petArchived'),
                     color: 'blue',
                     icon: <IconArchive size={16} />,
                 });
             } else {
                 notifications.show({
-                    title: 'Mascota Eliminada',
-                    message: 'La mascota ha sido eliminada permanentemente.',
+                    title: tNotifications('success'),
+                    message: tNotifications('petDeleted'),
                     color: 'red',
                     icon: <IconTrash size={16} />,
                 });
@@ -114,8 +116,8 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
         } catch (error) {
             console.error(error);
             notifications.show({
-                title: 'Error',
-                message: 'No se pudo eliminar/archivar la mascota',
+                title: tNotifications('error'),
+                message: tNotifications('petArchiveOrDeleteFailed'),
                 color: 'red',
             });
         }
@@ -140,11 +142,11 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
             </Paper>
 
             <Paper p="md" withBorder style={{ borderColor: 'red', backgroundColor: 'var(--mantine-color-red-light)' }}>
-                <Title order={5} c="red" mb="sm">Zona de Peligro</Title>
+                <Title order={5} c="red" mb="sm">{tPetEdit('dangerZoneTitle')}</Title>
                 <Text size="sm" mb="md">
                     {isArchived
-                        ? "Esta acción eliminará permanentemente todos los datos de la mascota, incluyendo historial médico. No se puede deshacer."
-                        : "Archivar la mascota la ocultará de tu lista principal, pero conservará sus datos en el historial."}
+                        ? tPetEdit('dangerZoneArchivedContent')
+                        : tPetEdit('dangerZoneActiveContent')}
                 </Text>
                 <Button
                     color="red"
@@ -152,18 +154,18 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
                     onClick={openDeleteData}
                     leftSection={isArchived ? <IconTrash size={16} /> : <IconArchive size={16} />}
                 >
-                    {isArchived ? 'Eliminar Permanentemente' : 'Archivar Mascota'}
+                    {isArchived ? tPetEdit('permanentlyDelete') : tPetEdit('archivePet')}
                 </Button>
             </Paper>
 
-            <Modal opened={deleteOpened} onClose={closeDeleteData} title={isArchived ? "Confirmar Eliminación" : "Confirmar Archivo"}>
+            <Modal opened={deleteOpened} onClose={closeDeleteData} title={isArchived ? tPetEdit('confirmDeleteTitle') : tPetEdit('confirmArchiveTitle')}>
                 <Text size="sm">
-                    ¿Estás seguro que deseas {isArchived ? 'eliminar permanentemente' : 'archivar'} a <strong>{pet.name}</strong>?
+                    {isArchived ? tPetEdit('confirmDeleteMessage') : tPetEdit('confirmArchiveMessage')} <strong>{pet.name}</strong>?
                 </Text>
                 <Group justify="flex-end" mt="md">
-                    <Button variant="default" onClick={closeDeleteData}>Cancelar</Button>
+                    <Button variant="default" onClick={closeDeleteData}>{tCommon('cancel')}</Button>
                     <Button color="red" onClick={handleArchiveOrDelete} loading={isDeleting}>
-                        {isArchived ? 'Sí, eliminar' : 'Sí, archivar'}
+                        {isArchived ? tPetEdit('buttonYesDelete') : tPetEdit('buttonYesArchive')}
                     </Button>
                 </Group>
             </Modal>

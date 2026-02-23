@@ -2,7 +2,8 @@ import { Stack, TextInput, Modal, Center, Text } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { IconCake } from '@tabler/icons-react';
-import { parseDate, formatDate, formatAge, dayjs } from '@/lib/dateUtils';
+import { parseDate, formatDate, getPetAge, dayjs } from '@/lib/dateUtils';
+import { useTranslations } from 'next-intl';
 
 interface BirthDatePickerProps {
     value: string;
@@ -12,6 +13,8 @@ interface BirthDatePickerProps {
 
 export function BirthDatePicker({ value, onChange, error }: BirthDatePickerProps) {
     const [opened, { open, close }] = useDisclosure(false);
+    const t = useTranslations('NewPet');
+    const tDashboardPets = useTranslations('DashboardView.Pets');
     // Use global util to parse date string to dayjs, then convert to JS Date for picker
     const dateObj = parseDate(value);
     const dateValue = dateObj ? dateObj.toDate() : null;
@@ -19,8 +22,8 @@ export function BirthDatePicker({ value, onChange, error }: BirthDatePickerProps
     return (
         <Stack gap={5}>
             <TextInput
-                label="Fecha de Nacimiento"
-                placeholder="Selecciona una fecha"
+                label={t('birthDate')}
+                placeholder={t('selectDate')}
                 size="md"
                 radius="md"
                 withAsterisk
@@ -36,7 +39,7 @@ export function BirthDatePicker({ value, onChange, error }: BirthDatePickerProps
             <Modal
                 opened={opened}
                 onClose={close}
-                title="Selecciona fecha de nacimiento"
+                title={t('selectDateTitle')}
                 centered
                 size="auto"
             >
@@ -62,7 +65,14 @@ export function BirthDatePicker({ value, onChange, error }: BirthDatePickerProps
 
             {value && (
                 <Text size="sm" c="dimmed" ta="right">
-                    Edad: <Text span fw={700} c="cyan">{formatAge(value)}</Text>
+                    {t('ageTitle')} <Text span fw={700} c="cyan">
+                        {(() => {
+                            const age = getPetAge(value);
+                            if (age.years >= 1) return tDashboardPets('ageYears', { count: age.years });
+                            if (age.months >= 2) return tDashboardPets('ageMonths', { count: age.months });
+                            return tDashboardPets('ageDays', { count: age.days === 0 ? 1 : age.days });
+                        })()}
+                    </Text>
                 </Text>
             )}
         </Stack>

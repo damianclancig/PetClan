@@ -1,5 +1,6 @@
 import { Paper, Title, Text, Group, Stack, ThemeIcon, SimpleGrid, Box } from '@mantine/core';
 import { IconNotes, IconFirstAidKit, IconStethoscope, IconPaw } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 
 interface PetExtraInfoCardProps {
     pet: any;
@@ -26,6 +27,7 @@ function InfoRow({ icon: Icon, color, title, content }: { icon: any, color: stri
 }
 
 export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
+    const t = useTranslations('PetDetail.ExtraInfo');
     const hasCharacteristics = !!pet.characteristics;
     const hasDiseases = !!pet.diseases;
     const hasTreatments = !!pet.treatments;
@@ -37,14 +39,14 @@ export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
 
     return (
         <Paper withBorder p="lg" radius="md" mt="md">
-            <Title order={4} mb="lg">Información Adicional</Title>
+            <Title order={4} mb="lg">{t('title')}</Title>
 
             <SimpleGrid cols={{ base: 1, md: 2 }} spacing={32} verticalSpacing="xl">
                 {hasCharacteristics && (
                     <InfoRow
                         icon={IconPaw}
                         color="orange"
-                        title="Características"
+                        title={t('characteristics')}
                         content={pet.characteristics}
                     />
                 )}
@@ -53,7 +55,7 @@ export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
                     <InfoRow
                         icon={IconStethoscope}
                         color="red"
-                        title="Enfermedades / Condiciones"
+                        title={t('diseases')}
                         content={pet.diseases}
                     />
                 )}
@@ -62,7 +64,7 @@ export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
                     <InfoRow
                         icon={IconFirstAidKit}
                         color="blue"
-                        title="Tratamientos"
+                        title={t('treatments')}
                         content={pet.treatments}
                     />
                 )}
@@ -71,7 +73,7 @@ export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
                     <InfoRow
                         icon={IconNotes}
                         color="gray"
-                        title="Notas"
+                        title={t('notes')}
                         content={[pet.notes, pet.keywords].filter(Boolean).join('\n')}
                     />
                 )}

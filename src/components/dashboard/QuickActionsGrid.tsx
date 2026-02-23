@@ -9,6 +9,7 @@ import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 import { QuickHealthEntryModal } from '@/components/health/QuickHealthEntryModal';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useTranslations } from 'next-intl';
 import 'dayjs/locale/es';
 
 dayjs.extend(relativeTime);
@@ -18,19 +19,22 @@ interface QuickActionsGridProps {
     pets?: DashboardPet[];
 }
 
-const actions = [
-    { label: 'Registrar Peso', icon: IconScale, color: 'blue', action: 'weight' },
-    { label: 'Actualizar Libreta', icon: IconClipboardHeart, color: 'teal', action: 'health_record' },
-    { label: 'Nueva Mascota', icon: IconPaw, color: 'grape', link: '/dashboard/pets/new' },
-];
-
 export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
+    const tEmpty = useTranslations('EmptyStates');
+    const t = useTranslations('DashboardView.Actions');
+    const tPets = useTranslations('DashboardView.Pets');
     const router = useRouter();
     const [selectionOpen, setSelectionOpen] = useState(false);
     const [weightModalOpen, setWeightModalOpen] = useState(false);
     const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
     const [actionType, setActionType] = useState<'weight' | 'health_record' | null>(null);
     const [healthModalOpen, setHealthModalOpen] = useState(false);
+
+    const actions = [
+        { label: t('actionWeight'), icon: IconScale, color: 'blue', action: 'weight' },
+        { label: t('actionHealth'), icon: IconClipboardHeart, color: 'teal', action: 'health_record' },
+        { label: t('actionNewPet'), icon: IconPaw, color: 'grape', link: '/dashboard/pets/new' },
+    ];
 
     const handleActionClick = (action: typeof actions[0]) => {
         if (action.action === 'weight' || action.action === 'health_record') {
@@ -68,7 +72,7 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
     return (
         <>
             <Paper withBorder p="md" radius="md">
-                <Title order={4} mb="md">Acciones Rápidas</Title>
+                <Title order={4} mb="md">{t('quickActionsTitle')}</Title>
                 <SimpleGrid cols={{ base: 2, sm: 4 }}>
                     {actions.map((action) => (
                         <UnstyledButton
@@ -105,7 +109,7 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
             <Modal
                 opened={selectionOpen}
                 onClose={() => setSelectionOpen(false)}
-                title="Selecciona una mascota 🐾"
+                title={t('selectPetTitle')}
                 centered
             >
                 <Stack>
@@ -131,12 +135,12 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
                                     <div style={{ flex: 1 }}>
                                         <Text size="sm" fw={500}>{pet.name}</Text>
                                         <Text size="xs" c="dimmed">
-                                            {pet.species === 'dog' ? 'Perro' : pet.species === 'cat' ? 'Gato' : 'Mascota'} • {pet.ageLabel}
+                                            {pet.species === 'dog' ? tPets('speciesDog') : pet.species === 'cat' ? tPets('speciesCat') : tPets('speciesOther')} • {pet.ageLabel}
                                         </Text>
                                         {pet.lastWeightDate && (
                                             <Text size="xs" c="dimmed" mt={4} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                                 <IconScale size={14} style={{ opacity: 0.7 }} />
-                                                Último: {dayjs(pet.lastWeightDate).format('DD/MM/YYYY')} • {dayjs(pet.lastWeightDate).fromNow()}
+                                                {tPets('lastWeightPrefix')} {dayjs(pet.lastWeightDate).format('DD/MM/YYYY')} • {dayjs(pet.lastWeightDate).fromNow()}
                                             </Text>
                                         )}
                                     </div>
@@ -146,7 +150,8 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
                         ))
                     ) : (
                         <Text c="dimmed" ta="center" py="xl">
-                            No tienes mascotas registradas. <Link href="/dashboard/pets/new">Registra una aquí</Link>.
+                            {tEmpty('noPetsDashboard')}
+                            <Link href="/dashboard/pets/new">{tEmpty('here')}</Link>.
                         </Text>
                     )}
                 </Stack>
@@ -162,8 +167,8 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
                 />
             )}
 
-            {selectedPetId && selectedPet && (
-                <Suspense fallback={null}>
+            <Suspense fallback={null}>
+                {selectedPetId && selectedPet && (
                     <QuickHealthEntryModal
                         opened={healthModalOpen}
                         onClose={() => {
@@ -177,8 +182,8 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
                         petBirthDate={new Date(selectedPet.birthDate)}
                         refreshDashboard={() => router.refresh()}
                     />
-                </Suspense>
-            )}
+                )}
+            </Suspense>
         </>
     );
 }

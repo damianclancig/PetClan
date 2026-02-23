@@ -1,5 +1,6 @@
 import { SimpleGrid, Paper, ThemeIcon, Text } from '@mantine/core';
 import { IconDog, IconCat, IconPaw } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 
 interface SpeciesSelectorProps {
     value: string;
@@ -7,12 +8,14 @@ interface SpeciesSelectorProps {
 }
 
 export function SpeciesSelector({ value, onChange }: SpeciesSelectorProps) {
+    const tCommon = useTranslations('Common');
+
     return (
         <SimpleGrid cols={3} spacing="xs" w="100%">
             {[
-                { value: 'dog', label: 'Perro', icon: <IconDog size={24} /> },
-                { value: 'cat', label: 'Gato', icon: <IconCat size={24} /> },
-                { value: 'other', label: 'Otro', icon: <IconPaw size={24} /> },
+                { value: 'dog', label: tCommon('species.dog').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').trim(), icon: <IconDog size={24} /> },
+                { value: 'cat', label: tCommon('species.cat').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').trim(), icon: <IconCat size={24} /> },
+                { value: 'other', label: tCommon('species.other').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').trim(), icon: <IconPaw size={24} /> },
             ].map((item) => {
                 const isSelected = value === item.value;
                 return (

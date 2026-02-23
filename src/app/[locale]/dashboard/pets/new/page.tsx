@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function NewPetPage() {
     const t = useTranslations('NewPet');
+    const tNotifications = useTranslations('Notifications');
     const router = useRouter();
     const queryClient = useQueryClient();
 
@@ -24,8 +25,8 @@ export default function NewPetPage() {
         },
         onSuccess: () => {
             notifications.show({
-                title: '¡Mascota Creada! 🎉',
-                message: 'Tu mascota ha sido registrada exitosamente.',
+                title: '🎉',
+                message: tNotifications('petCreated'),
                 color: 'green',
             });
             queryClient.invalidateQueries({ queryKey: ['pets'] });
@@ -33,8 +34,8 @@ export default function NewPetPage() {
         },
         onError: () => {
             notifications.show({
-                title: 'Error',
-                message: 'No se pudo crear la mascota.',
+                title: tNotifications('error'),
+                message: tNotifications('petCreationFailed'),
                 color: 'red',
             });
         }

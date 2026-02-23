@@ -6,9 +6,9 @@ import { getPetIdentityColor } from '@/utils/pet-identity';
 import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
 import { MagicParticles } from '@/components/ui/MagicWrappers';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import dayjs from 'dayjs';
-import { formatAge } from '@/lib/dateUtils';
+import { getPetAge } from '@/lib/dateUtils';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
 import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
@@ -28,6 +28,8 @@ interface PetProfileHeaderProps {
 export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRecord }: PetProfileHeaderProps) {
     const t = useTranslations('PetDetail');
     const tCommon = useTranslations('Common');
+    const tPets = useTranslations('DashboardView.Pets');
+    const format = useFormatter();
     const identityColor = getPetIdentityColor(pet._id);
     const [showTimeTravel, setShowTimeTravel] = useState(false);
     const isDeceased = pet.status === 'deceased';
@@ -111,7 +113,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                     leftSection={<IconPlus size={14} />}
                                     onClick={onAddRecord}
                                 >
-                                    Actualizar Libreta
+                                    {t('Header.updateRecord')}
                                 </Button>
                             )}
                         </Box>
@@ -196,7 +198,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 leftSection={<IconArrowBackUp size={18} />}
                                 style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
                             >
-                                Volver
+                                {t('Header.back')}
                             </Button>
                         </MagicParticles>
                     </HoverScale>
@@ -218,7 +220,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             className="shiny-button"
                                             display={{ base: 'none', xs: 'flex' }}
                                         >
-                                            Actualizar Libreta
+                                            {t('Header.updateRecord')}
                                         </Button>
                                     </MagicParticles>
                                 )}
@@ -229,7 +231,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             color={identityColor}
                                             size="lg"
                                             radius="xl"
-                                            aria-label="Compartir"
+                                            aria-label={t('Header.share')}
                                             style={{ pointerEvents: 'none' }} // Click handled by wrapper
                                         >
                                             <IconShare size={18} />
@@ -246,7 +248,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             color={identityColor}
                                             size="lg"
                                             radius="xl"
-                                            aria-label="Editar"
+                                            aria-label={t('Header.edit')}
                                         >
                                             <IconPencil size={18} />
                                         </ActionIcon>
@@ -259,7 +261,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             color={identityColor}
                                             size="lg"
                                             radius="xl"
-                                            aria-label="Simular Tiempo"
+                                            aria-label={t('Header.timeTravel')}
                                             onClick={() => setShowTimeTravel(true)}
                                         >
                                             <IconHistory size={18} />
@@ -289,7 +291,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                         color={identityColor}
                                         size="lg"
                                         radius="xl"
-                                        aria-label="Editar"
+                                        aria-label={t('Header.edit')}
                                     >
                                         <IconPencil size={18} />
                                     </ActionIcon>
@@ -337,7 +339,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                             {!isDeceased && (
                                 <FileButton onChange={(file) => file && updatePhoto(file)} accept="image/png,image/jpeg,image/webp">
                                     {(props) => (
-                                        <Tooltip label="Cambiar foto de perfil" withArrow position="right">
+                                        <Tooltip label={t('Header.changePhoto')} withArrow position="right">
                                             <ActionIcon
                                                 {...props}
                                                 variant="filled"
@@ -432,7 +434,14 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
                                             style={{ textTransform: 'none' }}
                                         >
-                                            {dayjs(pet.birthDate).utc().format('DD/MM/YY')} ({formatAge(pet.birthDate)})
+                                            {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({
+                                                (() => {
+                                                    const age = getPetAge(pet.birthDate);
+                                                    if (age.years >= 1) return tPets('ageYears', { count: age.years });
+                                                    if (age.months >= 2) return tPets('ageMonths', { count: age.months });
+                                                    return tPets('ageDays', { count: age.days === 0 ? 1 : age.days });
+                                                })()
+                                            })
                                         </Badge>
                                     )}
                                 </Flex>
@@ -451,19 +460,19 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                         >
                             <Tabs.List style={{ flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                                 <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    Resumen
+                                    {t('tabs.summary')}
                                     {activeTab === 'summary' && <MagicTabBackground />}
                                 </Tabs.Tab>
                                 <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    Línea de tiempo
+                                    {t('tabs.timeline')}
                                     {activeTab === 'timeline' && <MagicTabBackground />}
                                 </Tabs.Tab>
                                 <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    Salud
+                                    {t('tabs.health')}
                                     {activeTab === 'health' && <MagicTabBackground />}
                                 </Tabs.Tab>
                                 <Tabs.Tab value="gallery" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    Galería
+                                    {t('tabs.gallery')}
                                     {activeTab === 'gallery' && <MagicTabBackground />}
                                 </Tabs.Tab>
                                 {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
@@ -494,7 +503,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 onClick={onAddRecord}
                                 display={{ base: 'flex', xs: 'none' }}
                             >
-                                Actualizar
+                                {t('Header.updateRecord')}
                             </Button>
                         )}
                     </Transition>

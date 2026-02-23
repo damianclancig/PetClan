@@ -1,5 +1,6 @@
 import { Group, Paper, Stack, ThemeIcon, Text } from '@mantine/core';
 import { IconGenderMale, IconGenderFemale } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 
 interface SexSelectorProps {
     value: string;
@@ -7,11 +8,13 @@ interface SexSelectorProps {
 }
 
 export function SexSelector({ value, onChange }: SexSelectorProps) {
+    const tCommon = useTranslations('Common');
+
     return (
         <Group justify="center" gap="lg" grow>
             {[
-                { value: 'male', label: 'Macho', icon: <IconGenderMale size={24} />, color: 'blue' },
-                { value: 'female', label: 'Hembra', icon: <IconGenderFemale size={24} />, color: 'pink' }
+                { value: 'male', label: tCommon('sex.male'), icon: <IconGenderMale size={24} />, color: 'blue' },
+                { value: 'female', label: tCommon('sex.female'), icon: <IconGenderFemale size={24} />, color: 'pink' }
             ].map((option) => {
                 const isSelected = value === option.value;
                 return (

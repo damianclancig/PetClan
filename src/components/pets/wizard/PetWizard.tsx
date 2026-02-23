@@ -13,17 +13,18 @@ import DetailsStep from './steps/DetailsStep';
 import HealthStep from './steps/HealthStep';
 import MedicalStep from './steps/MedicalStep';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo } from 'react';
 
 // Schema Validation (Unified)
-const petSchema = z.object({
-    name: z.string().min(2, 'El nombre es obligatorio'),
+const getPetSchema = (tVal: any) => z.object({
+    name: z.string().min(2, tVal('nameLength')),
     species: z.enum(['dog', 'cat', 'other']),
-    breed: z.string().min(2, 'La raza es obligatoria'),
+    breed: z.string().min(2, tVal('breedRequired')),
     birthDate: z.string().refine((date) => new Date(date).toString() !== 'Invalid Date', {
-        message: 'Fecha inválida',
+        message: tVal('invalidDate'),
     }),
     sex: z.enum(['male', 'female']),
-    weight: z.number().min(0.1, 'Peso inválido'),
+    weight: z.number().min(0.1, tVal('weightPositive')),
     chipId: z.string().optional(),
     photoUrl: z.string().optional(),
     characteristics: z.string().optional(),
@@ -32,7 +33,7 @@ const petSchema = z.object({
     notes: z.string().optional(),
 });
 
-type PetWizardValues = z.infer<typeof petSchema>;
+type PetWizardValues = z.infer<ReturnType<typeof getPetSchema>>;
 
 interface PetWizardProps {
     onSubmit: (values: PetWizardValues) => void;
@@ -41,9 +42,15 @@ interface PetWizardProps {
 
 export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
     const t = useTranslations('NewPet');
+    const tWiz = useTranslations('Wizard');
+    const tCommon = useTranslations('Common');
+    const tVal = useTranslations('Validation');
+    const tForm = useTranslations('PetForm');
     const router = useRouter();
     const [active, setActive] = useState(0);
     const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+
+    const petSchema = useMemo(() => getPetSchema(tVal), [tVal]);
 
     const methods = useForm<PetWizardValues>({
         resolver: zodResolver(petSchema),
@@ -189,8 +196,8 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                                                     </Center>
                                                 }
                                             />
-                                            <Text size="xl" fw={700}>¡Todo listo!</Text>
-                                            <Text c="dimmed" ta="center">Mascota creada correctamente.<br />Redirigiendo...</Text>
+                                            <Text size="xl" fw={700}>{tWiz('allReady')}</Text>
+                                            <Text c="dimmed" ta="center">{tForm('redirecting', { fallback: 'Redirigiendo...' }).split('. ')[0]}.<br />{tForm('redirecting', { fallback: '' }).split('. ')[1] || ''}</Text>
                                         </Center>
                                     )}
                                 </motion.div>
@@ -201,17 +208,17 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                             <Group justify="space-between" mt="xl" wrap="nowrap" gap="xs">
                                 {active > 0 ? (
                                     <Button variant="subtle" color="gray" onClick={prevStep} leftSection={<IconChevronLeft size={16} />} size="sm">
-                                        Atrás
+                                        {tCommon('back')}
                                     </Button>
                                 ) : (
                                     <Button variant="subtle" color="red" component={Link} href="/dashboard/pets" size="sm">
-                                        Cancelar
+                                        {tCommon('cancel')}
                                     </Button>
                                 )}
 
                                 {active < 3 ? (
                                     <Button onClick={nextStep} color="cyan" rightSection={<IconChevronRight size={16} />} size="sm">
-                                        Siguiente
+                                        {tWiz('next')}
                                     </Button>
                                 ) : (
                                     <Button
@@ -227,7 +234,7 @@ export function PetWizard({ onSubmit, isLoading }: PetWizardProps) {
                                         size="sm"
                                         rightSection={<IconCheck size={16} />}
                                     >
-                                        Crear Mascota
+                                        {tWiz('create')}
                                     </Button>
                                 )}
                             </Group>

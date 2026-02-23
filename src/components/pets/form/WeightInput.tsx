@@ -1,6 +1,7 @@
 import { Group, ActionIcon, NumberInput, Text } from '@mantine/core';
 import { IconMinus, IconPlus } from '@tabler/icons-react';
 import { useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface WeightInputProps {
     value: number | string;
@@ -9,6 +10,7 @@ interface WeightInputProps {
 }
 
 export function WeightInput({ value, onChange, error }: WeightInputProps) {
+    const t = useTranslations('NewPet');
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const valueRef = useRef(value);
@@ -64,7 +66,7 @@ export function WeightInput({ value, onChange, error }: WeightInputProps) {
                 onPointerUp={stopAction}
                 onPointerLeave={stopAction}
                 disabled={!value || Number(value) <= 0.1}
-                aria-label="Disminuir peso"
+                aria-label={t('decreaseWeight')}
             >
                 <IconMinus size={24} />
             </ActionIcon>
@@ -96,7 +98,7 @@ export function WeightInput({ value, onChange, error }: WeightInputProps) {
                 onPointerDown={() => startAction('up')}
                 onPointerUp={stopAction}
                 onPointerLeave={stopAction}
-                aria-label="Aumentar peso"
+                aria-label={t('increaseWeight')}
             >
                 <IconPlus size={24} />
             </ActionIcon>

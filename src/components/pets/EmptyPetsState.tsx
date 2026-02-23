@@ -2,9 +2,11 @@
 
 import { Paper, Title, Text, Button, Stack, ThemeIcon, List, Group } from '@mantine/core';
 import { IconPaw, IconVaccine, IconScale, IconCheck, IconPlus } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
 export function EmptyPetsState() {
+    const tEmpty = useTranslations('EmptyStates');
     return (
         <Paper withBorder p="xl" radius="md" mt="md">
             <Stack align="center" gap="lg" py="lg">
@@ -18,14 +20,14 @@ export function EmptyPetsState() {
                 </ThemeIcon>
 
                 <Stack align="center" gap="xs">
-                    <Title order={3} ta="center">¡Bienvenido a PetClan!</Title>
+                    <Title order={3} ta="center">¡PetClan!</Title>
                     <Text ta="center" c="dimmed" maw={500}>
-                        Aún no tienes mascotas registradas. Agrega a tus compañeros peludos para comenzar a disfrutar de todos los beneficios.
+                        {tEmpty('emptyPetsTitle')}
                     </Text>
                 </Stack>
 
                 <Paper withBorder p="md" radius="md" w="100%" maw={500}>
-                    <Text size="sm" fw={600} mb="sm">Con PetClan podrás:</Text>
+                    <Text size="sm" fw={600} mb="sm">PetClan:</Text>
                     <List
                         spacing="xs"
                         size="sm"
@@ -36,10 +38,7 @@ export function EmptyPetsState() {
                             </ThemeIcon>
                         }
                     >
-                        <List.Item>Llevar el historial de vacunas y eventos de salud</List.Item>
-                        <List.Item>Registrar y monitorear el peso</List.Item>
-                        <List.Item>Recibir recordatorios importantes</List.Item>
-                        <List.Item>Tener todos los datos de tu mascota organizados</List.Item>
+                        <List.Item>{tEmpty('emptyPetsDetail')}</List.Item>
                     </List>
                 </Paper>
 
@@ -51,7 +50,7 @@ export function EmptyPetsState() {
                     leftSection={<IconPlus size={20} />}
                     mt="md"
                 >
-                    Registrar mi primera mascota
+                    {tEmpty('emptyPetsBtn')}
                 </Button>
             </Stack>
         </Paper>

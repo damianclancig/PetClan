@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { WeightEntryModal } from './WeightEntryModal';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useDisclosure } from '@mantine/hooks';
+import { useTranslations } from 'next-intl';
 
 interface WeightRecord {
     date: string; // ISO or formatted
@@ -19,6 +20,8 @@ interface WeightControlProps {
 }
 
 export function WeightControl({ petId, currentWeight, history }: WeightControlProps) {
+    const t = useTranslations('PetDetail.WeightControl');
+    const tSummary = useTranslations('PetDetail.Summary');
     const [opened, { open, close }] = useDisclosure(false);
     const [showHistory, { toggle }] = useDisclosure(false);
 
@@ -44,7 +47,7 @@ export function WeightControl({ petId, currentWeight, history }: WeightControlPr
                         <IconScale size={20} />
                     </ThemeIcon>
                     <div>
-                        <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Peso Actual</Text>
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{t('title')}</Text>
                         <Text fw={700} size="xl">{currentWeight} kg</Text>
                     </div>
                 </Group>
@@ -68,7 +71,7 @@ export function WeightControl({ petId, currentWeight, history }: WeightControlPr
                             <Tooltip
                                 labelStyle={{ color: 'black' }}
                                 itemStyle={{ color: '#228be6' }}
-                                formatter={(value: number | undefined) => [`${value ?? 0} kg`, 'Peso']}
+                                formatter={(value: number | undefined) => [`${value ?? 0} kg`, tSummary('weightTitle')]}
                             />
                             <Area type="monotone" dataKey="weight" stroke="#228be6" fillOpacity={1} fill="url(#colorWeight)" strokeWidth={2} />
                         </AreaChart>
@@ -84,7 +87,7 @@ export function WeightControl({ petId, currentWeight, history }: WeightControlPr
                 rightSection={showHistory ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
                 mt="xs"
             >
-                {showHistory ? 'Ocultar Historial' : 'Ver Historial Completo'}
+                {showHistory ? t('hideHistory') : t('showHistory')}
             </Button>
 
             <Collapse in={showHistory}>
@@ -95,7 +98,7 @@ export function WeightControl({ petId, currentWeight, history }: WeightControlPr
                             <Text size="sm" fw={600}>{record.weight} kg</Text>
                         </Group>
                     ))}
-                    {data.length === 0 && <Text size="sm" c="dimmed" ta="center">No hay registros previos.</Text>}
+                    {data.length === 0 && <Text size="sm" c="dimmed" ta="center">{t('noPrevious')}</Text>}
                 </Stack>
             </Collapse>
 

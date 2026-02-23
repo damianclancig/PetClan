@@ -3,7 +3,7 @@ import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw, IconGhost,
 import { Link } from '@/i18n/routing';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { MagicTap } from '@/components/ui/MagicWrappers';
-import { formatAge } from '@/lib/dateUtils';
+import { getPetAge } from '@/lib/dateUtils';
 import { PetSpeciesBadge } from './PetSpeciesBadge';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
@@ -18,6 +18,7 @@ interface PetCardProps {
 export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
     const t = useTranslations('Pets');
     const tCommon = useTranslations('Common');
+    const tDashboardPets = useTranslations('DashboardView.Pets');
     const identityColor = getPetIdentityColor(pet._id);
 
     const getSpeciesIcon = (species: string) => {
@@ -107,7 +108,13 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                             style={{ backdropFilter: 'blur(4px)' }}
                                         />
                                         <Text size="xs" c="white" style={{ opacity: 0.9 }}>
-                                            {formatAge(pet.birthDate)}
+                                            {(() => {
+                                                if (!pet.birthDate) return '';
+                                                const age = getPetAge(pet.birthDate);
+                                                if (age.years >= 1) return tDashboardPets('ageYears', { count: age.years });
+                                                if (age.months >= 2) return tDashboardPets('ageMonths', { count: age.months });
+                                                return tDashboardPets('ageDays', { count: age.days === 0 ? 1 : age.days });
+                                            })()}
                                         </Text>
                                     </Group>
                                 </Box>
@@ -129,13 +136,13 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                             }}
                         >
                             {pet.status === 'lost' && (
-                                <Badge color="red" variant="filled">🚨 PERDIDO</Badge>
+                                <Badge color="red" variant="filled">{t('badges.lost')}</Badge>
                             )}
                             {pet.status === 'deceased' && (
-                                <Badge color="violet" variant="light" leftSection={<IconGhost size={12} />}>En Memoria</Badge>
+                                <Badge color="violet" variant="light" leftSection={<IconGhost size={12} />}>{t('badges.deceased')}</Badge>
                             )}
                             {pet.status === 'archived' && (
-                                <Badge color="gray" variant="filled" leftSection={<IconArchive size={12} />}>Archivado</Badge>
+                                <Badge color="gray" variant="filled" leftSection={<IconArchive size={12} />}>{t('badges.archived')}</Badge>
                             )}
                             {/* Simulated Vaccine Status */}
                             {/* <Badge circle size="sm" color="green" title="Vacunas al día">✓</Badge> */}

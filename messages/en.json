@@ -56,13 +56,40 @@
         "myPets": "My Pets",
         "logout": "Log Out",
         "profile": "Profile",
+        "account": "Account",
+        "notifications": "Notifications",
         "greeting": "Hello, {name}!"
+    },
+    "NotificationsCenter": {
+        "title": "Notifications",
+        "emptyState": "You have no notifications"
+    },
+    "SettingsNotifications": {
+        "title": "Notification Settings 🔔",
+        "description": "Choose how you want to receive alerts about your pets and the community.",
+        "email": {
+            "label": "Email Notifications",
+            "description": "Receive important alerts, reminders, and requests via email."
+        },
+        "inApp": {
+            "label": "In-App Notifications",
+            "description": "Receive visual alerts (bell) and pop-up messages while using PetClan."
+        },
+        "save": "Save Changes",
+        "savedTitle": "Changes saved",
+        "savedMsg": "Your notification preferences have been updated.",
+        "errorTitle": "Error",
+        "errorLoadMsg": "Could not load preferences.",
+        "errorSaveMsg": "Could not save changes."
     },
     "Theme": {
         "title": "Theme",
         "light": "Light Mode",
         "dark": "Dark Mode",
         "auto": "System"
+    },
+    "Navigation": {
+        "language": "Language"
     },
     "Common": {
         "cancel": "Cancel",
@@ -72,21 +99,96 @@
         "share": "Share",
         "species": {
             "dog": "Dog 🐶",
+            "dog_female": "Dog (Female) 🐶",
             "cat": "Cat 🐱",
-            "other": "Other"
+            "cat_female": "Cat (Female) 🐱",
+            "internal": "Internal",
+            "external": "External",
+            "polyvalent": "Polyvalent",
+            "rabies": "Rabies",
+            "other": "Other",
+            "flea": "Flea / Tick"
         },
         "sex": {
             "male": "Male",
             "female": "Female"
         }
     },
+    "SmartRecord": {
+        "stepTitle": "What are we recording today?",
+        "stepDetails": "Record Details",
+        "types": {
+            "vaccine": "Vaccine",
+            "deworming": "Int. Deworming",
+            "externalDeworming": "Ext. Deworming",
+            "consultation": "Consultation",
+            "weight": "Weight",
+            "other": "Other"
+        },
+        "suggestions": {
+            "one": "Recommended for today:",
+            "many": "Recommended options:"
+        },
+        "external": {
+            "productConfig": "Product Configuration",
+            "productType": "Product Type",
+            "productTypePlaceholder": "E.g.: Spray, Powder, Bath...",
+            "duration": "Duration",
+            "durationCustom": "Custom Duration",
+            "durationDays": "days",
+            "protection": "Protection",
+            "methodPipette": "Pipette",
+            "methodTablet": "Tablet",
+            "methodCollar": "Collar",
+            "methodOther": "Other",
+            "durationOther": "Other",
+            "targetFleas": "Fleas",
+            "targetTicks": "Ticks",
+            "targetMosquitoes": "Mosquitoes",
+            "titleTemplate": "{method} ({days} days)",
+            "descTemplate": "Protection against: {targets}",
+            "defaultProduct": "Product"
+        },
+        "form": {
+            "title": "Title",
+            "titlePlaceholder": "E.g.: Triple Feline",
+            "appliedAt": "Application Date",
+            "appliedAtPlaceholder": "DD/MM/YYYY",
+            "nextDue": "Expiration / Next Dose",
+            "nextDuePlaceholder": "Auto-calculated.",
+            "weightKg": "Weight (kg)",
+            "vetClinic": "Vet / Clinic",
+            "optional": "Optional",
+            "notes": "Notes / Observations",
+            "notesPlaceholder": "Additional details...",
+            "validationTitle": "Title required",
+            "validationDate": "Date required"
+        },
+        "btn": {
+            "back": "Back",
+            "save": "Save Record"
+        },
+        "externalTitleDefault": "Protection against fleas and ticks"
+    },
     "Pets": {
         "title": "My Pets 🐾",
+        "badges": {
+            "lost": "⚠️ LOST",
+            "deceased": "In Memory",
+            "archived": "Archived"
+        },
         "addPet": "Register Pet",
-        "noPets": "You haven't registered any pets yet.",
+        "newPet": "New Pet",
+        "noPets": "You have no registered pets yet.",
         "breed": "Breed",
         "weight": "Weight",
-        "viewHealthRecord": "View Health Record"
+        "viewHealthRecord": "View Health Record",
+        "errorLoading": "Error loading pets.",
+        "noMemories": "There are no memories to display.",
+        "tabs": {
+            "active": "Active",
+            "history": "Memories"
+        }
     },
     "NewPet": {
         "title": "Register New Pet",
@@ -101,16 +203,97 @@
         "diseases": "Chronic Diseases",
         "treatments": "Active Treatments",
         "notes": "Notes",
+        "whoJoins": "Who is joining the family?",
+        "tapToAddPhoto": "Tap to add photo",
+        "aboutPet": "A bit about {name}...",
+        "healthData": "Health Data for {name}",
+        "medicalHistory": "Medical History of {name}",
+        "medicalHistoryDesc": "This information is optional, but helps maintain a better record.",
+        "optional": "Optional",
+        "selectDate": "Select a date",
+        "selectDateTitle": "Select date of birth",
+        "ageTitle": "Age:",
+        "decreaseWeight": "Decrease weight",
+        "increaseWeight": "Increase weight",
         "placeholders": {
             "name": "Buddy",
             "breed": "Mixed",
-            "chipId": "123456789"
+            "chipId": "123456789",
+            "characteristics": "Spot on ear, short tail...",
+            "diseases": "Ex. Chicken allergy, Hip dysplasia...",
+            "treatments": "Ex. Daily medication, Physical therapy...",
+            "notes": "Any other important detail..."
         },
         "submit": "Save Pet"
     },
+    "Wizard": {
+        "allReady": "All ready!",
+        "next": "Next",
+        "create": "Create Pet"
+    },
     "PetDetail": {
-        "notFound": "Pet not found.",
-        "birthDate": "Birth Date"
+        "notFound": "Sorry, we couldn't find the requested pet.",
+        "badges": {
+            "overdue": "⚠️ Attention: Overdue vaccines ({count})",
+            "dueNow": "✅ Perfect time ({count})",
+            "upcoming": "⏳ Upcoming vaccines ({count})",
+            "upToDate": "✨ Vaccines up to date",
+            "rabies": "💉 Active Rabies",
+            "deceased": "🕊️"
+        },
+        "tabs": {
+            "summary": "Summary",
+            "timeline": "Timeline",
+            "health": "Health",
+            "gallery": "Gallery"
+        },
+        "Header": {
+            "back": "Back",
+            "updateRecord": "Update Health Record",
+            "share": "Share",
+            "edit": "Edit",
+            "timeTravel": "Simulate Time",
+            "changePhoto": "Change profile photo"
+        },
+        "Summary": {
+            "healthStatus": "Health Status",
+            "weightTitle": "Weight",
+            "weightCurrent": "Current Weight",
+            "viewChart": "View chart and history",
+            "latestEvents": "Latest Events"
+        },
+        "ExtraInfo": {
+            "title": "Extra Information",
+            "characteristics": "Characteristics",
+            "diseases": "Diseases / Conditions",
+            "treatments": "Treatments",
+            "notes": "Notes"
+        },
+        "Deworming": {
+            "title": "Parasite Control",
+            "tooltip": "Smart calendar based on weight and age",
+            "internal": "Internal Deworming",
+            "external": "External Deworming",
+            "updateWeight": "Update Weight",
+            "vetRecommendation": "Recommendation",
+            "vetRecommendationDesc": "Consult your vet on which product to use.",
+            "vetAttention": "Warning",
+            "vetAttentionDesc": "Consult your vet for specific instructions."
+        },
+        "WeightControl": {
+            "title": "Current Weight",
+            "hideHistory": "Hide History",
+            "showHistory": "Show Full History",
+            "noPrevious": "No previous records."
+        },
+        "Gallery": {
+            "empty": "No photos in history yet. Upload some to see them grow! 📸",
+            "altThumb": "Pet photo",
+            "altFull": "Photo view"
+        },
+        "Deceased": {
+            "memories": "Memories and Events"
+        }
     },
     "Health": {
         "title": "Health History",
@@ -136,6 +319,15 @@
             "deworming": "Deworming",
             "consultation": "Consultation",
             "weight": "Weight"
+        },
+        "Timeline": {
+            "milestone": "Milestone",
+            "deathTitle": "Farewell 🕊️",
+            "deathDesc": "Forever in our hearts.",
+            "birthTitle": "Birth 🎉",
+            "birthDesc": "Welcome to the world!",
+            "update": "Update Health Record",
+            "viewAll": "View full history ({count})"
         }
     },
     "Validation": {
@@ -145,5 +337,322 @@
         "weightPositive": "Weight must be greater than 0",
         "titleRequired": "Title is required",
         "descriptionRequired": "Description is required"
+    },
+    "Notifications": {
+        "success": "Success",
+        "error": "Error",
+        "petCreated": "Your pet has been successfully registered.",
+        "petCreationFailed": "Could not create the pet.",
+        "petUpdated": "Data saved successfully.",
+        "petUpdateFailed": "Could not update the pet.",
+        "petArchived": "The pet has been moved to history.",
+        "petDeleted": "The pet has been permanently deleted.",
+        "petArchiveOrDeleteFailed": "Could not delete/archive the pet.",
+        "leftPetTitle": "You left the pet",
+        "leftPetMessage": "You no longer have access."
+    },
+    "PetEdit": {
+        "dangerZoneTitle": "Danger Zone",
+        "dangerZoneArchivedContent": "This action will permanently delete all pet data, including medical history. It cannot be undone.",
+        "dangerZoneActiveContent": "Archiving the pet will hide it from your main list, but its data will be kept in history.",
+        "permanentlyDelete": "Delete Permanently",
+        "archivePet": "Archive Pet",
+        "confirmDeleteTitle": "Confirm Deletion",
+        "confirmArchiveTitle": "Confirm Archive",
+        "confirmDeleteMessage": "Are you sure you want to permanently delete ",
+        "confirmArchiveMessage": "Are you sure you want to archive ",
+        "buttonYesDelete": "Yes, delete",
+        "buttonYesArchive": "Yes, archive"
+    },
+    "EmptyStates": {
+        "noPetsDashboard": "You have no pets registered. Register one ",
+        "here": "here",
+        "noAlerts": "You have no pending alerts for your pets.",
+        "emptyPetsTitle": "You haven't registered any pets yet. Add your furry companions to start enjoying all the benefits.",
+        "emptyPetsDetail": "Keep all your pet's data organized.",
+        "emptyPetsBtn": "Register my first pet"
+    },
+    "PetForm": {
+        "lostAlertTitle": "⚠️ Lost Pet Alert",
+        "lostAlertBody": "By marking as lost, the pet will be highlighted in red on your dashboard for easy identification.",
+        "deceasedAlertTitle": "🕊️ Deceased Pet",
+        "deceasedAlertBody": "The pet will be moved to history, keeping its medical records as a memory.",
+        "redirecting": "Pet created successfully. Redirecting...",
+        "initialWeight": "Initial Weight",
+        "initialWeightDesc": "Recorded when creating the pet",
+        "weightModal": {
+            "title": "Record Weight ⚖️",
+            "currentWeight": "Current Weight (kg)",
+            "notes": "Notes (Optional)",
+            "notesPlaceholder": "E.g.: After eating...",
+            "recordTitle": "Weight Check",
+            "successTitle": "Weight recorded",
+            "successMsg": "The weight has been updated successfully.",
+            "errorTitle": "Error",
+            "errorMsg": "Could not save the weight."
+        },
+        "photo": {
+            "upload": "Upload Photo",
+            "change": "Change Photo",
+            "delete": "Delete Photo"
+        },
+        "status": {
+            "label": "Status",
+            "active": "Active",
+            "lost": "Lost",
+            "deceased": "Deceased",
+            "archived": "Archived"
+        },
+        "deathDate": {
+            "label": "Death Date",
+            "placeholder": "DD/MM/YYYY",
+            "minDateHint": "Must be after the last record ({date})"
+        }
+    },
+    "ModalSharePet": {
+        "title": "Share {name}",
+        "tabs": {
+            "owners": "Owners",
+            "qr": "QR / Public"
+        },
+        "ownersTab": {
+            "description": "Add other users so they can view and manage {name}.",
+            "emailLabel": "User Email",
+            "emailPlaceholder": "user@email.com",
+            "btnInvite": "Invite",
+            "currentOwners": "Current owners:",
+            "you": "(You)",
+            "onlyOwnerTooltip": "You are the only owner. Manage status from Edit.",
+            "requestRemoveTooltip": "Request removal"
+        },
+        "qrTab": {
+            "description": "Share this QR code so others can view the basic profile of",
+            "btnOpenLink": "Open direct link"
+        },
+        "notifications": {
+            "inviteSentTitle": "Invitation sent",
+            "inviteSentMsg": "{email} has been invited to collaborate with {name}",
+            "inviteErrorTitle": "Error sending invitation",
+            "removeRequestSentTitle": "Request sent",
+            "removeRequestSentMsg": "The user has been notified.",
+            "removeRequestErrorTitle": "Error requesting removal"
+        },
+        "removeModal": {
+            "title": "Request removal",
+            "description": "Ask {name} to step down as owner? A notification will be sent for them to accept.",
+            "btnConfirm": "Send request",
+            "btnCancel": "Cancel"
+        },
+        "leavePetTitle": "Leave pet",
+        "leavePetTooltip": "Leave pet",
+        "leavePetConfirmMessage": "Are you sure you want to stop sharing the pet",
+        "leavePetConfirmMessage2": "? You will no longer be able to see or manage it.",
+        "btnLeavePet": "Leave pet",
+        "btnCancel": "Cancel"
+    },
+    "Auth": {
+        "loginSubtitle": "Manage your pets' health, vaccine reminders, and more. All in one place.",
+        "continueMessage": "Continue with",
+        "continueWithGoogle": "Continue with Google",
+        "acceptTermsPrefix": "By continuing, you agree to our",
+        "termsTitle": "Terms and Conditions of Use",
+        "termsContent1": "These Terms and Conditions govern the use of the PetClan application (hereinafter, 'the Application'). By accessing and using the Application, the user (hereinafter, 'the User') agrees to be bound by these Terms. If you do not agree with any of the terms, you must not use the Application."
+    },
+    "Terms": {
+        "section2Title": "2. Medical and Veterinary Disclaimer",
+        "section2Important": "IMPORTANT: PETCLAN DOES NOT SUBSTITUTE PROFESSIONAL VETERINARY ADVICE.",
+        "section2Body": "The Application is a management and information recording tool. Under no circumstances should the information provided by PetClan (including alerts, reminders, or date calculations) be considered as a diagnosis, treatment, or medical prescription.",
+        "consultationsTitle": "Professional Consultations:",
+        "consultationsBody": "Always seek the advice of your qualified veterinarian regarding any questions about your pet's health.",
+        "emergenciesTitle": "Emergencies:",
+        "emergenciesBody": "If you think your pet has a medical emergency, contact your veterinarian immediately. Do not rely on the Application for life-or-death situations.",
+        "variabilityTitle": "Biological Variability:",
+        "variabilityBody": "Deworming and vaccination reminders are estimates based on general guidelines. Every animal is unique and may require different protocols based on their health status, breed, age, and environment.",
+        "section3Title": "3. User Responsibility",
+        "section3Body": "The User is solely responsible for the truthfulness, accuracy, and updating of the data entered into the Application.",
+        "healthDataTitle": "Health Data:",
+        "healthDataBody": "You are responsible for correctly recording vaccination dates, weights, and administered doses. Errors in data entry will result in incorrect reminders.",
+        "accountSecurityTitle": "Account Security:",
+        "accountSecurityBody": "You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.",
+        "section4Title": "4. Limitation of Liability",
+        "section4Body": "To the maximum extent permitted by applicable law, PetClan's developers and owners shall not be liable for any direct, indirect, incidental, special, or consequential damages, including but not limited to:",
+        "liability1": "Damage to health or death of pets arising from the use or misuse of the Application's information.",
+        "liability2": "Loss of data, service interruptions, or technical failures.",
+        "liability3": "Costs of veterinary services incurred or not incurred based on the Application's reminders.",
+        "section5Title": "5. Intellectual Property",
+        "section5Body": "All content, design, source code, and logos of PetClan are the exclusive intellectual property of its developers, unless otherwise indicated (such as open-source libraries). Unauthorized reproduction, distribution, or modification is prohibited.",
+        "section6Title": "6. Privacy and Data",
+        "section6Body": "We respect your privacy. The data collected is used exclusively for the operation of the Application (management of pet profiles). We do not sell or share your personal data with third parties for advertising purposes.",
+        "section7Title": "7. Applicable Law and Jurisdiction",
+        "section7Body": "These Terms shall be governed by and construed in accordance with the laws of the Argentine Republic. Any dispute relating to these Terms shall be subject to the exclusive jurisdiction of the competent courts of the Autonomous City of Buenos Aires."
+    },
+    "TermsPage": {
+        "title": "Terms and Conditions of Use",
+        "backDefault": "Back to Dashboard",
+        "lastUpdated": "Last updated: January 2026",
+        "questions": "If you have any questions about these terms, please contact us through our support channels."
+    },
+    "Layout": {
+        "Footer": {
+            "rights": "© 2025 All rights reserved - MIT License",
+            "design": "Designed and developed by",
+            "termsPrefix": "By browsing this site, you agree to our",
+            "termsLink": "Terms and Conditions"
+        },
+        "Support": {
+            "title": "Support the Project",
+            "description": "PetClan is a free, open-source project, \\nmade with ❤ from Argentina.",
+            "share": "If you find this app helpful, please consider sharing it with friends and family. It helps a lot!",
+            "help": "If you wish to contribute to its maintenance and future improvements, you can do so through the following links.",
+            "copyLink": "Copy Link",
+            "linkCopied": "Link Copied",
+            "cafecito": "Buy me a Coffee",
+            "paypal": "Support via PayPal",
+            "portfolio": "Visit my Portfolio",
+            "github": "View on GitHub"
+        }
+    },
+    "PuppyCalendar": {
+        "title": "Vaccination Calendar",
+        "loading": "Loading calendar...",
+        "update": "Update Health Record",
+        "unavailableTitle": "Calendar not available",
+        "unavailableDesc1": "We do not have an automated calendar for",
+        "thisSpecies": "this species",
+        "unavailableDesc2": "We recommend consulting your vet to build the ideal health plan.",
+        "unavailableDesc3": "Support for more species coming soon (turtles, birds, rabbits, etc.).",
+        "status": {
+            "pending": "Pending",
+            "completed": "Completed",
+            "overdue": "Overdue",
+            "consultVet": "Consult Vet",
+            "upcoming": "Upcoming",
+            "schedule": "Schedule appt",
+            "replaced": "Replaced",
+            "covered": "Covered by follow-up dose",
+            "dueNow": "Time to vaccinate",
+            "visitVet": "Visit your vet"
+        },
+        "dewormingOvr": {
+            "title": "Deworming",
+            "desc": "Administer now"
+        },
+        "ageLabels": {
+            "2-3 Semanas": "2-3 Weeks",
+            "4-5 Semanas": "4-5 Weeks",
+            "6-7 Semanas": "6-7 Weeks",
+            "6-8 Semanas": "6-8 Weeks",
+            "8-9 Semanas": "8-9 Weeks",
+            "8 Semanas": "8 Weeks",
+            "10-12 Semanas": "10-12 Weeks",
+            "14-16 Semanas": "14-16 Weeks",
+            "3 Meses": "3 Months",
+            "3-4 Meses": "3-4 Months",
+            "4 Meses": "4 Months",
+            "5 Meses": "5 Months",
+            "6 Meses": "6 Months",
+            "Cada 3-4 Meses": "Every 3-4 Months",
+            "Mensual / Según Producto": "Monthly / Per Product",
+            "Anual": "Annual"
+        }
+    },
+    "DashboardView": {
+        "Header": {
+            "greeting": "Hi,",
+            "summary": "Here's the summary of your pack today."
+        },
+        "Pets": {
+            "ageYears": "{count, plural, =0 {0 years} one {1 year} other {# years}}",
+            "ageMonths": "{count, plural, =0 {0 months} one {1 month} other {# months}}",
+            "ageDays": "{count, plural, =0 {0 days} one {1 day} other {# days}}",
+            "healthOk": "Health Ok",
+            "lostHelp": "LOST - HELP ME",
+            "attention": "Attention",
+            "pending": "Pending",
+            "speciesDog": "Dog",
+            "speciesCat": "Cat",
+            "speciesOther": "Pet",
+            "lastWeightPrefix": "Last:"
+        },
+        "Alerts": {
+            "allGood": "All good",
+            "noAlerts": "You don't have any pending alerts for your pets.",
+            "activeAlerts": "Active Alerts",
+            "viewDetails": "View details",
+            "viewMore": "View {count} more alerts",
+            "weightMissingTitle": "Weight Update: {name}",
+            "weightMissingMessage": "We don't have a record of {name}'s last weight check. Keep it updated.",
+            "weightOverdueTitle": "It's time to weigh {name}!",
+            "weightOverdueMessage": "It's been {days} days since their last check. Because they are an {stage}, we recommend weighing them every {interval} days.",
+            "weightUpcomingTitle": "Upcoming Weight Check",
+            "weightUpcomingMessage": "In {days} days it's time for {name}'s weight check.",
+            "actionRequiredWeight": "Action Required: Weigh {name}",
+            "actionRequiredWeightDesc": "Due for {label}, but we need an updated weight.",
+            "attentionOverdue": "Attention! {label} Overdue",
+            "successDueToday": "It's today! {label}",
+            "upcomingDue": "Upcoming: {label}"
+        },
+        "Actions": {
+            "quickActionsTitle": "Quick Actions",
+            "actionWeight": "Log Weight",
+            "actionHealth": "Update Health Record",
+            "actionNewPet": "New Pet",
+            "selectPetTitle": "Select a pet 🐾"
+        },
+        "Tips": [
+            "Keep vaccines up to date to prevent serious diseases.",
+            "Daily exercise is vital for your pet's mental health. A 30-minute walk makes a difference.",
+            "Wash food and water bowls daily to avoid bacteria.",
+            "Chocolate is toxic to dogs and cats. Avoid giving it even in small amounts.",
+            "Use an ID tag with your number, even if your pet is microchipped.",
+            "Brush your pet regularly to reduce shedding and maintain healthy skin.",
+            "Visit the vet at least once a year for a general checkup.",
+            "Keep your pet free of fleas and ticks year-round.",
+            "Fresh, clean water should always be available.",
+            "Avoid giving them cooked bones, as they can splinter and cause internal damage.",
+            "Obesity reduces your pet's life expectancy. Control their portions.",
+            "Socialize your puppy early with other dogs and people.",
+            "Check their paw pads after long walks or on rough terrain.",
+            "Never leave your pet locked in the car, especially on hot days.",
+            "Clean their teeth regularly to prevent periodontal diseases.",
+            "Observe changes in their behavior; it can be a sign of illness.",
+            "Keep cleaning products and medications out of their reach.",
+            "Provide interactive toys to stimulate their mind.",
+            "Human food with high fat or seasoning can cause pancreatitis.",
+            "Establish a feeding and walking routine to give them security.",
+            "Check their ears weekly for infections or dirt.",
+            "If you have a cat, keep their litter box clean daily.",
+            "Positive reinforcement training builds the bond and improves behavior.",
+            "Know the toxic plants for pets and avoid them in your home.",
+            "Trim their nails regularly to prevent pain and walking problems.",
+            "Mental exercise is just as important as physical; teach them new tricks.",
+            "Do not self-medicate your pet with human drugs.",
+            "Use a seatbelt or carrier when traveling by car.",
+            "Deworm internally every 3-6 months as indicated by your vet.",
+            "Xylitol (sweetener) is extremely toxic to dogs.",
+            "Brush your cat to prevent hairballs in their stomach.",
+            "Identify 'pet-friendly' places before taking a vacation.",
+            "Give them a quiet space of their own where they can rest undisturbed.",
+            "Heat stroke is a medical emergency; keep them cool in summer.",
+            "Spaying/neutering prevents health and behavioral issues, and helps population control.",
+            "Playing 'fetch' is excellent cardiovascular exercise.",
+            "If your dog eats very fast, use slow feeders.",
+            "Cats need scratching posts to mark territory and care for their claws.",
+            "Clean the discharge from their eyes gently with a damp gauze.",
+            "Protect your pet from fireworks; the noise causes them anxiety.",
+            "Keep the trash closed to prevent them from eating something inappropriate.",
+            "Reward good behavior immediately so they associate it.",
+            "Swimming is a great low-impact exercise for dogs with joint problems.",
+            "Avoid walking on hot asphalt; if it burns your hand, it burns their paws.",
+            "Cats may drink less water than they need; consider water fountains.",
+            "Check their coat after walks in the countryside looking for seeds or parasites.",
+            "Onions and garlic are toxic to dogs and cats.",
+            "Environmental enrichment prevents boredom and destruction at home.",
+            "Consult your vet about the best diet for your pet's age and breed.",
+            "Love and attention are as important as food and shelter."
+        ],
+        "TipLabel": "Tip of the day",
+        "StagePuppy": "puppy",
+        "StageAdult": "adult"
     }
 }

@@ -37,8 +37,8 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, petDeathDate, 
         sortedRecords.unshift({
             _id: 'death-event',
             type: 'death_event' as any,
-            title: 'Hasta siempre 🕊️',
-            description: 'Siempre en nuestro recuerdo.',
+            title: t('Timeline.deathTitle'),
+            description: t('Timeline.deathDesc'),
             appliedAt: deathDateObj,
             petId: petId as any,
             createdBy: 'system' as any,
@@ -60,8 +60,8 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, petDeathDate, 
         sortedRecords.push({
             _id: 'birth-event',
             type: 'birth_event' as any, // Cast to avoid TS issues if strict
-            title: 'Nacimiento 🎉',
-            description: '¡Bienvenido al mundo!',
+            title: t('Timeline.birthTitle'),
+            description: t('Timeline.birthDesc'),
             appliedAt: petBirthDate,
             petId: petId as any,
             createdBy: 'system' as any,
@@ -90,7 +90,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, petDeathDate, 
             <Group justify="space-between" mb="lg">
                 <Text size="lg" fw={500}>{t('title')}</Text>
                 {!readOnly && (
-                    <Button onClick={handleAdd} size="xs" variant="light" color={identityColor}>Actualizar Libreta</Button>
+                    <Button onClick={handleAdd} size="xs" variant="light" color={identityColor}>{t('Timeline.update')}</Button>
                 )}
             </Group>
 
@@ -136,7 +136,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, petDeathDate, 
                             )}
                             <Group gap="xs" mt={4}>
                                 <Badge size="xs" color={typeColor} variant="subtle">
-                                    {(record.type === 'birth_event' || record.type === 'death_event') ? 'Hito' : t(`types.${record.type}`)}
+                                    {(record.type === 'birth_event' || record.type === 'death_event') ? t('Timeline.milestone') : t(`types.${record.type}`)}
                                 </Badge>
                                 <Text size="xs" c="dimmed">{formatDate(record.appliedAt)}</Text>
                             </Group>
@@ -153,7 +153,7 @@ export function HealthTimeline({ petId, petSpecies, petBirthDate, petDeathDate, 
                     mt="md"
                     onClick={onViewAll}
                 >
-                    Ver historial completo ({sortedRecords.length})
+                    {t('Timeline.viewAll', { count: sortedRecords.length })}
                 </Button>
             )}
 

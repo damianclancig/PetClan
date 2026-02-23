@@ -18,7 +18,18 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
     const { records, isLoading } = useHealthRecords(petId);
     const t = useTranslations('PuppyCalendar');
 
-    if (isLoading) return <Text>Cargando calendario...</Text>;
+    // Mapa de traducciones de ageLabel – next-intl no permite claves dinámicas, usamos typedProxy con fallback
+    const getAgeLabel = (raw: string): string => {
+        const key = raw as Parameters<typeof t>[0];
+        try {
+            // @ts-ignore – acceso dinámico intencional para mapear el ageLabel
+            return t(`ageLabels.${raw}` as any);
+        } catch {
+            return raw;
+        }
+    };
+
+    if (isLoading) return <Text>{t('loading')}</Text>;
 
     const schedule = getVaccinationSchedule(species);
 
@@ -28,14 +39,14 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
             <Paper p="md" radius="lg" withBorder bg="var(--mantine-color-body)">
                 <Group mb="md">
                     <IconVaccine size={24} />
-                    <Title order={3}>Calendario de Vacunación</Title>
+                    <Title order={3}>{t('title')}</Title>
                 </Group>
-                <Alert variant="light" color="blue" title="Calendario no disponible" icon={<IconInfoCircle />}>
-                    Por el momento, no tenemos un calendario automático para <strong>{species || 'esta especie'}</strong>.
+                <Alert variant="light" color="blue" title={t('unavailableTitle')} icon={<IconInfoCircle />}>
+                    {t('unavailableDesc1')} <strong>{species || t('thisSpecies')}</strong>.
                     <br />
-                    Te recomendamos consultar con tu veterinario para armar el plan de salud ideal.
+                    {t('unavailableDesc2')}
                     <br /><br />
-                    <em>Próximamente agregaremos soporte para más especies (tortugas, aves, conejos, etc.).</em>
+                    <em>{t('unavailableDesc3')}</em>
                 </Alert>
             </Paper>
         );
@@ -101,14 +112,14 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
 
         let color = 'gray';
         let icon = <IconClock size={16} />;
-        let statusText = 'Pendiente';
+        let statusText = t('status.pending');
         let subText = '';
 
         switch (status) {
             case 'completed':
                 color = 'green';
                 icon = <IconCheck size={16} />;
-                statusText = 'Completada';
+                statusText = t('status.completed');
                 subText = matchRecord
                     ? `${matchRecord.title} - ${new Date(matchRecord.appliedAt).toLocaleDateString()}`
                     : '';
@@ -116,26 +127,26 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
             case 'overdue':
                 color = 'red';
                 icon = <IconAlertTriangle size={16} />;
-                statusText = 'Vencida';
-                subText = 'Consultar Vet';
+                statusText = t('status.overdue');
+                subText = t('status.consultVet');
                 break;
             case 'due_soon':
                 color = 'yellow';
                 icon = <IconCalendarEvent size={16} />;
-                statusText = 'Próxima';
-                subText = 'Agendar turno';
+                statusText = t('status.upcoming');
+                subText = t('status.schedule');
                 break;
             case 'missed_replaced':
                 color = 'blue';
                 icon = <IconCheck size={16} />;
-                statusText = 'Reemplazada';
-                subText = 'Cubierta por dosis posterior';
+                statusText = t('status.replaced');
+                subText = t('status.covered');
                 break;
             case 'current_due':
                 color = 'orange';
                 icon = <IconClock size={16} />;
-                statusText = 'Es hora de vacunar';
-                subText = 'Visita a tu veterinario';
+                statusText = t('status.dueNow');
+                subText = t('status.visitVet');
                 break;
         }
 
@@ -147,8 +158,8 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
                 icon = <IconPill size={16} />;
             }
             if (status === 'current_due') {
-                statusText = 'Desparasitación';
-                subText = 'Administrar ahora';
+                statusText = t('dewormingOvr.title');
+                subText = t('dewormingOvr.desc');
             }
         }
 
@@ -218,7 +229,7 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
             <Group mb="md" justify="space-between">
                 <Group>
                     <IconVaccine size={24} />
-                    <Title order={3}>Calendario de Vacunación</Title>
+                    <Title order={3}>{t('title')}</Title>
                 </Group>
                 {onAddRecord && (
                     <Button
@@ -227,7 +238,7 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
                         leftSection={<IconPlus size={14} />}
                         onClick={onAddRecord}
                     >
-                        Actualizar Libreta
+                        {t('update')}
                     </Button>
                 )}
             </Group>
@@ -250,7 +261,7 @@ export function VaccinationCalendar({ petId, birthDate, species, onAddRecord }: 
                                 <Grid align="center">
                                     <Grid.Col span={{ base: 12, sm: 3 }}>
                                         <Badge size="lg" variant="light" color="gray" fullWidth>
-                                            {ageLabel}
+                                            {getAgeLabel(ageLabel)}
                                         </Badge>
                                     </Grid.Col>
                                     <Grid.Col span={{ base: 12, sm: 9 }}>

@@ -20,15 +20,15 @@ export class HealthAnalysisService {
     /**
      * Analyzes a pet's health history and returns a list of active alerts.
      */
-    static analyzePetHealth(pet: IPet, records: IHealthRecord[]): HealthAlert[] {
+    static analyzePetHealth(pet: IPet, records: IHealthRecord[], tAlerts: any): HealthAlert[] {
         const alerts: HealthAlert[] = [];
 
         // 1. Analyze Weight
-        const weightAlert = this.checkWeightStatus(pet);
+        const weightAlert = this.checkWeightStatus(pet, tAlerts);
         if (weightAlert) alerts.push(weightAlert);
 
         // 2. Analyze Vaccines & Deworming via Status Service
-        const medicalAlerts = this.checkMedicalStatuses(pet, records);
+        const medicalAlerts = this.checkMedicalStatuses(pet, records, tAlerts);
         alerts.push(...medicalAlerts);
 
         // 3. Sort Alerts by Priority
@@ -49,14 +49,14 @@ export class HealthAnalysisService {
     /**
      * Checks if weight update is overdue based on age.
      */
-    private static checkWeightStatus(pet: IPet): HealthAlert | null {
+    private static checkWeightStatus(pet: IPet, tAlerts: any): HealthAlert | null {
         // If never weighed (or no date), alert immediately
         if (!pet.lastWeightUpdate) {
             return {
                 id: `weight-${pet._id}-missing`,
                 type: 'health',
-                title: `Actualización de Peso: ${pet.name}`,
-                message: `No tenemos registrado cuándo fue el último control de peso de ${pet.name}. Mantenlo actualizado.`,
+                title: tAlerts('weightMissingTitle', { name: pet.name }),
+                message: tAlerts('weightMissingMessage', { name: pet.name }),
                 link: `/dashboard/pets/${pet._id}?tab=health`,
                 severity: 'warning',
                 date: new Date()
@@ -86,9 +86,8 @@ export class HealthAnalysisService {
             return {
                 id: `weight-${pet._id}-overdue`,
                 type: 'health',
-                title: `¡Es hora de pesar a ${pet.name}!`,
-                message: `Hace ${daysSinceLastUpdate} días fue su último control. ` +
-                    `Como es ${isPuppy ? 'cachorro' : 'adulto'}, recomendamos pesarlo cada ${daysThreshold} días.`,
+                title: tAlerts('weightOverdueTitle', { name: pet.name }),
+                message: tAlerts('weightOverdueMessage', { days: daysSinceLastUpdate, stage: isPuppy ? tAlerts('stagePuppy', { defaultMessage: 'cachorro' }) : tAlerts('stageAdult', { defaultMessage: 'adulto' }), interval: daysThreshold }),
                 link: `/dashboard/pets/${pet._id}?tab=health`,
                 severity: 'warning', // Could be critical if very late, but warning is fine
                 date: today
@@ -100,8 +99,8 @@ export class HealthAnalysisService {
             return {
                 id: `weight-${pet._id}-upcoming`,
                 type: 'health',
-                title: `Próximo Control de Peso`,
-                message: `En ${daysRemaining} días le toca control de peso a ${pet.name}.`,
+                title: tAlerts('weightUpcomingTitle'),
+                message: tAlerts('weightUpcomingMessage', { days: daysRemaining, name: pet.name }),
                 link: `/dashboard/pets/${pet._id}?tab=health`,
                 severity: 'warning',
                 date: today
@@ -114,7 +113,7 @@ export class HealthAnalysisService {
     /**
      * Delegates checks to VeterinaryStatusService.
      */
-    private static checkMedicalStatuses(pet: IPet, records: IHealthRecord[]): HealthAlert[] {
+    private static checkMedicalStatuses(pet: IPet, records: IHealthRecord[], tAlerts: any): HealthAlert[] {
         const alerts: HealthAlert[] = [];
         const categories: CategoryStatus['category'][] = [
             'deworming_internal',
@@ -139,18 +138,18 @@ export class HealthAnalysisService {
                 if (status.status === 'upcoming') severity = 'warning';
 
                 if (status.action === 'update_weight') {
-                    title = `Acción Requerida: Pesar a ${pet.name}`;
+                    title = tAlerts('actionRequiredWeight', { name: pet.name });
                     if (status.details.reason === 'Peso desactualizado') {
-                        message = `Toca ${status.details.slot.label}, pero necesitamos peso actualizado.`;
+                        message = tAlerts('actionRequiredWeightDesc', { label: status.details.slot.label });
                     }
                 } else {
                     // Standard title logic
                     if (severity === 'critical') {
-                        title = `¡Atención! ${status.details.slot.label} Vencida`;
+                        title = tAlerts('attentionOverdue', { label: status.details.slot.label });
                     } else if (severity === 'success') {
-                        title = `¡Es hoy! ${status.details.slot.label}`;
+                        title = tAlerts('successDueToday', { label: status.details.slot.label });
                     } else {
-                        title = `Próximamente: ${status.details.slot.label}`;
+                        title = tAlerts('upcomingDue', { label: status.details.slot.label });
                     }
                 }
 

@@ -3,7 +3,7 @@
 import { Group, Stack, Text, Title, Box } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
+import { useTranslations, useFormatter } from 'next-intl';
 
 interface DashboardHeaderProps {
     userName: string;
@@ -11,7 +11,16 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ userName }: DashboardHeaderProps) {
     const isMobile = useMediaQuery('(max-width: 768px)');
-    const today = dayjs().locale('es').format('dddd, D [de] MMMM');
+    const t = useTranslations('DashboardView.Header');
+    const format = useFormatter();
+    const now = new Date();
+
+    // next-intl formatter for "lunes, 15 de abril" or "Monday, April 15"
+    const today = format.dateTime(now, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+    });
 
     return (
         <Box mb="xl">
@@ -21,10 +30,10 @@ export function DashboardHeader({ userName }: DashboardHeaderProps) {
                         {today}
                     </Text>
                     <Title order={2} style={{ fontSize: isMobile ? '1.5rem' : '2rem' }}>
-                        Hola, <Text span c="teal" inherit>{userName}</Text>
+                        {t('greeting')} <Text span c="teal" inherit>{userName}</Text>
                     </Title>
                     <Text c="dimmed" size="sm" mt={4}>
-                        Aquí tienes el resumen de tu manada hoy.
+                        {t('summary')}
                     </Text>
                 </Stack>
             </Group>

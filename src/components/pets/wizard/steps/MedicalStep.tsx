@@ -2,37 +2,39 @@
 
 import { Stack, Text, Textarea } from '@mantine/core';
 import { useFormContext } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 export default function MedicalStep() {
     const { register, watch, formState: { errors } } = useFormContext();
+    const t = useTranslations('NewPet');
     const name = watch('name');
 
     return (
         <Stack gap="sm">
-            <Text size="md" fw={700} ta="center">Antecedentes Médicos de {name}</Text>
+            <Text size="md" fw={700} ta="center">{t('medicalHistory', { name: name || '' })}</Text>
             <Text size="sm" c="dimmed" ta="center" mb="sm">
-                Esta información es opcional, pero ayuda a mantener un mejor historial.
+                {t('medicalHistoryDesc')}
             </Text>
 
             <Textarea
-                label="Enfermedades Preexistentes"
-                placeholder="Ej. Alergia al pollo, Displasia de cadera..."
+                label={t('diseases')}
+                placeholder={t('placeholders.diseases')}
                 minRows={3}
                 radius="md"
                 {...register('diseases')}
             />
 
             <Textarea
-                label="Tratamientos en Curso"
-                placeholder="Ej. Medicación diaria, Fisioterapia..."
+                label={t('treatments')}
+                placeholder={t('placeholders.treatments')}
                 minRows={3}
                 radius="md"
                 {...register('treatments')}
             />
 
             <Textarea
-                label="Notas Adicionales"
-                placeholder="Cualquier otro detalle importante..."
+                label={t('notes')}
+                placeholder={t('placeholders.notes')}
                 minRows={3}
                 radius="md"
                 {...register('notes')}

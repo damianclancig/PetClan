@@ -6,6 +6,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { signOut } from 'next-auth/react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { IconHome, IconPaw, IconLogout, IconSettings, IconUser, IconChevronRight } from '@tabler/icons-react';
 import { getPetIdentityColor } from '@/utils/pet-identity'; // Although not used for general layout, might be useful later
@@ -103,6 +104,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
                     <Group gap="xs" wrap="nowrap">
                         <NotificationBell />
+                        <LanguageToggle />
                         <ThemeToggle />
                         <Menu shadow="md" width={200} position="bottom-end">
                             <Menu.Target>
@@ -120,7 +122,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                             </Menu.Target>
 
                             <Menu.Dropdown>
-                                <Menu.Label>Cuenta</Menu.Label>
+                                <Menu.Label>{t('account')}</Menu.Label>
                                 <Menu.Item leftSection={<IconUser size={14} />} disabled>
                                     {t('profile')}
                                 </Menu.Item>
@@ -129,7 +131,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                                     href="/dashboard/settings/notifications"
                                     leftSection={<IconSettings size={14} />}
                                 >
-                                    Notificaciones
+                                    {t('notifications')}
                                 </Menu.Item>
                                 <Menu.Divider />
                                 <Menu.Item

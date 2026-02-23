@@ -6,6 +6,7 @@ import { IconDog, IconCat, IconHelp, IconScale, IconCheck, IconAlertTriangle } f
 import { Link } from '@/i18n/routing';
 import type { DashboardPet, DashboardAlert } from '@/types/dashboard';
 import { EmptyPetsState } from '@/components/pets/EmptyPetsState';
+import { useTranslations } from 'next-intl';
 
 interface PetSnapshotGridProps {
     pets: DashboardPet[];
@@ -14,6 +15,7 @@ interface PetSnapshotGridProps {
 
 export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
     const isDesktop = useMediaQuery('(min-width: 992px)'); // md breakpoint
+    const t = useTranslations('DashboardView.Pets');
 
     if (!pets || pets.length === 0) {
         return (
@@ -30,20 +32,20 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
 
                 let statusColor = 'green';
                 let StatusIcon = IconCheck;
-                let statusLabel = 'Salud Ok';
+                let statusLabel = t('healthOk');
 
                 if (pet.status === 'lost') {
                     statusColor = 'red';
                     StatusIcon = IconAlertTriangle;
-                    statusLabel = 'PERDIDO - AYÚDAME';
+                    statusLabel = t('lostHelp');
                 } else if (hasCritical) {
                     statusColor = 'red';
                     StatusIcon = IconAlertTriangle;
-                    statusLabel = 'Atención';
+                    statusLabel = t('attention');
                 } else if (hasWarning) {
                     statusColor = 'orange';
                     StatusIcon = IconAlertTriangle;
-                    statusLabel = 'Pendientes';
+                    statusLabel = t('pending');
                 }
 
                 return (

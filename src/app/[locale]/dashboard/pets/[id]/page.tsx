@@ -66,7 +66,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
                 <Stack gap="xl">
                     <Paper withBorder p="md" radius="md">
-                        <Title order={4} mb="md">Recuerdos y Eventos</Title>
+                        <Title order={4} mb="md">{t('Deceased.memories')}</Title>
                         <HealthTimeline
                             petId={pet._id as unknown as string}
                             petSpecies={pet.species}
@@ -112,7 +112,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                     <Grid.Col span={{ base: 12, md: 4 }}>
                         <Stack>
                             <Paper withBorder p="md" radius="md">
-                                <Title order={4} mb="md">Estado de Salud</Title>
+                                <Title order={4} mb="md">{t('Summary.healthStatus')}</Title>
                                 <Stack gap="xs">
                                     {overdueCount > 0 && (
                                         <Badge
@@ -123,7 +123,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ⚠️ Atención: Vacunas vencidas ({overdueCount})
+                                            {t('badges.overdue', { count: overdueCount })}
                                         </Badge>
                                     )}
                                     {dueNowCount > 0 && (
@@ -135,7 +135,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ✅ Es el momento ideal ({dueNowCount})
+                                            {t('badges.dueNow', { count: dueNowCount })}
                                         </Badge>
                                     )}
                                     {upcomingCount > 0 && (
@@ -147,7 +147,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ⏳ Próximas vacunas ({upcomingCount})
+                                            {t('badges.upcoming', { count: upcomingCount })}
                                         </Badge>
                                     )}
                                     {isUpToDate && (
@@ -159,7 +159,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            ✨ Vacunas al día
+                                            {t('badges.upToDate')}
                                         </Badge>
                                     )}
                                     {hasRabies && (
@@ -171,7 +171,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setActiveTab('health')}
                                         >
-                                            💉 Antirábica Vigente
+                                            {t('badges.rabies')}
                                         </Badge>
                                     )}
                                 </Stack>
@@ -185,7 +185,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
                             <Paper withBorder p="md" radius="md">
                                 <Group justify="space-between" mb="xs">
-                                    <Title order={4}>{tPets('weight')}</Title>
+                                    <Title order={4}>{t('Summary.weightTitle')}</Title>
                                     <ActionIconMotion onClick={openWeightModal}>
                                         <ActionIcon variant="subtle" color="blue">
                                             <IconPlus size={16} />
@@ -199,7 +199,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                     fullWidth
                                     onClick={() => setActiveTab('health')}
                                 >
-                                    Ver gráfico e historial
+                                    {t('Summary.viewChart')}
                                 </Button>
                             </Paper>
                         </Stack>
@@ -209,7 +209,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         <Stack>
                             <PetExtraInfoCard pet={pet as any} />
                             <Paper withBorder p="md" radius="md">
-                                <Title order={4} mb="md">Últimos Eventos</Title>
+                                <Title order={4} mb="md">{t('Summary.latestEvents')}</Title>
                                 <HealthTimeline
                                     petId={pet._id as unknown as string}
                                     petSpecies={pet.species}

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { motion, Variants } from 'framer-motion';
 import { IconPaw, IconHeartbeat, IconVaccine } from '@tabler/icons-react';
+import { TopRightControls } from '@/components/ui/TopRightControls';
 
 export function HeroSection() {
     const t = useTranslations('Landing.Hero');
@@ -41,6 +42,10 @@ export function HeroSection() {
                 paddingBottom: rem(80)
             }}
         >
+            <Box style={{ position: 'absolute', top: rem(20), right: rem(20), zIndex: 10 }}>
+                <TopRightControls />
+            </Box>
+
             {/* Background decoration */}
             <Box
                 style={{
