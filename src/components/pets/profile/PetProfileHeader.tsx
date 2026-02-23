@@ -33,6 +33,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
     const format = useFormatter();
     const identityColor = getPetIdentityColor(pet._id);
     const [showTimeTravel, setShowTimeTravel] = useState(false);
+    const [isFooterVisible, setIsFooterVisible] = useState(false);
     const isDeceased = pet.status === 'deceased';
     const { updatePhoto, isUploading } = useUpdatePetPhoto(pet._id);
 
@@ -60,6 +61,29 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
             }, 1000);
             return () => clearTimeout(timer);
         }
+    }, [isMobile]);
+
+    // Footer visibility observer for mobile floating action button
+    useEffect(() => {
+        if (!isMobile) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsFooterVisible(entry.isIntersecting);
+            },
+            { threshold: 0.1 }
+        );
+
+        const footer = document.getElementById('main-footer');
+        if (footer) {
+            observer.observe(footer);
+        }
+
+        return () => {
+            if (footer) {
+                observer.unobserve(footer);
+            }
+        };
     }, [isMobile]);
 
     // Icon for Sticky Header
@@ -574,7 +598,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
 
             {onAddRecord && (
                 <Affix position={{ bottom: 20, right: 20 }} zIndex={199}>
-                    <Transition transition="slide-up" mounted={true}>
+                    <Transition transition="slide-up" mounted={!isFooterVisible}>
                         {(transitionStyles) => (
                             <Button
                                 leftSection={<IconPlus size={18} />}

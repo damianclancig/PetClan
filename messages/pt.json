@@ -1,6 +1,6 @@
 {
     "HomePage": {
-        "title": "Bem-vindo ao PetClan 🐾",
+        "title": "Bem-vindo ao PetClan",
         "subtitle": "Gerencie a saúde dos seus animais de estimação, lembretes de vacinas e muito mais.",
         "start": "Começar Agora"
     },
@@ -65,7 +65,7 @@
         "emptyState": "Você não tem notificações"
     },
     "SettingsNotifications": {
-        "title": "Configurações de Notificações 🔔",
+        "title": "Configurações de Notificações",
         "description": "Escolha como deseja receber alertas sobre seus pets e a comunidade.",
         "email": {
             "label": "Notificações por E-mail",
@@ -171,7 +171,7 @@
         "externalTitleDefault": "Proteção contra pulgas e carrapatos"
     },
     "Pets": {
-        "title": "Meus Pets 🐾",
+        "title": "Meus Pets",
         "badges": {
             "lost": "⚠️ PERDIDO",
             "deceased": "Em Memória",
@@ -234,12 +234,12 @@
     "PetDetail": {
         "notFound": "Desculpe, não encontramos o pet solicitado.",
         "badges": {
-            "overdue": "⚠️ Atenção: Vacinas vencidas ({count})",
-            "dueNow": "✅ É o momento ideal ({count})",
-            "upcoming": "⏳ Próximas vacinas ({count})",
-            "upToDate": "✨ Vacinas em dia",
-            "rabies": "💉 Antirrábica Válida",
-            "deceased": "🕊️"
+            "overdue": "Atenção: Vacinas vencidas ({count})",
+            "dueNow": "É o momento ideal ({count})",
+            "upcoming": "Próximas vacinas ({count})",
+            "upToDate": "Vacinas em dia",
+            "rabies": "Antirrábica Válida",
+            "deceased": "Em Memória"
         },
         "tabs": {
             "summary": "Resumo",
@@ -322,9 +322,9 @@
         },
         "Timeline": {
             "milestone": "Marco",
-            "deathTitle": "Até sempre 🕊️",
+            "deathTitle": "Até sempre",
             "deathDesc": "Sempre na nossa memória.",
-            "birthTitle": "Nascimento 🎉",
+            "birthTitle": "Nascimento",
             "birthDesc": "Bem-vindo ao mundo!",
             "update": "Atualizar Prontuário",
             "viewAll": "Ver histórico completo ({count})"
@@ -381,7 +381,7 @@
         "initialWeight": "Peso Inicial",
         "initialWeightDesc": "Registrado ao criar o pet",
         "weightModal": {
-            "title": "Registrar Peso ⚖️",
+            "title": "Registrar Peso",
             "currentWeight": "Peso Atual (kg)",
             "notes": "Notas (Opcional)",
             "notesPlaceholder": "Ex: Após comer...",

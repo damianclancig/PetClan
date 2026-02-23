@@ -13,7 +13,7 @@ import { PetProfileHeader } from '@/components/pets/profile/PetProfileHeader';
 import { SharePetModal } from '@/components/pets/SharePetModal';
 import { PetExtraInfoCard } from '@/components/pets/profile/PetExtraInfoCard';
 import { useTranslations } from 'next-intl';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconAlertTriangle, IconClock, IconCalendarEvent, IconCheck, IconVaccine } from '@tabler/icons-react';
 import { use, useState, useMemo } from 'react';
 import { WeightControl } from '@/components/pets/WeightControl';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
@@ -116,6 +116,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                                     fullWidth
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => setActiveTab('health')}
+                                                    leftSection={<IconAlertTriangle size={16} />}
                                                 >
                                                     {t('badges.overdue', { count: overdueCount })}
                                                 </Badge>
@@ -128,6 +129,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                                     fullWidth
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => setActiveTab('health')}
+                                                    leftSection={<IconClock size={16} />}
                                                 >
                                                     {t('badges.dueNow', { count: dueNowCount })}
                                                 </Badge>
@@ -140,6 +142,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                                     fullWidth
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => setActiveTab('health')}
+                                                    leftSection={<IconCalendarEvent size={16} />}
                                                 >
                                                     {t('badges.upcoming', { count: upcomingCount })}
                                                 </Badge>
@@ -152,6 +155,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                                     fullWidth
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => setActiveTab('health')}
+                                                    leftSection={<IconCheck size={16} />}
                                                 >
                                                     {t('badges.upToDate')}
                                                 </Badge>
@@ -164,6 +168,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                                     fullWidth
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => setActiveTab('health')}
+                                                    leftSection={<IconVaccine size={16} />}
                                                 >
                                                     {t('badges.rabies')}
                                                 </Badge>

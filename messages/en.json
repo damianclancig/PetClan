@@ -1,6 +1,6 @@
 {
     "HomePage": {
-        "title": "Welcome to PetClan 🐾",
+        "title": "Welcome to PetClan",
         "subtitle": "Manage your pets' health, vaccine reminders, and more.",
         "start": "Start Now"
     },
@@ -65,7 +65,7 @@
         "emptyState": "You have no notifications"
     },
     "SettingsNotifications": {
-        "title": "Notification Settings 🔔",
+        "title": "Notification Settings",
         "description": "Choose how you want to receive alerts about your pets and the community.",
         "email": {
             "label": "Email Notifications",
@@ -171,7 +171,7 @@
         "externalTitleDefault": "Protection against fleas and ticks"
     },
     "Pets": {
-        "title": "My Pets 🐾",
+        "title": "My Pets",
         "badges": {
             "lost": "⚠️ LOST",
             "deceased": "In Memory",
@@ -234,12 +234,12 @@
     "PetDetail": {
         "notFound": "Sorry, we couldn't find the requested pet.",
         "badges": {
-            "overdue": "⚠️ Attention: Overdue vaccines ({count})",
-            "dueNow": "✅ Perfect time ({count})",
-            "upcoming": "⏳ Upcoming vaccines ({count})",
-            "upToDate": "✨ Vaccines up to date",
-            "rabies": "💉 Active Rabies",
-            "deceased": "🕊️"
+            "overdue": "Attention: Overdue vaccines ({count})",
+            "dueNow": "Perfect time ({count})",
+            "upcoming": "Upcoming vaccines ({count})",
+            "upToDate": "Vaccines up to date",
+            "rabies": "Active Rabies",
+            "deceased": "In Memory"
         },
         "tabs": {
             "summary": "Summary",
@@ -322,9 +322,9 @@
         },
         "Timeline": {
             "milestone": "Milestone",
-            "deathTitle": "Farewell 🕊️",
+            "deathTitle": "Farewell",
             "deathDesc": "Forever in our hearts.",
-            "birthTitle": "Birth 🎉",
+            "birthTitle": "Birth",
             "birthDesc": "Welcome to the world!",
             "update": "Update Health Record",
             "viewAll": "View full history ({count})"
@@ -381,7 +381,7 @@
         "initialWeight": "Initial Weight",
         "initialWeightDesc": "Recorded when creating the pet",
         "weightModal": {
-            "title": "Record Weight ⚖️",
+            "title": "Record Weight",
             "currentWeight": "Current Weight (kg)",
             "notes": "Notes (Optional)",
             "notesPlaceholder": "E.g.: After eating...",

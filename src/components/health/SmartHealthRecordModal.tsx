@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Modal, Group, Stack, Text, Button, SimpleGrid, Paper, ThemeIcon, TextInput, NumberInput, Select, Textarea, SegmentedControl, Chip, Autocomplete } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { IconVaccine, IconStethoscope, IconScale, IconPill, IconNote, IconChevronRight, IconCheck, IconCalendarEvent, IconAlertCircle, IconBug } from '@tabler/icons-react';
+import { IconVaccine, IconStethoscope, IconScale, IconPill, IconNote, IconChevronRight, IconCheck, IconCalendarEvent, IconAlertCircle, IconBug, IconDroplet, IconCalendar, IconSparkles, IconShieldCheck } from '@tabler/icons-react';
 
 // ...
 
@@ -337,9 +337,9 @@ export function SmartHealthRecordModal({
                     gap: 4
                 }}
             >
-                <Text size="lg">
-                    {value === 'pipette' ? '💧' : value === 'tablet' ? '💊' : value === 'collar' ? '🧣' : '✨'}
-                </Text>
+                <ThemeIcon variant="transparent" size="lg" color={isSelected ? 'white' : 'blue'}>
+                    {value === 'pipette' ? <IconDroplet size={24} /> : value === 'tablet' ? <IconPill size={24} /> : value === 'collar' ? <IconShieldCheck size={24} /> : <IconSparkles size={24} />}
+                </ThemeIcon>
                 <Text size="xs" fw={700} c={isSelected ? 'white' : 'dimmed'} style={{ lineHeight: 1.1 }}>{label}</Text>
             </Paper>
         );
@@ -368,7 +368,9 @@ export function SmartHealthRecordModal({
                     gap: 4
                 }}
             >
-                <Text size="lg" fw={800} c={isSelected ? 'white' : 'dimmed'}>{value === 'other' ? '📅' : value}</Text>
+                <ThemeIcon variant="transparent" size="lg" color={isSelected ? 'white' : 'grape'}>
+                    {value === 'other' ? <IconCalendar size={24} /> : <Text fw={800} size="xl" c="inherit">{value}</Text>}
+                </ThemeIcon>
                 <Text size="xs" fw={700} c={isSelected ? 'white' : 'dimmed'} style={{ lineHeight: 1.1 }}>{label}</Text>
             </Paper>
         );
