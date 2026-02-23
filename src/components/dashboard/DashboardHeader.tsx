@@ -23,7 +23,7 @@ export function DashboardHeader({ userName }: DashboardHeaderProps) {
     });
 
     return (
-        <Box mb="xl">
+        <Box mb={{ base: 'md', sm: 'xl' }}>
             <Group justify="space-between" align="flex-end">
                 <Stack gap={0}>
                     <Text size="sm" c="dimmed" tt="capitalize">

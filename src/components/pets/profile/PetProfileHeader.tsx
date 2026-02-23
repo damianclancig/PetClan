@@ -1,7 +1,8 @@
 'use client';
 
-import { Box, Container, Avatar, Title, Text, Flex, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button, Affix, Transition, Tooltip } from '@mantine/core';
-import { useWindowScroll } from '@mantine/hooks';
+import { Box, Container, Avatar, Title, Text, Flex, Badge, Paper, Tabs, rem, ActionIcon, Menu, Button, Affix, Transition, Tooltip, useComputedColorScheme } from '@mantine/core';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useWindowScroll, useMediaQuery } from '@mantine/hooks';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
@@ -12,7 +13,7 @@ import { getPetAge } from '@/lib/dateUtils';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
 import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { TimeTravelModal } from '@/components/debug/TimeTravelModal';
 import { useUpdatePetPhoto } from '@/hooks/useUpdatePetPhoto';
 import { FileButton, Loader } from '@mantine/core';
@@ -35,8 +36,31 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
     const isDeceased = pet.status === 'deceased';
     const { updatePhoto, isUploading } = useUpdatePetPhoto(pet._id);
 
+    const colorScheme = useComputedColorScheme('light');
+    const isDark = colorScheme === 'dark';
+    const isMobile = useMediaQuery('(max-width: 480px)');
+    const tabGap = isMobile ? '4px' : '8px';
+    const tabPadding = isMobile ? '8px 12px' : '8px 20px';
     const [scroll] = useWindowScroll();
     const showSticky = scroll.y > 180;
+    const tabsListRef = useRef<HTMLDivElement>(null);
+
+    // Horizontal scroll hint for mobile users
+    useEffect(() => {
+        if (isMobile && tabsListRef.current) {
+            const el = tabsListRef.current;
+            const timer = setTimeout(() => {
+                // Scroll to end
+                el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
+
+                // Wait and scroll back
+                setTimeout(() => {
+                    el.scrollTo({ left: 0, behavior: 'smooth' });
+                }, 800);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isMobile]);
 
     // Icon for Sticky Header
     const StickyAddButton = onAddRecord ? (
@@ -123,7 +147,6 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
 
             {/* ... styles ... */}
 
-            {/* Injected Style for Responsive Left Offset */}
             <style jsx global>{`
                 @media (min-width: 768px) {
                     .sticky-pet-header {
@@ -133,7 +156,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                 }
             `}</style>
 
-            <Paper radius="lg" withBorder mb="lg" style={{ overflow: 'hidden', backgroundColor: 'var(--bg-surface)' }}>
+            <Paper radius="lg" withBorder mb="lg" style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0, overflow: 'hidden', backgroundColor: 'var(--bg-surface)' }}>
                 {/* Organic Header Background */}
                 <Box
                     h={120}
@@ -307,7 +330,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                     petId={pet._id}
                 />
 
-                <Container size="lg" style={{ marginTop: -60, paddingBottom: 16, position: 'relative' }}>
+                <Container size="lg" style={{ marginTop: -60, paddingBottom: 0, position: 'relative' }}>
                     <Flex
                         direction="row" // Always row for mobile and desktop (Mobile: Avatar left, Name right)
                         align={{ base: 'center', xs: 'flex-start' }} // Center vertically on mobile (for half-color alignment), Top on desktop
@@ -449,38 +472,105 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                         </Box>
                     </Flex>
 
-                    {pet.status !== 'deceased' && (
-                        <Tabs
-                            value={activeTab}
-                            onChange={onTabChange}
-                            variant="outline"
-                            radius="md"
-                            mt="xl"
-                            color={identityColor}
-                        >
-                            <Tabs.List style={{ flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                                <Tabs.Tab value="summary" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    {t('tabs.summary')}
-                                    {activeTab === 'summary' && <MagicTabBackground />}
-                                </Tabs.Tab>
-                                <Tabs.Tab value="timeline" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    {t('tabs.timeline')}
-                                    {activeTab === 'timeline' && <MagicTabBackground />}
-                                </Tabs.Tab>
-                                <Tabs.Tab value="health" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    {t('tabs.health')}
-                                    {activeTab === 'health' && <MagicTabBackground />}
-                                </Tabs.Tab>
-                                <Tabs.Tab value="gallery" style={{ position: 'relative', zIndex: 1, transition: 'color 0.2s' }}>
-                                    {t('tabs.gallery')}
-                                    {activeTab === 'gallery' && <MagicTabBackground />}
-                                </Tabs.Tab>
-                                {/* <Tabs.Tab value="docs">Documentos</Tabs.Tab> */}
-                            </Tabs.List>
-                        </Tabs>
-                    )}
                 </Container>
-            </Paper >
+
+                {pet.status !== 'deceased' && (
+                    <Box style={{
+                        background: isDark
+                            ? 'linear-gradient(to top, rgba(0, 0, 0, 0.25) 80%, rgba(0, 0, 0, 0) 100%)'
+                            : 'linear-gradient(to top, rgba(227, 227, 227, 0.5) 80%, rgba(255, 255, 255, 0) 100%)',
+                        backdropFilter: 'blur(10px)',
+                        width: '100%',
+                        marginTop: 10,
+                    }}>
+                        <Container size="lg" px="md">
+                            <Tabs
+                                value={activeTab}
+                                onChange={onTabChange}
+                                variant="unstyled"
+                            >
+                                <Tabs.List
+                                    ref={tabsListRef}
+                                    style={{
+                                        display: 'flex',
+                                        flexWrap: 'nowrap',
+                                        justifyContent: 'flex-start',
+                                        overflowX: 'auto',
+                                        scrollbarWidth: 'none',
+                                        WebkitOverflowScrolling: 'touch',
+                                        gap: tabGap,
+                                        position: 'relative',
+                                        padding: '12px 16px 0px 16px'
+                                    }}
+                                >
+                                    {[
+                                        { value: 'summary', label: t('tabs.summary') },
+                                        { value: 'timeline', label: t('tabs.timeline') },
+                                        { value: 'health', label: t('tabs.health') },
+                                        { value: 'gallery', label: t('tabs.gallery') },
+                                    ].map((tab) => {
+                                        const isActive = activeTab === tab.value;
+                                        return (
+                                            <MagicParticles key={tab.value} color={isActive ? `var(--mantine-color-${identityColor}-filled)` : []}>
+                                                <Tabs.Tab
+                                                    value={tab.value}
+                                                    style={{
+                                                        flex: '0 1 auto',
+                                                        minWidth: 'fit-content',
+                                                        padding: tabPadding,
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '1px',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 700,
+                                                        borderRadius: '12px 12px 0 0',
+                                                        transition: 'color 0.4s ease',
+                                                        cursor: 'pointer',
+                                                        position: 'relative',
+                                                        color: isActive
+                                                            ? (isDark ? '#fff' : '#000')
+                                                            : (isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)'),
+                                                        background: 'transparent',
+                                                        border: 'none',
+                                                    }}
+                                                >
+                                                    <span style={{ position: 'relative', zIndex: 2 }}>
+                                                        {tab.label}
+                                                    </span>
+                                                    {isActive && (
+                                                        <motion.div
+                                                            layoutId="aurora-pill"
+                                                            style={{
+                                                                position: 'absolute',
+                                                                inset: 0,
+                                                                borderTopLeftRadius: '12px',
+                                                                borderTopRightRadius: '12px',
+                                                                borderBottomLeftRadius: '0px',
+                                                                borderBottomRightRadius: '0px',
+                                                                background: isDark
+                                                                    ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-8) 0%, var(--mantine-color-${identityColor}-7) 100%)`
+                                                                    : `linear-gradient(135deg, var(--mantine-color-${identityColor}-1) 0%, var(--mantine-color-${identityColor}-2) 100%)`,
+                                                                boxShadow: isDark
+                                                                    ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1)`
+                                                                    : `0 4px 12px var(--mantine-color-${identityColor}-light-color), inset 0 1px 1px rgba(255,255,255,0.8)`,
+                                                                zIndex: 1
+                                                            }}
+                                                            transition={{
+                                                                type: 'spring',
+                                                                bounce: 0.15,
+                                                                duration: 0.4,
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Tabs.Tab>
+                                            </MagicParticles>
+                                        );
+                                    })}
+                                </Tabs.List>
+                            </Tabs>
+                        </Container>
+                    </Box>
+                )}
+            </Paper>
 
             {onAddRecord && (
                 <Affix position={{ bottom: 20, right: 20 }} zIndex={199}>

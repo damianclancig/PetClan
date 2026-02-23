@@ -12,7 +12,7 @@ interface PageContainerProps {
 
 export function PageContainer({ children, title, action, size = 'xl' }: PageContainerProps) {
     return (
-        <Container size={size} py="lg">
+        <Container size={size} py={{ base: 'sm', sm: 'lg' }} px={{ base: 'xs', sm: 'md' }}>
             {(title || action) && (
                 <Group justify="space-between" mb="lg" align="center">
                     {title && (
