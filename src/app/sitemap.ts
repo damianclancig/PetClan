@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://petclan.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://petclan.clancig.com.ar';
     const locales = ['es', 'en', 'pt'];
     const paths = [
         '/',

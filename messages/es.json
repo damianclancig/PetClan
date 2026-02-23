@@ -654,5 +654,17 @@
             "El amor y la atención son tan importantes como la comida y el refugio."
         ],
         "TipLabel": "Tip del día"
+    },
+    "SEO": {
+        "Landing": {
+            "title": "PetClan - Libreta Sanitaria Digital para tus Mascotas",
+            "description": "La forma más fácil de gestionar la salud de tus mascotas. Control de vacunas, peso, desparasitaciones y más. ¡Empieza gratis!",
+            "keywords": "mascotas, libreta sanitaria, vacunas, salud animal, perros, gatos, control de peso, veterinaria digital"
+        },
+        "Login": {
+            "title": "Iniciar Sesión | PetClan",
+            "description": "Accede a tu cuenta de PetClan para gestionar la salud de tus mascotas.",
+            "keywords": "login, iniciar sesión, petclan, mascotas"
+        }
     }
 }

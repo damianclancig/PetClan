@@ -654,5 +654,17 @@
             "Amor e atenção são tão importantes quanto comida e abrigo."
         ],
         "TipLabel": "Dica do dia"
+    },
+    "SEO": {
+        "Landing": {
+            "title": "PetClan - Carteira de Saúde Digital para seus Pets",
+            "description": "A maneira mais fácil de gerenciar a saúde de seus animais de estimação. Controle de vacinas, peso, desparasitação e muito mais. Comece grátis!",
+            "keywords": "pets, carteira de saúde, vacinas, saúde animal, cães, gatos, controle de peso, veterinária digital"
+        },
+        "Login": {
+            "title": "Entrar | PetClan",
+            "description": "Acesse sua conta PetClan para gerenciar a saúde de seus pets.",
+            "keywords": "login, entrar, petclan, pets"
+        }
     }
 }

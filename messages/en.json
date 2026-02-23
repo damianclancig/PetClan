@@ -654,5 +654,17 @@
             "Love and attention are as important as food and shelter."
         ],
         "TipLabel": "Tip of the day"
+    },
+    "SEO": {
+        "Landing": {
+            "title": "PetClan - Digital Health Record for your Pets",
+            "description": "The easiest way to manage your pets' health. Vaccination tracking, weight, deworming, and more. Start for free!",
+            "keywords": "pets, health record, vaccines, animal health, dogs, cats, weight control, digital veterinary"
+        },
+        "Login": {
+            "title": "Login | PetClan",
+            "description": "Log in to your PetClan account to manage your pets' health.",
+            "keywords": "login, sign in, petclan, pets"
+        }
     }
 }
