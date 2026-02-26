@@ -1,6 +1,6 @@
 'use client';
 
-import { Flex, Text, Anchor, ActionIcon, Modal, Box, rem, Stack } from '@mantine/core';
+import { Flex, Text, Anchor, ActionIcon, Modal, Box, rem, Stack, Group } from '@mantine/core';
 import { IconHeart } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Link } from '@/i18n/routing';
@@ -16,7 +16,7 @@ export function Footer() {
         <Box
             id="main-footer"
             component="div"
-            h="100%"
+            w="100%"
         >
             <Flex
                 direction={{ base: 'column', sm: 'row' }}
@@ -24,7 +24,6 @@ export function Footer() {
                 align="center"
                 wrap="wrap"
                 gap="md"
-                h="100%"
             >
                 {/* Column 1: Copyright & Credits */}
                 <Box>
@@ -41,9 +40,15 @@ export function Footer() {
                     <Text size="xs" c="dimmed">
                         {t('termsPrefix')}
                     </Text>
-                    <Anchor component={Link} href="/terms" size="xs" c="dimmed" td="underline">
-                        {t('termsLink')}
-                    </Anchor>
+                    <Group gap="xs" wrap="wrap" justify="center">
+                        <Anchor component={Link} href="/terms" size="xs" c="dimmed" td="underline">
+                            {t('termsLink')}
+                        </Anchor>
+                        <Text size="xs" c="dimmed">•</Text>
+                        <Anchor component={Link} href="/privacy-policy" size="xs" c="dimmed" td="underline">
+                            {t('privacyLink')}
+                        </Anchor>
+                    </Group>
                 </Stack>
                 {/* Mobile version for Legal Disclaimer (hidden on desktop to avoid clutter or handled via responsive props) 
                     For now, following user request on "center". 

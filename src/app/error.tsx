@@ -21,7 +21,7 @@ export default function Error({
     }, [error]);
 
     return (
-        <Providers>
+        <Providers messages={{}} locale="es">
             <Container className="h-screen flex items-center justify-center" size="lg">
                 <Stack align="center" gap="xl">
                     <div style={{ position: 'relative', width: '100%', maxWidth: 500, aspectRatio: '4/3' }}>

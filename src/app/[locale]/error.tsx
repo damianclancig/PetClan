@@ -18,7 +18,7 @@ export default function Error({
     }, [error]);
 
     return (
-        <Providers>
+        <Providers messages={{}} locale="es">
             <div className="relative h-screen w-full overflow-hidden">
                 <AnimatedBackground />
                 <Container className="relative h-full flex items-center justify-center" size="lg">

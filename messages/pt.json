@@ -455,7 +455,9 @@
         "continueMessage": "Continuar com",
         "continueWithGoogle": "Continuar com Google",
         "acceptTermsPrefix": "Ao continuar, você aceita nossos",
+        "and": "e a",
         "termsTitle": "Termos e Condições de Uso",
+        "privacyTitle": "Política de Privacidade",
         "termsContent1": "Estes Termos e Condições regulam o uso do aplicativo PetClan (doravante denominado 'o Aplicativo'). Ao acessar e usar o Aplicativo, o usuário (doravante denominado 'o Usuário') concorda em ficar vinculado por estes Termos. Se você não concordar com algum dos termos, não deve usar o Aplicativo."
     },
     "Terms": {
@@ -487,17 +489,39 @@
         "section7Body": "Estes Termos serão regidos e interpretados de acordo com as leis da República Argentina. Qualquer disputa relacionada a estes Termos estará sujeita à jurisdição exclusiva dos tribunais competentes da Cidade Autônoma de Buenos Aires."
     },
     "TermsPage": {
-        "title": "Termos e Condições de Uso",
-        "backDefault": "Voltar ao Dashboard",
-        "lastUpdated": "Última atualização: Janeiro de 2026",
-        "questions": "Se você tiver alguma dúvida sobre estes termos, entre em contato conosco através de nossos canais de suporte."
+        "title": "Termos e Condições",
+        "backDefault": "Voltar",
+        "lastUpdated": "Última atualização: 26 de fevereiro de 2026",
+        "questions": "Si tiver alguma pregunta sobre estes Termos, por favor contate-nos."
+    },
+    "Privacy": {
+        "section1Title": "1. Informações que Coletamos",
+        "section1Body": "O PetClan coleta informações para fornecer melhores serviços a todos os nossos usuários. As informações que coletamos incluem:",
+        "data1": "Dados de perfil fornecidos pelo Google (Nome, E-mail, Foto de perfil).",
+        "data2": "Informações sobre seus animais de estimação (Nome, Espécie, Raça, Saúde, Peso).",
+        "section2Title": "2. Como Usamos as Informações",
+        "section2Body": "Usamos as informações coletadas para fornecer, manter, proteger e melhorar nossos serviços, bem como para proteger o PetClan e nossos usuários.",
+        "use1": "Personalização da experiência do usuário.",
+        "use2": "Gestão de lembretes e alertas de saúde.",
+        "section3Title": "3. Segurança dos Dados",
+        "section3Body": "Nós nos esforçamos para proteger o PetClan e nossos usuários contra acesso não autorizado ou alteração, divulgação ou destruição não autorizada das informações que mantemos.",
+        "section4Title": "4. Direitos do Usuário",
+        "section4Body": "Você pode acessar, atualizar ou excluir suas informações pessoais a qualquer momento através das configurações de sua conta.",
+        "section5Title": "5. Contato",
+        "section5Body": "Se você tiver dúvidas sobre nossa política de privacidade, entre em contato conosco através das configurações da conta."
+    },
+    "PrivacyPage": {
+        "title": "Política de Privacidade",
+        "backDefault": "Voltar",
+        "lastUpdated": "Última atualização: 26 de fevereiro de 2026"
     },
     "Layout": {
         "Footer": {
             "rights": "© 2025 Todos os direitos reservados - Licença MIT",
             "design": "Design e desenvolvimento por",
             "termsPrefix": "Ao navegar no site, você aceita nossos",
-            "termsLink": "Termos e Condições"
+            "termsLink": "Termos e Condições",
+            "privacyLink": "Política de Privacidade"
         },
         "Support": {
             "title": "Apoie o Projeto",

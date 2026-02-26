@@ -49,7 +49,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                 collapsed: { mobile: !opened },
             }}
             footer={{
-                height: 60,
+                height: 80,
                 collapsed: isMobile || false,
             }}
             padding={{ base: 2, md: 'md' }}
@@ -225,7 +225,15 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                 </Box>
             </AppShell.Main>
 
-            <AppShell.Footer p="md" zIndex={100} style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+            <AppShell.Footer
+                px="md"
+                zIndex={100}
+                style={{
+                    borderTop: '1px solid var(--mantine-color-gray-2)',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+            >
                 <Footer />
             </AppShell.Footer>
         </AppShell>

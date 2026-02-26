@@ -1,14 +1,15 @@
-import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { ColorSchemeScript } from '@mantine/core';
-import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css';
-import '@/styles/globals.css';
-import { inter, poppins } from '@/styles/fonts';
 import { Providers } from '@/components/providers/Providers';
 import { Metadata } from 'next';
+import { inter, poppins } from '@/styles/fonts';
+
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
+import '@/styles/globals.css';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -92,7 +93,6 @@ export default async function LocaleLayout({
 
     // Providing all messages to the client
     // for error boundary handling and fallback.
-    // In a real app we might pick only the needed ones.
     const messages = await getMessages();
 
     return (
@@ -101,11 +101,9 @@ export default async function LocaleLayout({
                 <ColorSchemeScript defaultColorScheme="auto" />
             </head>
             <body>
-                <NextIntlClientProvider messages={messages}>
-                    <Providers>
-                        {children}
-                    </Providers>
-                </NextIntlClientProvider>
+                <Providers messages={messages} locale={locale}>
+                    {children}
+                </Providers>
             </body>
         </html>
     );

@@ -455,7 +455,9 @@
         "continueMessage": "Continue with",
         "continueWithGoogle": "Continue with Google",
         "acceptTermsPrefix": "By continuing, you agree to our",
+        "and": "and our",
         "termsTitle": "Terms and Conditions of Use",
+        "privacyTitle": "Privacy Policy",
         "termsContent1": "These Terms and Conditions govern the use of the PetClan application (hereinafter, 'the Application'). By accessing and using the Application, the user (hereinafter, 'the User') agrees to be bound by these Terms. If you do not agree with any of the terms, you must not use the Application."
     },
     "Terms": {
@@ -488,16 +490,38 @@
     },
     "TermsPage": {
         "title": "Terms and Conditions of Use",
-        "backDefault": "Back to Dashboard",
-        "lastUpdated": "Last updated: January 2026",
+        "backDefault": "Go Back",
+        "lastUpdated": "Last updated: February 26, 2026",
         "questions": "If you have any questions about these terms, please contact us through our support channels."
+    },
+    "Privacy": {
+        "section1Title": "1. Information We Collect",
+        "section1Body": "PetClan collects information to provide better services to all our users. The information we collect includes:",
+        "data1": "Profile data provided by Google (Name, Email, Profile Picture).",
+        "data2": "Information about your pets (Name, Species, Breed, Health, Weight).",
+        "section2Title": "2. How We Use Information",
+        "section2Body": "We use the information collected to provide, maintain, protect and improve our services, as well as to protect PetClan and our users.",
+        "use1": "User experience personalization.",
+        "use2": "Management of health reminders and alerts.",
+        "section3Title": "3. Data Security",
+        "section3Body": "We strive to protect PetClan and our users from unauthorized access to or unauthorized alteration, disclosure or destruction of information we hold.",
+        "section4Title": "4. User Rights",
+        "section4Body": "You can access, update, or delete your personal information at any time through your account settings.",
+        "section5Title": "5. Contact",
+        "section5Body": "If you have questions about our privacy policy, please contact us through support channels."
+    },
+    "PrivacyPage": {
+        "title": "Privacy Policy",
+        "backDefault": "Go Back",
+        "lastUpdated": "Last updated: February 26, 2026"
     },
     "Layout": {
         "Footer": {
             "rights": "© 2025 All rights reserved - MIT License",
             "design": "Designed and developed by",
             "termsPrefix": "By browsing this site, you agree to our",
-            "termsLink": "Terms and Conditions"
+            "termsLink": "Terms and Conditions",
+            "privacyLink": "Privacy Policy"
         },
         "Support": {
             "title": "Support the Project",

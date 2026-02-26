@@ -1,0 +1,23 @@
+{
+    "name": "PetClan - Libreta Sanitaria Digital",
+    "short_name": "PetClan",
+    "description": "Gestiona la salud de tus mascotas de forma fácil y segura. Historial de vacunas, recordatorios y más.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#14B8A6",
+    "icons": [
+        {
+            "src": "/assets/logo-icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/logo-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

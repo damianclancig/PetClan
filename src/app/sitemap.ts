@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/',
         '/login',
         '/terms',
+        '/privacy-policy',
         '/public/support' // Asumiendo que existe o se creará
     ];
 

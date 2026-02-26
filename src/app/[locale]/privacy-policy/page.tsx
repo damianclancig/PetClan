@@ -1,13 +1,13 @@
 'use client';
 
-import { Container, Title, Text, Paper, Button, Group } from '@mantine/core';
+import { Container, Title, Text, Paper, Button } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useRouter } from '@/i18n/routing';
-import { TermsOfService } from '@/components/legal/TermsOfService';
+import { PrivacyPolicy } from '@/components/legal/PrivacyPolicy';
 import { useTranslations } from 'next-intl';
 
-export default function TermsPage() {
-    const t = useTranslations('TermsPage');
+export default function PrivacyPolicyPage() {
+    const t = useTranslations('PrivacyPage');
     const router = useRouter();
 
     const handleBack = () => {
@@ -36,14 +36,8 @@ export default function TermsPage() {
                     {t('lastUpdated')}
                 </Text>
 
-                <TermsOfService />
+                <PrivacyPolicy />
             </Paper>
-
-            <Text ta="center" c="dimmed" size="sm">
-                {t('questions')}
-            </Text>
         </Container>
     );
 }
-
-

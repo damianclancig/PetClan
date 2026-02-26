@@ -5,23 +5,43 @@ import { SessionProvider } from 'next-auth/react';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
+import { NextIntlClientProvider } from 'next-intl';
 import { theme } from '@/styles/theme';
 import { useState } from 'react';
-import '@mantine/notifications/styles.css';
 
-export function Providers({ children }: { children: React.ReactNode }) {
-    const [queryClient] = useState(() => new QueryClient());
+export function Providers({
+    children,
+    messages,
+    locale
+}: {
+    children: React.ReactNode;
+    messages: any;
+    locale: string;
+}) {
+    const [queryClient] = useState(() => new QueryClient({
+        defaultOptions: {
+            queries: {
+                staleTime: 60 * 1000,
+            },
+        },
+    }));
 
     return (
-        <SessionProvider>
-            <QueryClientProvider client={queryClient}>
-                <MantineProvider theme={theme} defaultColorScheme="auto">
-                    <Notifications />
-                    <ModalsProvider>
-                        {children}
-                    </ModalsProvider>
-                </MantineProvider>
-            </QueryClientProvider>
-        </SessionProvider>
+        <MantineProvider theme={theme} defaultColorScheme="auto">
+            <Notifications />
+            <ModalsProvider>
+                <NextIntlClientProvider
+                    locale={locale}
+                    messages={messages}
+                    timeZone="America/Argentina/Buenos_Aires"
+                >
+                    <SessionProvider>
+                        <QueryClientProvider client={queryClient}>
+                            {children}
+                        </QueryClientProvider>
+                    </SessionProvider>
+                </NextIntlClientProvider>
+            </ModalsProvider>
+        </MantineProvider>
     );
 }

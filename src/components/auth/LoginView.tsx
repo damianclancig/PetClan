@@ -22,6 +22,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { TermsOfService } from '@/components/legal/TermsOfService';
 import { useTranslations } from 'next-intl';
 import { TopRightControls } from '@/components/ui/TopRightControls';
+import { PrivacyPolicy } from '@/components/legal/PrivacyPolicy';
 
 function GoogleIcon() {
     return (
@@ -37,7 +38,8 @@ function GoogleIcon() {
 function LoginContent() {
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-    const [opened, { open, close }] = useDisclosure(false);
+    const [openedTerms, { open: openTerms, close: closeTerms }] = useDisclosure(false);
+    const [openedPrivacy, { open: openPrivacy, close: closePrivacy }] = useDisclosure(false);
     const tAuth = useTranslations('Auth');
 
     const handleGoogleLogin = () => {
@@ -53,8 +55,8 @@ function LoginContent() {
 
             {/* Modal de Términos y Condiciones */}
             <Modal
-                opened={opened}
-                onClose={close}
+                opened={openedTerms}
+                onClose={closeTerms}
                 title={tAuth('termsTitle')}
                 size="lg"
                 padding="xl"
@@ -63,6 +65,20 @@ function LoginContent() {
                 scrollAreaComponent={ScrollArea.Autosize}
             >
                 <TermsOfService />
+            </Modal>
+
+            {/* Modal de Política de Privacidad */}
+            <Modal
+                opened={openedPrivacy}
+                onClose={closePrivacy}
+                title={tAuth('privacyTitle')}
+                size="lg"
+                padding="xl"
+                centered
+                radius="md"
+                scrollAreaComponent={ScrollArea.Autosize}
+            >
+                <PrivacyPolicy />
             </Modal>
 
             {/* Background Gradient for Mobile / Base Element */}
@@ -210,9 +226,19 @@ function LoginContent() {
                                     fw={500}
                                     c="teal"
                                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                    onClick={open}
+                                    onClick={openTerms}
                                 >
                                     {tAuth('termsTitle')}
+                                </Text>
+                                {' '}{tAuth('and')}{' '}
+                                <Text
+                                    span
+                                    fw={500}
+                                    c="teal"
+                                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                    onClick={openPrivacy}
+                                >
+                                    {tAuth('privacyTitle')}
                                 </Text>
                                 .
                             </Text>
