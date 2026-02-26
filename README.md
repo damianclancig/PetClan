@@ -39,6 +39,11 @@
 - **🕊️ Modo "In Memoriam"**: Un diseño conmemorativo y respetuoso para mascotas fallecidas, adaptando la UI para preservar su legado como un hermoso tributo.
 - **⚡ Carga Rápida (Smart Entry)**: Modales inteligentes y pre-completados que interpretan la intención del usuario desde el dashboard, reduciendo clics al añadir peso o vacunas.
 
+#### 📱 Progressive Web App (PWA)
+- **⚡ Instalable**: Soporte completo para PWA con `manifest.json` y carga optimizada.
+- **🚀 Acceso Rápido**: Capacidad de agregar a la pantalla de inicio en Android y iOS para una experiencia de app nativa.
+- **🎨 Branding Consistente**: Splash screens y temas configurados para una integración fluida con el sistema operativo.
+
 #### 🔔 Sistema de Notificaciones
 - **⏰ Recordatorios Inteligentes**: Alertas automáticas para vacunas, desparasitaciones y eventos importantes
 - **📱 Notificaciones en Tiempo Real**: Sistema de notificaciones in-app con indicadores visuales
@@ -58,10 +63,10 @@
 - **📅 Formatos Locales**: Fechas y números formateados según el idioma del usuario
 
 #### 🔐 Seguridad y Privacidad
-- **🔒 Autenticación Segura**: Sistema de autenticación robusto con NextAuth.js (Google OAuth)
-- **🛡️ Protección de Datos**: Control de acceso basado en roles y relaciones (owner, co-owner)
-- **🔑 Tokens Seguros**: Sistema de invitaciones y compartición con tokens encriptados
-- **📜 Términos de Servicio**: Páginas legales integradas (Términos y Condiciones, Privacidad)
+- **🔒 Autenticación Segura**: Sistema de autenticación robusto con NextAuth.js (Google OAuth) completamente configurado para producción.
+- **🛡️ Protección de Datos**: Control de acceso basado en roles y relaciones (owner, co-owner).
+- **🔑 Tokens Seguros**: Sistema de invitaciones y compartición con tokens encriptados.
+- **📜 Páginas Legales**: Implementación completa de **Términos y Condiciones** y **Política de Privacidad** (requerimiento de Google OAuth) con navegación inteligente.
 
 ---
 
@@ -151,7 +156,8 @@ PetClan/
 │   │   │   ├── 📁 invitations/           # Sistema de invitaciones
 │   │   │   ├── 📁 requests/              # Solicitudes de co-tutoría
 │   │   │   ├── 📁 public/                # Perfiles públicos de mascotas
-│   │   │   └── 📁 terms/                 # Términos y condiciones
+│   │   │   ├── 📁 terms/                 # Términos y condiciones
+│   │   │   └── 📁 privacy-policy/        # Política de privacidad
 │   │   ├── 📁 api/                       # API Routes (Backend)
 │   │   │   ├── auth/                     # NextAuth endpoints
 │   │   │   ├── pets/                     # CRUD de mascotas
@@ -204,7 +210,8 @@ PetClan/
 │   │   │   ├── Footer.tsx                # Footer global
 │   │   │   └── SupportProjectModal.tsx   # Modal de apoyo
 │   │   ├── legal/                        # Componentes legales
-│   │   │   └── TermsOfService.tsx        # Términos de servicio
+│   │   │   ├── TermsOfService.tsx        # Términos de servicio
+│   │   │   └── PrivacyPolicy.tsx         # Política de privacidad
 │   │   ├── debug/                        # Herramientas de debug
 │   │   │   └── TimeTravelModal.tsx       # Modal de viaje en el tiempo
 │   │   ├── providers/                    # Providers de contexto
@@ -596,7 +603,7 @@ Este proyecto está bajo la Licencia **ISC**.
 ```
 ISC License
 
-Copyright (c) 2024 PetClan
+Copyright (c) 2026 PetClan
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -647,7 +654,7 @@ Si te gusta PetClan y quieres apoyar su desarrollo:
 
 <div align="center">
   <p>Hecho con ❤️ y ☕ para todos los amantes de las mascotas</p>
-  <p>© 2024 PetClan - Libreta Sanitaria Digital</p>
+  <p>© 2026 PetClan - Libreta Sanitaria Digital</p>
   
   ⭐ **Si este proyecto te resulta útil, por favor considera darle una estrella en GitHub** ⭐
 </div>
