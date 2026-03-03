@@ -28,6 +28,7 @@ export function useHealthRecords(petId: string) {
         queryKey: ['healthRecords', petId],
         queryFn: () => fetchHealthRecords(petId),
         enabled: !!petId,
+        retry: false,
     });
 
     const createRecordMutation = useMutation({

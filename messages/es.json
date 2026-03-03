@@ -188,7 +188,8 @@
         "tabs": {
             "active": "Activas",
             "history": "Memorias"
-        }
+        },
+        "back": "Volver"
     },
     "NewPet": {
         "title": "Registrar Nueva Mascota",
@@ -689,6 +690,22 @@
             "title": "Iniciar Sesión | PetClan",
             "description": "Accede a tu cuenta de PetClan para gestionar la salud de tus mascotas.",
             "keywords": "login, iniciar sesión, petclan, mascotas"
+        }
+    },
+    "Errors": {
+        "NotFound": {
+            "title": "¡Ups! No encontramos lo que buscabas",
+            "description": "Parece que la página que intentas visitar no existe o ha sido movida. Nuestros amigos peludos están olfateando el problema.",
+            "button": "Volver al Inicio"
+        },
+        "ServerError": {
+            "title": "Algo salió mal",
+            "description": "Estamos teniendo algunos problemas técnicos. Nuestros veterinarios de sistemas ya están trabajando en ello.",
+            "button": "Reintentar"
+        },
+        "PetNotFound": {
+            "title": "Mascota no encontrada",
+            "description": "Lo sentimos, no pudimos encontrar la información de esta mascota. Puede que el enlace sea incorrecto o la mascota ya no esté disponible."
         }
     }
 }

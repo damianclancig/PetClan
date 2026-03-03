@@ -1,7 +1,8 @@
 'use client';
 
-import { Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button } from '@mantine/core';
+import { Grid, Paper, Title, Text, Group, Badge, ActionIcon, Stack, Button, Container, Box } from '@mantine/core';
 import { PageContainer } from '@/components/layout/PageContainer';
+import Image from 'next/image';
 import { PetProfileSkeleton } from '@/components/ui/Skeletons';
 import { useDisclosure } from '@mantine/hooks';
 import { ActionIconMotion } from '@/components/ui/MotionWrappers';
@@ -13,7 +14,8 @@ import { PetProfileHeader } from '@/components/pets/profile/PetProfileHeader';
 import { SharePetModal } from '@/components/pets/SharePetModal';
 import { PetExtraInfoCard } from '@/components/pets/profile/PetExtraInfoCard';
 import { useTranslations } from 'next-intl';
-import { IconPlus, IconAlertTriangle, IconClock, IconCalendarEvent, IconCheck, IconVaccine } from '@tabler/icons-react';
+import { Link } from '@/i18n/routing';
+import { IconPlus, IconAlertTriangle, IconClock, IconCalendarEvent, IconCheck, IconVaccine, IconChevronRight } from '@tabler/icons-react';
 import { use, useState, useMemo } from 'react';
 import { WeightControl } from '@/components/pets/WeightControl';
 import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
@@ -47,8 +49,53 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
         return getPetHealthSummary(pet, healthRecords);
     }, [pet, healthRecords]);
 
+    const tErrors = useTranslations('Errors.PetNotFound');
+
     if (isLoading) return <PageContainer><PetProfileSkeleton /></PageContainer>;
-    if (isError || !pet) return <PageContainer><Text>{t('notFound')}</Text></PageContainer>;
+    if (isError || !pet) {
+        return (
+            <PageContainer>
+                <Box style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: 'calc(100vh - 300px)', // Adjust based on header/footer
+                    width: '100%'
+                }}>
+                    <Container size="sm" w="100%">
+                        <Stack align="center" gap="xl">
+                            <Box style={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '1/1' }}>
+                                <Image
+                                    src="/assets/images/pet-not-found.webp"
+                                    alt="Pet Not Found"
+                                    fill
+                                    style={{ objectFit: 'contain' }}
+                                    priority
+                                />
+                            </Box>
+                            <Stack gap="xs" align="center">
+                                <Title order={2} ta="center" size="h1">{tErrors('title')}</Title>
+                                <Text c="dimmed" ta="center" size="lg" maw={500}>
+                                    {tErrors('description')}
+                                </Text>
+                            </Stack>
+                            <Button
+                                component={Link}
+                                href="/dashboard"
+                                variant="filled"
+                                color="teal"
+                                size="lg"
+                                radius="md"
+                                leftSection={<IconChevronRight size={18} style={{ transform: 'rotate(180deg)' }} />}
+                            >
+                                {tPets('back')}
+                            </Button>
+                        </Stack>
+                    </Container>
+                </Box>
+            </PageContainer>
+        );
+    }
 
 
 

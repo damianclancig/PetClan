@@ -75,6 +75,7 @@ export function usePet(id: string) {
         queryKey: ['pet', id],
         queryFn: () => fetchPet(id),
         enabled: !!id,
+        retry: false, // Don't retry if pet not found or error (faster UI feedback)
     });
 
     const updatePetMutation = useMutation({

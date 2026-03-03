@@ -188,7 +188,8 @@
         "tabs": {
             "active": "Active",
             "history": "Memories"
-        }
+        },
+        "back": "Back"
     },
     "NewPet": {
         "title": "Register New Pet",
@@ -689,6 +690,22 @@
             "title": "Login | PetClan",
             "description": "Log in to your PetClan account to manage your pets' health.",
             "keywords": "login, sign in, petclan, pets"
+        }
+    },
+    "Errors": {
+        "NotFound": {
+            "title": "Oops! We couldn't find what you were looking for",
+            "description": "It seems the page you are trying to visit doesn't exist or has been moved. Our furry friends are sniffing out the problem.",
+            "button": "Back to Home"
+        },
+        "ServerError": {
+            "title": "Something went wrong",
+            "description": "We are having some technical issues. Our system vets are already working on it.",
+            "button": "Try Again"
+        },
+        "PetNotFound": {
+            "title": "Pet Not Found",
+            "description": "Sorry, we couldn't find this pet's information. The link might be incorrect or the pet may no longer be available."
         }
     }
 }

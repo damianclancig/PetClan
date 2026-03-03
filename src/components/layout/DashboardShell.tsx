@@ -228,6 +228,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
             <AppShell.Footer
                 px="md"
                 zIndex={100}
+                visibleFrom="sm"
                 style={{
                     borderTop: '1px solid var(--mantine-color-gray-2)',
                     display: 'flex',
