@@ -106,6 +106,10 @@
             "internal": "Interna",
             "external": "Externa",
             "polyvalent": "Polivalente / Múltiple",
+            "sextuple": "Séxtuple / Quíntuple / Triple",
+            "triple_cat": "Triple Felina",
+            "internal_deworming": "Desparasitación Interna",
+            "external_deworming": "Desparasitación Externa",
             "rabies": "Antirrábica",
             "flea": "Pulgas / Garrapatas"
         },
@@ -707,5 +711,31 @@
             "title": "Mascota no encontrada",
             "description": "Lo sentimos, no pudimos encontrar la información de esta mascota. Puede que el enlace sea incorrecto o la mascota ya no esté disponible."
         }
+    },
+    "PublicPet": {
+        "breed": "Raza",
+        "sex": "Sexo",
+        "age": "Edad",
+        "weight": "Peso",
+        "verifiedProfile": "Perfil verificado en PetClan 🐾",
+        "goToPetClan": "Ir a PetClan",
+        "owners": "Dueños",
+        "lastVaccines": "Últimas Vacunas",
+        "noVaccines": "Sin vacunas registradas",
+        "months": "meses",
+        "years": "años",
+        "upToDate": "Salud al día",
+        "overdue": "Revisar salud ({count})",
+        "rabies": "Antirrábica Vigente",
+        "healthControl": "Control de Salud",
+        "lastApplied": "Última aplicación",
+        "expires": "Vence",
+        "pending": "Pendiente",
+        "status": "Estado",
+        "category": "Categoría",
+        "sextuple": "Séxtuple / Triple",
+        "triple": "Triple Felina",
+        "internalDeworming": "Desp. Interna",
+        "externalDeworming": "Desp. Externa"
     }
 }

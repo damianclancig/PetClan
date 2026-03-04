@@ -1,6 +1,7 @@
 'use client';
 
 import { Modal, NumberInput, Button, Group, Stack, Text } from '@mantine/core';
+import { isDev } from '@/utils/env';
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import { IconHistory } from '@tabler/icons-react';
@@ -14,6 +15,8 @@ interface TimeTravelModalProps {
 export function TimeTravelModal({ opened, onClose, petId }: TimeTravelModalProps) {
     const [loading, setLoading] = useState(false);
     const [days, setDays] = useState<number | string>(7);
+
+    if (!isDev) return null;
 
     const handleTravel = async () => {
         if (!days) return;

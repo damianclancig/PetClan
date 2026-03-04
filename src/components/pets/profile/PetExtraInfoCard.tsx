@@ -38,8 +38,8 @@ export function PetExtraInfoCard({ pet }: PetExtraInfoCardProps) {
     if (!hasInfo) return null;
 
     return (
-        <Paper withBorder p="lg" radius="md" mt="md">
-            <Title order={4} mb="lg">{t('title')}</Title>
+        <Paper withBorder p="md" radius="md">
+            <Title order={4} mb="md">{t('title')}</Title>
 
             <SimpleGrid cols={{ base: 1, md: 2 }} spacing={32} verticalSpacing="xl">
                 {hasCharacteristics && (

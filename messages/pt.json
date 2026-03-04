@@ -107,7 +107,11 @@
             "polyvalent": "Polivalente / Múltipla",
             "rabies": "Antirrábica",
             "other": "Outros",
-            "flea": "Pulgas / Carrapatos"
+            "flea": "Pulgas / Carrapatos",
+            "sextuple": "Sêxtupla / Polivalente / Tríplice",
+            "triple_cat": "Tríplice Felina",
+            "internal_deworming": "Desparasitação Interna",
+            "external_deworming": "Desparasitação Externa"
         },
         "sex": {
             "male": "Macho",
@@ -707,5 +711,31 @@
                 "description": "Desculpe, não conseguimos encontrar as informações deste pet. O link pode estar incorreto ou o pet pode não estar mais disponível."
             }
         }
+    },
+    "PublicPet": {
+        "breed": "Raça",
+        "sex": "Sexo",
+        "age": "Idade",
+        "weight": "Peso",
+        "verifiedProfile": "Perfil verificado no PetClan 🐾",
+        "goToPetClan": "Ir para PetClan",
+        "owners": "Donos",
+        "lastVaccines": "Últimas Vacinas",
+        "noVaccines": "Sem vacinas registradas",
+        "months": "meses",
+        "years": "anos",
+        "upToDate": "Saúde em dia",
+        "overdue": "Revisar saúde ({count})",
+        "rabies": "Antirrábica Válida",
+        "healthControl": "Controle de Saúde",
+        "lastApplied": "Última aplicação",
+        "expires": "Vencimento",
+        "pending": "Pendente",
+        "status": "Estado",
+        "category": "Categoria",
+        "sextuple": "Sêxtupla / Tríplice",
+        "triple": "Tríplice Felina",
+        "internalDeworming": "Desp. Interna",
+        "externalDeworming": "Desp. Externa"
     }
 }

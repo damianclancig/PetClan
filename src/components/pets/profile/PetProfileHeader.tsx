@@ -17,6 +17,7 @@ import { useState, useRef, useEffect } from 'react';
 import { TimeTravelModal } from '@/components/debug/TimeTravelModal';
 import { useUpdatePetPhoto } from '@/hooks/useUpdatePetPhoto';
 import { FileButton, Loader } from '@mantine/core';
+import { isDev } from '@/utils/env';
 
 interface PetProfileHeaderProps {
     pet: any;
@@ -301,20 +302,22 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                         </ActionIcon>
                                     </ActionIconMotion>
                                 </MagicParticles>
-                                <MagicParticles color="white">
-                                    <ActionIconMotion>
-                                        <ActionIcon
-                                            variant="white"
-                                            color={identityColor}
-                                            size="lg"
-                                            radius="xl"
-                                            aria-label={t('Header.timeTravel')}
-                                            onClick={() => setShowTimeTravel(true)}
-                                        >
-                                            <IconHistory size={18} />
-                                        </ActionIcon>
-                                    </ActionIconMotion>
-                                </MagicParticles>
+                                {isDev && (
+                                    <MagicParticles color="white">
+                                        <ActionIconMotion>
+                                            <ActionIcon
+                                                variant="white"
+                                                color={identityColor}
+                                                size="lg"
+                                                radius="xl"
+                                                aria-label={t('Header.timeTravel')}
+                                                onClick={() => setShowTimeTravel(true)}
+                                            >
+                                                <IconHistory size={18} />
+                                            </ActionIcon>
+                                        </ActionIconMotion>
+                                    </MagicParticles>
+                                )}
                             </>
                         )}
 

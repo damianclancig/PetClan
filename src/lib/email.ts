@@ -1,4 +1,5 @@
 import { IUser } from '@/models/User';
+import https from 'https';
 
 const MAILEROO_API_URL = 'https://smtp.maileroo.com/api/v2/emails';
 
@@ -57,30 +58,60 @@ export async function sendMailerooEmail(
     let retries = 3;
     while (retries > 0) {
         try {
-            const response = await fetch(MAILEROO_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Api-Key': apiKey,
-                },
-                body: JSON.stringify(payload),
-                signal: AbortSignal.timeout(10000) // 10s timeout to avoid hanging indefinitely
+            console.log(`[Maileroo] Intentando enviar email a ${toEmail} via HTTPS nativo. Intentos restantes: ${retries - 1}`);
+
+            if (!apiKey) throw new Error('MAILEROO_API_KEY is missing');
+
+            const postData = JSON.stringify(payload);
+
+            const result = await new Promise<{ success: boolean; data?: any }>((resolve, reject) => {
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Api-Key': apiKey,
+                        'Content-Length': Buffer.byteLength(postData),
+                    },
+                    timeout: 30000, // 30s
+                };
+
+                const req = https.request(MAILEROO_API_URL, options, (res) => {
+                    let body = '';
+                    res.on('data', (chunk) => (body += chunk));
+                    res.on('end', () => {
+                        try {
+                            resolve(JSON.parse(body));
+                        } catch (e) {
+                            reject(new Error('Invalid JSON response from Maileroo'));
+                        }
+                    });
+                });
+
+                req.on('error', (err) => reject(err));
+                req.on('timeout', () => {
+                    req.destroy();
+                    reject(new Error('ETIMEDOUT'));
+                });
+
+                req.write(postData);
+                req.end();
             });
 
-            const data = await response.json();
-
-            if (!data.success) {
-                console.error('Maileroo API Error:', data);
+            if (!result.success) {
+                console.error('Maileroo API Error:', result);
                 return false;
             }
 
+            console.log(`[Maileroo] Email enviado exitosamente a ${toEmail}`);
             return true;
-        } catch (error) {
-            console.error(`Error sending email with Maileroo (Attempts left: ${retries - 1}):`, error);
+
+        } catch (error: any) {
+            console.error(`Error sending email with Maileroo (Attempts left: ${retries - 1}):`, error.message || error);
+
+            // Reintentar si es un error de red o timeout
             retries--;
             if (retries === 0) return false;
-            // Wait 1 second before retrying
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
         }
     }
     return false;

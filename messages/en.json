@@ -107,7 +107,11 @@
             "polyvalent": "Polyvalent",
             "rabies": "Rabies",
             "other": "Other",
-            "flea": "Flea / Tick"
+            "flea": "Flea / Tick",
+            "sextuple": "Sextuple / Polyvalent / Triple",
+            "triple_cat": "Triple Feline",
+            "internal_deworming": "Internal Deworming",
+            "external_deworming": "External Deworming"
         },
         "sex": {
             "male": "Male",
@@ -707,5 +711,31 @@
             "title": "Pet Not Found",
             "description": "Sorry, we couldn't find this pet's information. The link might be incorrect or the pet may no longer be available."
         }
+    },
+    "PublicPet": {
+        "breed": "Breed",
+        "sex": "Sex",
+        "age": "Age",
+        "weight": "Weight",
+        "verifiedProfile": "Verified profile on PetClan 🐾",
+        "goToPetClan": "Go to PetClan",
+        "owners": "Owners",
+        "lastVaccines": "Last Vaccines",
+        "noVaccines": "No vaccines registered",
+        "months": "months",
+        "years": "years",
+        "upToDate": "Health up to date",
+        "overdue": "Review health ({count})",
+        "rabies": "Active Rabies",
+        "healthControl": "Health Control",
+        "lastApplied": "Last applied",
+        "expires": "Expires",
+        "pending": "Pending",
+        "status": "Status",
+        "category": "Category",
+        "sextuple": "Sextuple / Triple",
+        "triple": "Triple Feline",
+        "internalDeworming": "Int. Deworming",
+        "externalDeworming": "Ext. Deworming"
     }
 }
