@@ -81,6 +81,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
             }
         }
 
+        // Auto-delete the pending removal request notification for this user
+        try {
+            const Notification = (await import('@/models/Notification')).default;
+            await Notification.findOneAndDelete({
+                userId: currentUser._id,
+                link: { $regex: new RegExp(`/requests/${token}$`) }
+            });
+        } catch (e) {
+            console.error('Failed to auto-delete request notification:', e);
+        }
+
         return NextResponse.json({ success: true, action });
 
     } catch (error: any) {

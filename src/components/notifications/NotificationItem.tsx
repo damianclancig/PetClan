@@ -1,7 +1,7 @@
 'use client';
 
-import { Text, Group, UnstyledButton, ThemeIcon, Box } from '@mantine/core';
-import { IconVaccine, IconMail, IconUsers, IconInfoCircle, IconCake, IconUserMinus } from '@tabler/icons-react';
+import { Text, Group, UnstyledButton, ThemeIcon, Box, ActionIcon, Tooltip } from '@mantine/core';
+import { IconVaccine, IconMail, IconUsers, IconInfoCircle, IconCake, IconTrash } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
@@ -9,7 +9,7 @@ import 'dayjs/locale/es';
 import 'dayjs/locale/en';
 import 'dayjs/locale/pt';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 dayjs.extend(relativeTime);
 
@@ -23,14 +23,19 @@ interface NotificationItemProps {
         isRead: boolean;
         createdAt: string;
         severity?: 'warning' | 'critical' | 'success';
+        canDelete?: boolean;
+        isVirtual?: boolean;
     };
     onClose: () => void;
+    onDelete?: (id: string, isVirtual?: boolean) => void;
+    isDeleting?: boolean;
 }
 
-export default function NotificationItem({ notification, onClose }: NotificationItemProps) {
+export default function NotificationItem({ notification, onClose, onDelete, isDeleting }: NotificationItemProps) {
     const router = useRouter();
     const queryClient = useQueryClient();
     const locale = useLocale();
+    const t = useTranslations('NotificationsCenter');
     dayjs.locale(locale);
 
     const handleClick = () => {
@@ -98,29 +103,57 @@ export default function NotificationItem({ notification, onClose }: Notification
                     {getIcon()}
                 </ThemeIcon>
 
-                <Box style={{ flex: 1 }}>
-                    <Text size="sm" fw={notification.isRead ? 500 : 700} lh={1.3}>
-                        {notification.title}
-                    </Text>
-                    <Text size="xs" c="dimmed" mt={2}>
-                        {notification.message}
-                    </Text>
-                    <Text size="xs" c="dimmed" mt={4} style={{ fontSize: '10px' }}>
-                        {dayjs(notification.createdAt).fromNow()}
-                    </Text>
-                </Box>
+                <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {/* Top Row: Title + Unread Dot */}
+                    <Group justify="space-between" align="start" wrap="nowrap">
+                        <Text size="sm" fw={notification.isRead ? 500 : 700} lh={1.3}>
+                            {notification.title}
+                        </Text>
+                        {!notification.isRead && (
+                            <Box
+                                style={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    backgroundColor: 'var(--mantine-color-blue-6)',
+                                    marginTop: 4,
+                                    flexShrink: 0
+                                }}
+                            />
+                        )}
+                    </Group>
 
-                {!notification.isRead && (
-                    <Box
-                        style={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            backgroundColor: 'var(--mantine-color-blue-6)',
-                            marginTop: 8
-                        }}
-                    />
-                )}
+                    {/* Bottom Row: Message + Date + Delete Button */}
+                    <Group justify="space-between" align="center" wrap="nowrap">
+                        <Box style={{ flex: 1 }}>
+                            <Text size="xs" c="dimmed" mt={2} lineClamp={2}>
+                                {notification.message}
+                            </Text>
+                            <Text size="xs" c="dimmed" mt={4} style={{ fontSize: '10px' }}>
+                                {dayjs(notification.createdAt).fromNow()}
+                            </Text>
+                        </Box>
+                        {notification.canDelete !== false && (
+                            <Tooltip label={t('delete')} position="left" withArrow withinPortal>
+                                <ActionIcon
+                                    component="div"
+                                    variant="subtle"
+                                    color="gray"
+                                    size="sm"
+                                    loading={isDeleting}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        onDelete?.(notification._id, notification.isVirtual);
+                                    }}
+                                    style={{ flexShrink: 0 }}
+                                >
+                                    <IconTrash size={16} />
+                                </ActionIcon>
+                            </Tooltip>
+                        )}
+                    </Group>
+                </Box>
             </Group>
         </UnstyledButton>
     );

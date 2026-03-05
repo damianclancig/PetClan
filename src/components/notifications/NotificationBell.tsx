@@ -27,6 +27,27 @@ export default function NotificationBell(props: NotificationBellProps) {
         refetchInterval: 60000,
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: async ({ id }: { id: string }) => {
+            const res = await fetch(`/api/notifications/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Failed to delete');
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        }
+    });
+
+    const handleDelete = (id: string, isVirtual?: boolean) => {
+        if (isVirtual) {
+            // Wait, virtual notifications (health alerts) cannot be deleted directly via ID since they don't exist in DB
+            // Or maybe they can? If they are virtual, should we hide the delete button?
+            // Actually, we pass canDelete: false for virtual in the backend ? Wait! 
+        } else {
+            deleteMutation.mutate({ id });
+        }
+    };
+
     const notifications = data?.notifications || [];
     const unreadCount = data?.unreadCount || 0;
 
@@ -73,6 +94,8 @@ export default function NotificationBell(props: NotificationBellProps) {
                                     key={notif._id}
                                     notification={notif}
                                     onClose={() => setOpened(false)}
+                                    onDelete={handleDelete}
+                                    isDeleting={deleteMutation.isPending && deleteMutation.variables?.id === notif._id}
                                 />
                             ))}
                         </Box>

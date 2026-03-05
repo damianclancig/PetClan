@@ -89,7 +89,51 @@ export async function GET(req: Request) {
     // Count unread (All computed are unread + stored unread)
     const unreadCount = healthAlerts.length + storedNotifications.filter(n => !n.isRead).length;
 
-    return NextResponse.json({ notifications: allNotifications, unreadCount });
+    // Find all potential tokens for computing canDelete
+    const tokens: string[] = [];
+    allNotifications.forEach(n => {
+        if (n.link && (n.type === 'invitation' || n.type === 'social')) {
+            const match = n.link.match(/\/(?:invitations|requests)\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                tokens.push(match[1]);
+            }
+        }
+    });
+
+    // Fetch pending invitations matching those tokens
+    const pendingTokens = new Set<string>();
+    if (tokens.length > 0) {
+        const Invitation = (await import('@/models/Invitation')).default;
+        const pendingInvs = await Invitation.find({
+            token: { $in: tokens },
+            status: 'pending'
+        }).select('token').lean();
+        pendingInvs.forEach((inv: any) => pendingTokens.add(inv.token));
+    }
+
+    // Compute canDelete
+    const mappedNotifications = allNotifications.map(n => {
+        let canDelete = true;
+
+        if (n.isVirtual) {
+            canDelete = false; // Cannot delete computed health alerts
+        } else if (n.link && (n.type === 'invitation' || n.type === 'social')) {
+            const match = n.link.match(/\/(?:invitations|requests)\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1] && pendingTokens.has(match[1])) {
+                canDelete = false;
+            }
+        }
+
+        // Ensure n is a plain object before spreading
+        const plainNotification = typeof n.toObject === 'function' ? n.toObject() : n;
+
+        return {
+            ...plainNotification,
+            canDelete
+        };
+    });
+
+    return NextResponse.json({ notifications: mappedNotifications, unreadCount });
 }
 
 

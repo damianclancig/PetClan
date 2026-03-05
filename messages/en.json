@@ -62,7 +62,8 @@
     },
     "NotificationsCenter": {
         "title": "Notifications",
-        "emptyState": "You have no notifications"
+        "emptyState": "You have no notifications",
+        "delete": "Delete notification"
     },
     "SettingsNotifications": {
         "title": "Notification Settings",

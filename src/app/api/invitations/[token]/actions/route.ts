@@ -80,6 +80,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
             });
         }
 
+        // Auto-delete the pending invitation notification for this user
+        try {
+            const Notification = (await import('@/models/Notification')).default;
+            await Notification.findOneAndDelete({
+                userId: currentUser._id,
+                link: { $regex: new RegExp(`/invitations/${token}$`) }
+            });
+        } catch (e) {
+            console.error('Failed to auto-delete invitation notification:', e);
+        }
+
         return NextResponse.json({ success: true, action });
 
     } catch (error) {

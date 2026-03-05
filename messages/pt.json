@@ -62,7 +62,8 @@
     },
     "NotificationsCenter": {
         "title": "Notificações",
-        "emptyState": "Você não tem notificações"
+        "emptyState": "Você não tem notificações",
+        "delete": "Excluir notificação"
     },
     "SettingsNotifications": {
         "title": "Configurações de Notificações",
