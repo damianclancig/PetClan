@@ -1,146 +1,146 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { Container, Title, Text, Button, Group, Paper, Avatar, Stack, Box, UnstyledButton, Divider, ThemeIcon } from '@mantine/core';
+import { IconClock } from '@tabler/icons-react';
+import RequestActions from './RequestActions';
+import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { Link } from '@/i18n/routing';
+import { getTranslations } from 'next-intl/server';
 
-import { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
-import { Container, Paper, Title, Text, Button, Group, Avatar, Stack, Loader, Center } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
-import { IconCheck, IconX, IconAlertCircle } from '@tabler/icons-react';
+async function getRequest(token: string) {
+    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/requests/${token}`, {
+        cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    return res.json();
+}
 
-export default function RequestPage({ params }: { params: Promise<{ token: string }> }) {
-    const { token } = use(params);
-    const router = useRouter();
-    const [request, setRequest] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [processing, setProcessing] = useState(false);
-    const [error, setError] = useState('');
+export default async function RequestPage({ params }: { params: Promise<{ token: string, locale: string }> }) {
+    const { token, locale } = await params;
+    const session = await getServerSession(authOptions);
+    const t = await getTranslations({ locale, namespace: 'Requests' });
+    const tLayout = await getTranslations({ locale, namespace: 'Layout.Footer' });
 
-    useEffect(() => {
-        const fetchRequest = async () => {
-            try {
-                const res = await fetch(`/api/requests/${token}`);
-                if (!res.ok) {
-                    const data = await res.json();
-                    throw new Error(data.error || 'Error fetching request');
-                }
-                const data = await res.json();
-                setRequest(data);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchRequest();
-    }, [token]);
+    if (!session) {
+        redirect(`/api/auth/signin?callbackUrl=/requests/${token}`);
+    }
 
-    const handleAction = async (action: 'accept' | 'reject') => {
-        setProcessing(true);
-        try {
-            const res = await fetch(`/api/requests/${token}/action`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action }),
-            });
+    const request = await getRequest(token);
 
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || 'Error processing request');
-            }
+    // Render Function Layout to keep it DRY
+    const renderLayout = (children: React.ReactNode) => (
+        <Box bg="var(--bg-background)" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <AnimatedBackground style={{ opacity: 0.15 }} />
 
-            notifications.show({
-                title: action === 'accept' ? 'Solicitud aceptada' : 'Solicitud rechazada',
-                message: action === 'accept' ? 'Has dejado de compartir la mascota.' : 'Sigues siendo dueño de la mascota.',
-                color: 'green',
-                icon: <IconCheck size={16} />,
-            });
+            <Container size="sm" py="xl" style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {/* Top Header */}
+                <Group justify="space-between" mb="xl" gap="xs">
+                    <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+                        <UnstyledButton>
+                            <Group gap="xs">
+                                <Box w={34} h={34} style={{ position: 'relative' }}>
+                                    <img src="/assets/logo-icon.png" alt="PetClan Isotype" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                </Box>
+                                <Box w={{ base: 100, sm: 140 }} h={40} style={{ position: 'relative' }}>
+                                    <img
+                                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
+                                        alt="PetClan"
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
+                                    />
+                                </Box>
+                            </Group>
+                        </UnstyledButton>
+                    </Link>
 
-            // Redirect to dashboard
-            router.push('/dashboard');
-        } catch (err: any) {
-            notifications.show({
-                title: 'Error',
-                message: err.message,
-                color: 'red',
-                icon: <IconAlertCircle size={16} />,
-            });
-        } finally {
-            setProcessing(false);
-        }
-    };
+                    <Group gap="xs">
+                        <LanguageToggle />
+                        <ThemeToggle />
+                    </Group>
+                </Group>
 
-    if (loading) return <Center h="100vh"><Loader /></Center>;
+                {/* Main Content */}
+                <Box style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {children}
+                </Box>
 
-    if (error) {
-        return (
-            <Container size="sm" mt={100}>
-                <Paper p="xl" radius="md" withBorder>
-                    <Stack align="center">
-                        <IconAlertCircle size={48} color="red" />
-                        <Title order={3}>Error</Title>
-                        <Text c="dimmed">{error}</Text>
-                        <Button onClick={() => router.push('/dashboard')}>Ir al Dashboard</Button>
-                    </Stack>
-                </Paper>
+                {/* Minimal Footer */}
+                <Box mt="xl" pt="xl">
+                    <Divider mb="md" style={{ opacity: 0.5 }} />
+                    <Text ta="center" size="sm" c="dimmed">
+                        {tLayout('rights')}
+                    </Text>
+                </Box>
             </Container>
+        </Box>
+    );
+
+    if (!request) {
+        return renderLayout(
+            <Paper shadow="xl" p={{ base: 'xl', sm: 40 }} radius="md" withBorder w="100%" style={{ backgroundColor: 'var(--mantine-color-body)' }}>
+                <Stack align="center" gap="lg">
+                    <ThemeIcon size={80} radius="xl" variant="light" color="indigo">
+                        <IconClock size={45} stroke={1.5} />
+                    </ThemeIcon>
+                    <Stack gap="xs" align="center" ta="center">
+                        <Title order={2} size="h2">{t('invalid_title')}</Title>
+                        <Text size="md" c="dimmed">
+                            {t('invalid_desc')}
+                        </Text>
+                    </Stack>
+                    <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+                        <Button mt="md" variant="filled" size="md" color="cyan" radius="xl">
+                            Ir al Dashboard
+                        </Button>
+                    </Link>
+                </Stack>
+            </Paper>
         );
     }
 
-    return (
-        <Container size="xs" mt={60}>
-            <Paper radius="md" p="xl" withBorder shadow="sm">
-                <Stack align="center" gap="lg">
-                    <Title order={3} ta="center">Solicitud de Baja</Title>
+    return renderLayout(
+        <Paper shadow="xl" p={{ base: 'xl', sm: 40 }} radius="md" withBorder w="100%" style={{ backgroundColor: 'var(--mantine-color-body)' }}>
+            <Stack align="center" gap="xl">
+                <Avatar
+                    src={request.requesterImage}
+                    size={100}
+                    radius="xl"
+                    color="cyan"
+                    style={{ border: '3px solid var(--mantine-primary-color-filled)', boxShadow: 'var(--mantine-shadow-xs)' }}
+                >
+                    {request.requesterName?.charAt(0)}
+                </Avatar>
 
-                    <Avatar
-                        src={request.requesterImage}
-                        size="lg"
-                        radius="xl"
-                        color="cyan"
-                    >
-                        {request.requesterName?.charAt(0)}
-                    </Avatar>
-
-                    <Text ta="center" size="lg">
-                        <strong>{request.requesterName}</strong> te ha solicitado que dejes de ser dueño de:
+                <Stack gap="xs" align="center" ta="center">
+                    <Title order={2} size="h2" mb={0}>{t('title')}</Title>
+                    <Text size="md" c="dimmed">
+                        {t('requested_by', { name: `**${request.requesterName}**` })
+                            .split('**').map((part, i) => i % 2 === 1 ? <strong key={i} style={{ color: 'var(--mantine-color-text)' }}>{part}</strong> : part)}
                     </Text>
-
-                    <Avatar
-                        src={request.petPhoto}
-                        size={120}
-                        radius="md"
-                        color="blue"
-                    >
-                        {request.petName?.charAt(0)}
-                    </Avatar>
-
-                    <Title order={2}>{request.petName}</Title>
-
-                    <Text c="dimmed" ta="center" size="sm">
-                        Si aceptas, ya no tendrás acceso a esta mascota ni a su historial médico.
-                    </Text>
-
-                    <Group w="100%" grow>
-                        <Button
-                            color="red"
-                            variant="outline"
-                            onClick={() => handleAction('accept')}
-                            loading={processing}
-                            leftSection={<IconCheck size={18} />}
-                        >
-                            Aceptar y Salir
-                        </Button>
-                        <Button
-                            color="gray"
-                            variant="subtle"
-                            onClick={() => handleAction('reject')}
-                            loading={processing}
-                            leftSection={<IconX size={18} />}
-                        >
-                            Rechazar
-                        </Button>
-                    </Group>
                 </Stack>
-            </Paper>
-        </Container>
+
+                <Avatar
+                    src={request.petPhoto}
+                    size={150}
+                    radius="md"
+                    color="blue"
+                    style={{ border: '4px solid var(--mantine-color-blue-filled)', boxShadow: 'var(--mantine-shadow-sm)' }}
+                >
+                    {request.petName?.charAt(0)}
+                </Avatar>
+
+                <Title order={1} size="h1" c="blue.6">{request.petName}</Title>
+
+                <Text c="dimmed" ta="center" size="sm" px="lg">
+                    {t('warning')}
+                </Text>
+
+                <Box w="100%" mt="sm">
+                    <RequestActions token={token} />
+                </Box>
+            </Stack>
+        </Paper>
     );
 }

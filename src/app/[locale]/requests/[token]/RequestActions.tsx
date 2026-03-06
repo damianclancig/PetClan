@@ -7,15 +7,15 @@ import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 
-export default function InvitationActions({ token }: { token: string }) {
+export default function RequestActions({ token }: { token: string }) {
     const router = useRouter();
-    const t = useTranslations('Invitations');
+    const t = useTranslations('Requests');
     const [loading, setLoading] = useState<'accept' | 'reject' | null>(null);
 
     const handleAction = async (action: 'accept' | 'reject') => {
         setLoading(action);
         try {
-            const res = await fetch(`/api/invitations/${token}/actions`, {
+            const res = await fetch(`/api/requests/${token}/action`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action }),
@@ -27,12 +27,11 @@ export default function InvitationActions({ token }: { token: string }) {
 
             if (action === 'accept') {
                 notifications.show({
-                    title: '¡Bienvenido!',
-                    message: t('accept_success', { name: data.pet?.name || '' }),
+                    title: t('accept_success'),
+                    message: '',
                     color: 'green',
                     icon: <IconCheck size={18} />
                 });
-                router.push('/dashboard');
             } else {
                 notifications.show({
                     title: t('reject_success'),
@@ -40,9 +39,9 @@ export default function InvitationActions({ token }: { token: string }) {
                     color: 'blue',
                     icon: <IconX size={18} />
                 });
-                router.push('/dashboard');
             }
 
+            router.push('/dashboard');
             router.refresh();
 
         } catch (error: any) {
@@ -58,8 +57,8 @@ export default function InvitationActions({ token }: { token: string }) {
     return (
         <Group mt="md" grow>
             <Button
-                color="red"
-                variant="light"
+                color="gray"
+                variant="subtle"
                 size="md"
                 leftSection={<IconX size={20} />}
                 loading={loading === 'reject'}
@@ -69,7 +68,7 @@ export default function InvitationActions({ token }: { token: string }) {
                 {t('reject')}
             </Button>
             <Button
-                color="green"
+                color="red"
                 size="md"
                 leftSection={<IconCheck size={20} />}
                 loading={loading === 'accept'}

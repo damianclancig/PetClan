@@ -738,5 +738,32 @@
         "triple": "Tríplice Felina",
         "internalDeworming": "Desp. Interna",
         "externalDeworming": "Desp. Externa"
+    },
+    "Invitations": {
+        "title": "Convite de Copropriedade!",
+        "invited_by": "{name} convidou você para colaborar nos cuidados de:",
+        "account_mismatch_title": "Conta incorreta",
+        "account_mismatch_desc": "Este convite foi enviado para {invitedEmail}, mas você está conectado como {currentEmail}. Você deve mudar de conta para aceitar.",
+        "invalid_title": "Ops! Este convite não está mais disponível",
+        "invalid_desc": "Parece que o link que você seguiu não é mais válido. Isso pode acontecer se o convite já foi aceito, rejeitado ou expirou.",
+        "go_to_dashboard": "Ir para o Dashboard",
+        "accept": "Aceitar Convite",
+        "reject": "Rejeitar",
+        "processing": "Processando...",
+        "accept_success": "Convite aceito! {name} foi adicionado aos seus pets.",
+        "reject_success": "Convite rejeitado.",
+        "error": "Ocorreu um erro ao processar o convite."
+    },
+    "Requests": {
+        "title": "Solicitação de Remoção de Propriedade",
+        "requested_by": "{name} solicitou que você deixe de ser proprietário de:",
+        "warning": "Se você aceitar, não terá mais acesso a este animal de estimação ou ao seu histórico médico.",
+        "accept": "Aceitar e Sair",
+        "reject": "Rejeitar",
+        "invalid_title": "Ops! Esta solicitação não está mais disponível",
+        "invalid_desc": "Parece que o link que você seguiu não é mais válido. Isso pode acontecer se a solicitação já foi aceita, rejeitada ou expirou.",
+        "accept_success": "Solicitação aceita. Você não está mais compartilhando o animal.",
+        "reject_success": "Solicitação rejeitada. Você ainda possui o animal.",
+        "error": "Erro ao processar a solicitação."
     }
 }

@@ -738,5 +738,32 @@
         "triple": "Triple Felina",
         "internalDeworming": "Desp. Interna",
         "externalDeworming": "Desp. Externa"
+    },
+    "Invitations": {
+        "title": "¡Invitación de Copropiedad!",
+        "invited_by": "{name} te ha invitado a colaborar en el cuidado de:",
+        "account_mismatch_title": "Cuenta incorrecta",
+        "account_mismatch_desc": "Esta invitación fue enviada a {invitedEmail}, pero has iniciado sesión como {currentEmail}. Debes cambiar de cuenta para aceptar.",
+        "invalid_title": "¡Ups! Esta invitación ya no está disponible",
+        "invalid_desc": "Parece que el enlace que seguiste ya no es válido. Esto puede suceder si la invitación ya fue aceptada, rechazada o si ha expirado.",
+        "go_to_dashboard": "Ir al Dashboard",
+        "accept": "Aceptar Invitación",
+        "reject": "Rechazar",
+        "processing": "Procesando...",
+        "accept_success": "¡Invitación aceptada! {name} ha sido agregada a tus mascotas.",
+        "reject_success": "Invitación rechazada.",
+        "error": "Ocurrió un error al procesar la invitación."
+    },
+    "Requests": {
+        "title": "Solicitud de Baja",
+        "requested_by": "{name} te ha solicitado que dejes de ser dueño de:",
+        "warning": "Si aceptas, ya no tendrás acceso a esta mascota ni a su historial médico.",
+        "accept": "Aceptar y Salir",
+        "reject": "Rechazar",
+        "invalid_title": "¡Ups! Esta solicitud ya no está disponible",
+        "invalid_desc": "Parece que el enlace que seguiste ya no es válido. Esto puede suceder si la solicitud ya fue aceptada, rechazada o si ha expirado.",
+        "accept_success": "Solicitud aceptada. Has dejado de compartir la mascota.",
+        "reject_success": "Solicitud rechazada. Sigues siendo dueño de la mascota.",
+        "error": "Error al procesar la solicitud."
     }
 }

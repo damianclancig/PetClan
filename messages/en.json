@@ -738,5 +738,32 @@
         "triple": "Triple Feline",
         "internalDeworming": "Int. Deworming",
         "externalDeworming": "Ext. Deworming"
+    },
+    "Invitations": {
+        "title": "Co-ownership Invitation!",
+        "invited_by": "{name} has invited you to collaborate in the care of:",
+        "account_mismatch_title": "Incorrect Account",
+        "account_mismatch_desc": "This invitation was sent to {invitedEmail}, but you are logged in as {currentEmail}. You must switch accounts to accept.",
+        "invalid_title": "Oops! This invitation is no longer available",
+        "invalid_desc": "It seems the link you followed is no longer valid. This can happen if the invitation was already accepted, rejected, or has expired.",
+        "go_to_dashboard": "Go to Dashboard",
+        "accept": "Accept Invitation",
+        "reject": "Reject",
+        "processing": "Processing...",
+        "accept_success": "Invitation accepted! {name} has been added to your pets.",
+        "reject_success": "Invitation rejected.",
+        "error": "An error occurred while processing the invitation."
+    },
+    "Requests": {
+        "title": "Ownership Removal Request",
+        "requested_by": "{name} has requested that you stop being an owner of:",
+        "warning": "If you accept, you will no longer have access to this pet or its medical history.",
+        "accept": "Accept and Exit",
+        "reject": "Reject",
+        "invalid_title": "Oops! This request is no longer available",
+        "invalid_desc": "It seems the link you followed is no longer valid. This can happen if the request was already accepted, rejected, or has expired.",
+        "accept_success": "Request accepted. You are no longer sharing the pet.",
+        "reject_success": "Request rejected. You still own the pet.",
+        "error": "Error processing the request."
     }
 }
