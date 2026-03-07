@@ -429,7 +429,8 @@
             "currentOwners": "Dueños actuales:",
             "you": "(Tú)",
             "onlyOwnerTooltip": "Eres el único dueño. Gestiona el estado desde Editar.",
-            "requestRemoveTooltip": "Solicitar baja"
+            "requestRemoveTooltip": "Solicitar baja",
+            "pendingRemovalTooltip": "Solicitud de baja pendiente"
         },
         "qrTab": {
             "description": "Compartí este código QR para que otros puedan ver la ficha básica de",
@@ -765,5 +766,25 @@
         "accept_success": "Solicitud aceptada. Has dejado de compartir la mascota.",
         "reject_success": "Solicitud rechazada. Sigues siendo dueño de la mascota.",
         "error": "Error al procesar la solicitud."
+    },
+    "NotificationDetails": {
+        "title": "Detalle de Notificación",
+        "delete": "Eliminar Notificación",
+        "back": "Volver al Dashboard",
+        "not_found_title": "Notificación no encontrada",
+        "not_found_desc": "La notificación que buscas ya no existe o fue eliminada.",
+        "deleted_success": "Notificación eliminada",
+        "deleted_error": "Error al eliminar la notificación",
+        "loading": "Cargando...",
+        "pet_updated_title": "Perfil Actualizado",
+        "pet_updated_message": "{updater} modificó el perfil de {pet}:",
+        "invitation_title": "¡Nueva Invitación!",
+        "invitation_message": "{name} te ha invitado a colaborar con {pet}",
+        "invitation_accepted_title": "Invitación Aceptada",
+        "invitation_accepted_message": "{name} aceptó tu invitación para {pet}",
+        "invitation_rejected_title": "Invitación Rechazada",
+        "invitation_rejected_message": "{name} rechazó tu invitación para {pet}",
+        "remove_request_title": "Solicitud de Baja",
+        "remove_request_message": "{name} solicita que dejes de ser dueño de {pet}"
     }
 }

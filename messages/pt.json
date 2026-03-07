@@ -429,7 +429,8 @@
             "currentOwners": "Donos atuais:",
             "you": "(Você)",
             "onlyOwnerTooltip": "Você é o único dono. Gerencie o status em Editar.",
-            "requestRemoveTooltip": "Solicitar remoção"
+            "requestRemoveTooltip": "Solicitar remoção",
+            "pendingRemovalTooltip": "Solicitação de remoção pendente"
         },
         "qrTab": {
             "description": "Compartilhe este código QR para que outros possam ver o perfil básico de",
@@ -761,9 +762,29 @@
         "accept": "Aceitar e Sair",
         "reject": "Rejeitar",
         "invalid_title": "Ops! Esta solicitação não está mais disponível",
-        "invalid_desc": "Parece que o link que você seguiu não é mais válido. Isso pode acontecer se a solicitação já foi aceita, rejeitada ou expirou.",
-        "accept_success": "Solicitação aceita. Você não está mais compartilhando o animal.",
-        "reject_success": "Solicitação rejeitada. Você ainda possui o animal.",
-        "error": "Erro ao processar a solicitação."
+        "invalid_desc": "Parece que o link que você seguiu não é mais válido. Isso pode acontecer se a solicitação já tiver sido aceita, rejeitada ou se tiver expirado.",
+        "accept_success": "Solicitação aceita. Você não divide a mascota com os outros.",
+        "reject_success": "Solicitação rejeitada. Você ainda é proprietário da mascota.",
+        "error": "Erro no tratamento da solicitação."
+    },
+    "NotificationDetails": {
+        "title": "Detalhe da Notificação",
+        "delete": "Excluir Notificação",
+        "back": "Voltar ao Dashboard",
+        "not_found_title": "Notificação não encontrada",
+        "not_found_desc": "A notificação que você procura não existe mais ou foi excluída.",
+        "deleted_success": "Notificação excluída",
+        "deleted_error": "Erro ao excluir notificação",
+        "loading": "Carregando...",
+        "pet_updated_title": "Perfil Atualizado",
+        "pet_updated_message": "{updater} modificou o perfil de {pet}:",
+        "invitation_title": "Nova Invitación!",
+        "invitation_message": "{name} te convidou a colaborar com {pet}",
+        "invitation_accepted_title": "Convite Aceito",
+        "invitation_accepted_message": "{name} aceitou seu convite para {pet}",
+        "invitation_rejected_title": "Convite Rejeitado",
+        "invitation_rejected_message": "{name} rejeitou seu convite para {pet}",
+        "remove_request_title": "Solicitação de Baixa",
+        "remove_request_message": "{name} solicita que você deixe de ser proprietário de {pet}"
     }
 }

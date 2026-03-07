@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Tabs, Stack, Text, Button, TextInput, Avatar, Group, ActionIcon, Tooltip } from '@mantine/core';
-import { IconQrcode, IconUsers, IconMail, IconCheck, IconAlertCircle, IconLogout, IconUserMinus } from '@tabler/icons-react';
+import { IconQrcode, IconUsers, IconMail, IconCheck, IconAlertCircle, IconLogout, IconUserMinus, IconHourglassHigh } from '@tabler/icons-react';
 import { PetQRCode } from './PetQRCode';
 import { notifications } from '@mantine/notifications';
 import { modals } from '@mantine/modals';
@@ -28,6 +28,17 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
     const tCommon = useTranslations('Common');
     const tNotifications = useTranslations('Notifications');
 
+    // Auto-refresh data while modal is open to catch external changes (accept/reject)
+    useEffect(() => {
+        if (!opened) return;
+
+        const interval = setInterval(() => {
+            queryClient.invalidateQueries({ queryKey: ['pet', petId] });
+        }, 10000); // Poll every 10 seconds
+
+        return () => clearInterval(interval);
+    }, [opened, petId, queryClient]);
+
     const handleShare = async () => {
         if (!email) return;
         setLoading(true);
@@ -53,6 +64,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
             });
 
             setEmail('');
+            queryClient.invalidateQueries({ queryKey: ['pet', petId] });
         } catch (error: any) {
             notifications.show({
                 title: tNotifications('error'),
@@ -120,6 +132,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                     }
 
                     notifications.show({ title: tModalShare('notifications.removeRequestSentTitle'), message: tModalShare('notifications.removeRequestSentMsg'), color: 'green' });
+                    queryClient.invalidateQueries({ queryKey: ['pet', petId] });
                 } catch (error: any) {
                     notifications.show({ title: tNotifications('error'), message: error.message, color: 'red' });
                 }
@@ -141,6 +154,16 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
         }
         return false;
     };
+
+    const hourglassAnimation = `
+        @keyframes hourglass-rotate {
+            0% { transform: rotate(0deg); }
+            40% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            90% { transform: rotate(180deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
 
     return (
         <Modal opened={opened} onClose={() => { onClose(); setEmail(''); }} title={tModalShare('title', { name: petName })} centered size="md">
@@ -209,6 +232,17 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                                     </ActionIcon>
                                                 </Tooltip>
                                             )
+                                        ) : owner.hasPendingRemoval ? (
+                                            <Tooltip label={tModalShare('ownersTab.pendingRemovalTooltip')}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28 }}>
+                                                    <style>{hourglassAnimation}</style>
+                                                    <IconHourglassHigh
+                                                        size={18}
+                                                        color="var(--mantine-color-orange-filled)"
+                                                        style={{ animation: 'hourglass-rotate 3s infinite ease-in-out' }}
+                                                    />
+                                                </div>
+                                            </Tooltip>
                                         ) : (
                                             <Tooltip label={tModalShare('ownersTab.requestRemoveTooltip')}>
                                                 <ActionIcon color="orange" variant="transparent" onClick={() => handleRequestRemove(owner._id, owner.name)}>

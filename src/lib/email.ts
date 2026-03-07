@@ -279,18 +279,38 @@ export async function sendReminderEmail(
 export async function sendPetUpdateEmail(
     user: { email: string; name: string },
     petName: string,
-    updatedBy: string
+    updatedBy: string,
+    modifiedFields: { label: string; value: string }[] = []
 ) {
     const subject = `Actualización en el perfil de ${petName} 🐾`;
+
+    let changesHtml = '';
+    if (modifiedFields.length > 0) {
+        changesHtml = `
+            <div style="margin-top: 25px; padding: 15px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <p style="margin: 0 0 10px 0; font-size: 14px; color: #475569; font-weight: bold;">DETALLE DE CAMBIOS:</p>
+                ${modifiedFields.map(field => `
+                    <p style="margin: 5px 0; font-size: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px;">
+                        <span style="color: #64748b;">${field.label}:</span> 
+                        <strong style="color: #1e293b;">${field.value}</strong>
+                    </p>
+                `).join('')}
+            </div>
+        `;
+    }
+
     const content = `
         <h2 style="color: #0d9488;">Cambios en el perfil</h2>
         <p>Hola <strong>${user.name}</strong>,</p>
         <p>Te informamos que <strong>${updatedBy}</strong> ha realizado cambios en el perfil de tu mascota compartida, <strong>${petName}</strong>.</p>
-        <div class="card">
-            <p style="margin: 0;">Puedes revisar los detalles actualizados y el historial médico desde tu panel de control.</p>
+        
+        ${changesHtml}
+
+        <div class="card" style="margin-top: 20px; padding: 15px; background-color: #fffbeb; border-radius: 8px;">
+            <p style="margin: 0; font-size: 14px; color: #92400e;">Puedes revisar los detalles actualizados y el historial médico desde tu panel de control.</p>
         </div>
         <div style="text-align: center; margin-top: 30px;">
-            <a href="${process.env.NEXTAUTH_URL}/dashboard" class="btn">Ver Perfil de ${petName}</a>
+            <a href="${process.env.NEXTAUTH_URL}/dashboard" class="btn" style="background-color: #0d9488; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Ver Perfil de ${petName}</a>
         </div>
     `;
 

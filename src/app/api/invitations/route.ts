@@ -85,8 +85,8 @@ export async function POST(req: Request) {
             await Notification.create({
                 userId: targetUser._id,
                 type: 'invitation',
-                title: 'Nueva Invitación',
-                message: `${currentUser.name} te invitó a colaborar con ${pet.name}.`,
+                title: 'INVITATION_NEW',
+                message: `INVITATION_NEW|${currentUser.name}|${pet.name}`,
                 link: `/invitations/${token}`
             });
         }

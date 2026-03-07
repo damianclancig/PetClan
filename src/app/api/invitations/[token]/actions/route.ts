@@ -6,6 +6,7 @@ import Invitation from '@/models/Invitation';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
 import { sendInvitationResultEmail } from '@/lib/email';
+import mongoose, { Types } from 'mongoose';
 
 export async function POST(req: Request, { params }: { params: Promise<{ token: string }> }) {
     const session = await getServerSession(authOptions);
@@ -70,14 +71,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
             );
 
             // In-App Notification using dynamic import
-            const Notification = (await import('@/models/Notification')).default;
-            await Notification.create({
-                userId: inviter._id,
-                type: 'invitation',
-                title: action === 'accept' ? 'Invitación Aceptada' : 'Invitación Rechazada',
-                message: `${currentUser.name} ${action === 'accept' ? 'aceptó' : 'rechazó'} tu invitación para ${pet.name}.`,
-                link: action === 'accept' ? `/dashboard/pets/${pet._id}` : undefined
-            });
+            try {
+                const Notification = (await import('@/models/Notification')).default;
+                const newNotificationId = new Types.ObjectId();
+
+                await Notification.create({
+                    _id: newNotificationId,
+                    userId: inviter._id,
+                    type: 'invitation',
+                    title: action === 'accept' ? 'INVITATION_ACCEPTED' : 'INVITATION_REJECTED',
+                    message: `INVITATION_${action === 'accept' ? 'ACCEPTED' : 'REJECTED'}|${currentUser.name}|${pet.name}`,
+                    link: `/notifications/${newNotificationId}`
+                });
+            } catch (error) {
+                console.error('Error creating in-app notification:', error);
+            }
         }
 
         // Auto-delete the pending invitation notification for this user

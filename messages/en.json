@@ -429,7 +429,8 @@
             "currentOwners": "Current owners:",
             "you": "(You)",
             "onlyOwnerTooltip": "You are the only owner. Manage status from Edit.",
-            "requestRemoveTooltip": "Request removal"
+            "requestRemoveTooltip": "Request ownership removal",
+            "pendingRemovalTooltip": "Ownership removal request pending"
         },
         "qrTab": {
             "description": "Share this QR code so others can view the basic profile of",
@@ -761,9 +762,29 @@
         "accept": "Accept and Exit",
         "reject": "Reject",
         "invalid_title": "Oops! This request is no longer available",
-        "invalid_desc": "It seems the link you followed is no longer valid. This can happen if the request was already accepted, rejected, or has expired.",
-        "accept_success": "Request accepted. You are no longer sharing the pet.",
-        "reject_success": "Request rejected. You still own the pet.",
+        "invalid_desc": "It seems the link you followed is no longer valid. This can happen if the request has already been accepted, rejected, or if it has expired.",
+        "accept_success": "Request accepted. You have left the pet.",
+        "reject_success": "Request rejected. You are still an owner of the pet.",
         "error": "Error processing the request."
+    },
+    "NotificationDetails": {
+        "title": "Notification Detail",
+        "delete": "Delete Notification",
+        "back": "Back to Dashboard",
+        "not_found_title": "Notification not found",
+        "not_found_desc": "The notification you are looking for no longer exists or was deleted.",
+        "deleted_success": "Notification deleted",
+        "deleted_error": "Error deleting notification",
+        "loading": "Loading...",
+        "pet_updated_title": "Profile Updated",
+        "pet_updated_message": "{updater} updated {pet}'s profile:",
+        "invitation_title": "New Invitation!",
+        "invitation_message": "{name} invited you to collaborate with {pet}",
+        "invitation_accepted_title": "Invitation Accepted",
+        "invitation_accepted_message": "{name} accepted your invitation for {pet}",
+        "invitation_rejected_title": "Invitation Rejected",
+        "invitation_rejected_message": "{name} rejected your invitation for {pet}",
+        "remove_request_title": "Removal Request",
+        "remove_request_message": "{name} requests that you stop being an owner of {pet}"
     }
 }

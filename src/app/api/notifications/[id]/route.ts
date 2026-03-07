@@ -6,6 +6,26 @@ import Notification from '@/models/Notification';
 import User from '@/models/User';
 import Invitation from '@/models/Invitation';
 
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    await dbConnect();
+    const currentUser = await User.findOne({ email: session.user.email });
+    if (!currentUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    const notification = await Notification.findOne({ _id: id, userId: currentUser._id });
+    if (!notification) {
+        return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ notification });
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) {

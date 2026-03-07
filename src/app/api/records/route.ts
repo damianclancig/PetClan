@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
 import HealthRecord from '@/models/HealthRecord';
 import Pet from '@/models/Pet';
+import mongoose, { Types } from 'mongoose';
+import { sendHealthRecordEmail } from '@/lib/email';
 
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
@@ -65,7 +67,6 @@ export async function POST(req: Request) {
             if (pet && pet.owners && pet.owners.length > 1) {
                 const otherOwners = pet.owners.filter((owner: any) => owner._id.toString() !== user._id.toString());
 
-                const { sendHealthRecordEmail } = await import('@/lib/email');
                 const Notification = (await import('@/models/Notification')).default;
 
                 for (const owner of otherOwners) {
@@ -73,7 +74,7 @@ export async function POST(req: Request) {
                         body.type === 'consultation' ? 'Consulta' :
                             body.type === 'antiparasitic' ? 'Desparasitación' : 'Registro';
 
-                    const notificationTitle = `Nuevo Registro: ${pet.name}`;
+                    const notificationTitle = `Nuevo Registro`;
                     const notificationMessage = `${user.name} agregó "${body.title || recordTypeLabel}" al historial de ${pet.name}.`;
 
                     // 1. Email
@@ -98,12 +99,14 @@ export async function POST(req: Request) {
                     const wantsInApp = owner.notificationPreferences?.inApp !== false;
                     if (wantsInApp) {
                         try {
+                            const newNotificationId = new Types.ObjectId();
                             await Notification.create({
+                                _id: newNotificationId,
                                 userId: owner._id,
                                 type: 'social',
                                 title: notificationTitle,
                                 message: notificationMessage,
-                                link: `/dashboard/pets/${pet._id}`
+                                link: `/notifications/${newNotificationId}`
                             });
                         } catch (e) {
                             console.error('Failed to create notification', e);

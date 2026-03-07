@@ -5,7 +5,8 @@ import dbConnect from '@/lib/mongodb';
 import Invitation from '@/models/Invitation';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
+import { sendRemovalResultEmail } from '@/lib/email';
 
 export async function POST(req: Request, { params }: { params: Promise<{ token: string }> }) {
     const session = await getServerSession(authOptions);
@@ -55,12 +56,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
         const wantsInApp = requester.notificationPreferences?.inApp !== false;
         if (wantsInApp) {
             const Notification = (await import('@/models/Notification')).default;
+            const newNotificationId = new Types.ObjectId();
+
             await Notification.create({
+                _id: newNotificationId,
                 userId: requester._id,
                 type: 'social',
                 title: action === 'accept' ? 'Solicitud Aceptada' : 'Solicitud Rechazada',
                 message: `${currentUser.name} ha ${action === 'accept' ? 'aceptado' : 'rechazado'} dejar de ser dueño de ${pet.name}.`,
-                link: `/dashboard/pets/${pet._id}`
+                link: `/notifications/${newNotificationId}`
             });
         }
 
@@ -68,7 +72,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
         const wantsEmail = requester.notificationPreferences?.email !== false;
         if (wantsEmail && requester.email && requester.name) {
             try {
-                const { sendRemovalResultEmail } = await import('@/lib/email');
                 await sendRemovalResultEmail(
                     requester.email,
                     requester.name,

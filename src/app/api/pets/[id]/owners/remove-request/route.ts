@@ -6,6 +6,8 @@ import Pet from '@/models/Pet';
 import User from '@/models/User';
 import Invitation from '@/models/Invitation';
 import crypto from 'crypto';
+import mongoose, { Types } from 'mongoose';
+import { sendRemovalRequestEmail } from '@/lib/email';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
@@ -49,21 +51,24 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         // Notify Target User
         const wantsInApp = targetUser.notificationPreferences?.inApp !== false;
         if (wantsInApp) {
-            const Notification = (await import('@/models/Notification')).default;
-            await Notification.create({
-                userId: targetUser._id,
-                type: 'social', // Or 'system' or 'alert'
-                title: 'Solicitud de Baja',
-                message: `${currentUser.name} solicita que dejes de ser dueño de ${pet.name}.`,
-                link: `/requests/${token}` // New page for actions
-            });
+            try {
+                const Notification = (await import('@/models/Notification')).default;
+                await Notification.create({
+                    userId: targetUser._id,
+                    type: 'social',
+                    title: 'REMOVE_REQUEST',
+                    message: `REMOVE_REQUEST|${currentUser.name}|${pet.name}`,
+                    link: `/requests/${token}`
+                });
+            } catch (error) {
+                console.error('Error creating in-app notification:', error);
+            }
         }
 
         // Email Notification
         const wantsEmail = targetUser.notificationPreferences?.email !== false;
         if (wantsEmail) {
             try {
-                const { sendRemovalRequestEmail } = await import('@/lib/email');
                 await sendRemovalRequestEmail(
                     targetUser.email,
                     targetUser.name,
