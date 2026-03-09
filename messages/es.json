@@ -770,6 +770,8 @@
     "NotificationDetails": {
         "title": "Detalle de Notificación",
         "delete": "Eliminar Notificación",
+        "accept": "Aceptar",
+        "reject": "Rechazar",
         "back": "Volver al Dashboard",
         "not_found_title": "Notificación no encontrada",
         "not_found_desc": "La notificación que buscas ya no existe o fue eliminada.",

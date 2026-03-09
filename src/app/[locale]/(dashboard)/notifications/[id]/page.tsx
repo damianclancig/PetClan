@@ -279,6 +279,18 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
         );
     };
 
+    let actionType: 'invitation' | 'remove_request' | null = null;
+    let actionToken: string | null = null;
+
+    const link = notification.link || '';
+    if (link.includes('/invitations/') && (notification.title === 'INVITATION_NEW' || notification.message.startsWith('INVITATION_NEW|'))) {
+        actionType = 'invitation';
+        actionToken = link.split('/').pop() || null;
+    } else if (link.includes('/requests/') && (notification.title === 'REMOVE_REQUEST' || notification.message.startsWith('REMOVE_REQUEST|'))) {
+        actionType = 'remove_request';
+        actionToken = link.split('/').pop() || null;
+    }
+
     return renderLayout(
         <Paper shadow="xl" p={{ base: 'xl', sm: 40 }} radius="md" withBorder w="100%" style={{ backgroundColor: 'var(--mantine-color-body)' }}>
             <Stack align="center" gap="xl">
@@ -306,7 +318,11 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
                 </Stack>
 
                 <Box w="100%" mt="sm">
-                    <NotificationActions notificationId={id} />
+                    <NotificationActions
+                        notificationId={id}
+                        actionType={actionType}
+                        actionToken={actionToken}
+                    />
                 </Box>
             </Stack>
         </Paper>
