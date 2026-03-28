@@ -34,11 +34,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         },
         icons: {
             icon: [
-                { url: '/assets/logo-icon.png', sizes: '32x32' },
-                { url: '/assets/logo-icon.png', sizes: '192x192' },
+                { url: '/assets/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+                { url: '/assets/icon-512x512.png', sizes: '512x512', type: 'image/png' },
             ],
-            shortcut: '/assets/logo-icon.png',
-            apple: '/assets/logo-icon.png',
+            shortcut: '/assets/icon-192x192.png',
+            apple: [
+                { url: '/assets/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+            ],
         },
         manifest: '/manifest.json',
         openGraph: {
