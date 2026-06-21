@@ -151,16 +151,25 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                     left: '50%',
                                     transform: 'translate(-50%, -50%)',
                                     textAlign: 'center',
-                                    width: 'auto',
-                                    padding: '4px 12px',
+                                    width: '90%',
+                                    maxWidth: '180px',
+                                    padding: '6px 10px',
                                     zIndex: 10,
-                                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                    borderRadius: '16px',
-                                    backdropFilter: 'blur(2px)'
+                                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                                    borderRadius: '12px',
+                                    backdropFilter: 'blur(2px)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '2px',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
                             >
-                                <Text size="sm" c="white" fw={500} fs="italic">
-                                    🕊️ {dayjs(pet.birthDate).format('YYYY')} - {pet.deathDate ? dayjs(pet.deathDate).format('YYYY') : '...'}
+                                <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')}
+                                </Text>
+                                <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    † {pet.deathDate ? dayjs(pet.deathDate).format('DD/MM/YYYY') : '...'}
                                 </Text>
                             </Box>
                         )}
