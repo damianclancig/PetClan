@@ -5,6 +5,11 @@
     "start": "Empezar Ahora"
   },
   "Landing": {
+    "Header": {
+      "features": "Funcionalidades",
+      "benefits": "Beneficios",
+      "login": "Iniciar Sesión"
+    },
     "Hero": {
       "title": "El cuidado que tu mascota merece",
       "subtitle": "PetClan es la libreta sanitaria digital completa para llevar el control de vacunas, peso, desparasitaciones y más. Todo en un solo lugar.",

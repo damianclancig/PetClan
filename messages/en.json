@@ -5,6 +5,11 @@
     "start": "Start Now"
   },
   "Landing": {
+    "Header": {
+      "features": "Features",
+      "benefits": "Benefits",
+      "login": "Log In"
+    },
     "Hero": {
       "title": "The care your pet deserves",
       "subtitle": "PetClan is the complete digital health record to track vaccines, weight, deworming, and more. All in one place.",

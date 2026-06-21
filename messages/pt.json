@@ -5,6 +5,11 @@
     "start": "Começar Agora"
   },
   "Landing": {
+    "Header": {
+      "features": "Funcionalidades",
+      "benefits": "Benefícios",
+      "login": "Iniciar Sessão"
+    },
     "Hero": {
       "title": "O cuidado que seu pet merece",
       "subtitle": "PetClan é a carteira de vacinação digital completa para controlar vacinas, peso, desparasitações e mais. Tudo em um só lugar.",
