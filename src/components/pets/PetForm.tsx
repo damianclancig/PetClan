@@ -51,6 +51,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
     const tForm = useTranslations('PetForm');
     const [preview, setPreview] = useState<string | null>(initialValues?.photoUrl || null);
     const resetRef = useRef<() => void>(null);
+    const cancelHref = isEditMode && petId ? `/dashboard/pets/${petId}` : '/dashboard/pets';
 
     const petSchema = z.object({
         name: z.string().min(2, tValidation('nameLength')),
@@ -301,7 +302,7 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
             {/* Mobile Buttons: Full width, side by side */}
             <Box hiddenFrom="xs" mt="xl">
                 <Group grow>
-                    <Button variant="default" component={Link} href="/dashboard/pets" size="md">{tCommon('cancel')}</Button>
+                    <Button variant="default" component={Link} href={cancelHref} size="md">{tCommon('cancel')}</Button>
                     <Button type="submit" loading={isLoading} color="cyan" size="md">
                         {submitLabel || t('submit')}
                     </Button>
@@ -310,11 +311,12 @@ export function PetForm({ initialValues, onSubmit, isLoading, submitLabel, lastR
 
             {/* Desktop Buttons: Right aligned */}
             <Group visibleFrom="xs" justify="flex-end" mt="xl">
-                <Button variant="default" component={Link} href="/dashboard/pets">{tCommon('cancel')}</Button>
+                <Button variant="default" component={Link} href={cancelHref}>{tCommon('cancel')}</Button>
                 <Button type="submit" loading={isLoading} color="cyan">
                     {submitLabel || t('submit')}
                 </Button>
             </Group>
+
         </form>
     );
 }

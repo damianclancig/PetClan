@@ -1,4 +1,5 @@
 import { Paper, Title, Text, Group, Stack, ThemeIcon, SimpleGrid, Box } from '@mantine/core';
+import { LinkifiedText } from '@/components/ui/LinkifiedText';
 import { IconNotes, IconFirstAidKit, IconStethoscope, IconPaw } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 
@@ -18,9 +19,7 @@ function InfoRow({ icon: Icon, color, title, content }: { icon: any, color: stri
                 <Text size="xs" tt="uppercase" c="dimmed" fw={700} mb={4}>
                     {title}
                 </Text>
-                <Text size="sm" style={{ whiteSpace: 'pre-line', lineHeight: 1.5 }}>
-                    {content}
-                </Text>
+                <LinkifiedText size="sm" style={{ lineHeight: 1.5 }} text={content} />
             </Box>
         </Group>
     );

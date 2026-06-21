@@ -28,15 +28,22 @@ export default async function middleware(req: NextRequest) {
     // Verificar si es ruta protegida (/dashboard)
     const isProtected = pathWithoutLocale === '/dashboard' || pathWithoutLocale.startsWith('/dashboard/');
 
-    if (isProtected) {
-        const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
+    if (isProtected) {
         if (!token) {
             // Usuario no autenticado: Redirigir a login con el locale correcto
             const url = new URL(`/${locale}/login`, req.url);
             url.searchParams.set('callbackUrl', pathname); // Guardar URL original para redirección posterior
             return NextResponse.redirect(url);
         }
+    }
+
+    // Si el usuario está autenticado e intenta acceder a la landing page o login,
+    // redirigir directamente al dashboard para una experiencia más fluida.
+    if ((pathWithoutLocale === '/' || pathWithoutLocale === '/login') && token) {
+        const url = new URL(`/${locale}/dashboard`, req.url);
+        return NextResponse.redirect(url);
     }
 
     // Continuar con el manejo de i18n (redirecciones de locale, reescrituras, etc.)

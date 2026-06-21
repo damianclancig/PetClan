@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Container } from '@mantine/core';
+import { LandingHeader } from './LandingHeader';
 import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { BenefitsSection } from './BenefitsSection';
@@ -10,6 +11,7 @@ import { Footer } from '../layout/Footer';
 export function LandingPage() {
     return (
         <Box>
+            <LandingHeader />
             <HeroSection />
             <FeaturesSection />
             <BenefitsSection />
