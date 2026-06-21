@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { motion, Variants } from 'framer-motion';
 import { IconPaw, IconHeartbeat, IconVaccine } from '@tabler/icons-react';
-import { TopRightControls } from '@/components/ui/TopRightControls';
 
 export function HeroSection() {
     const t = useTranslations('Landing.Hero');
@@ -38,13 +37,10 @@ export function HeroSection() {
             style={{
                 position: 'relative',
                 overflow: 'hidden',
-                paddingTop: rem(80),
-                paddingBottom: rem(80)
+                paddingTop: rem(40),
+                paddingBottom: rem(60)
             }}
         >
-            <Box style={{ position: 'absolute', top: rem(20), right: rem(20), zIndex: 10 }}>
-                <TopRightControls />
-            </Box>
 
             {/* Background decoration */}
             <Box
@@ -124,7 +120,7 @@ export function HeroSection() {
                             <Group mt={30} gap="md" justify="center" style={{ width: '100%', justifyContent: 'flex-start' }}>
                                 <Button
                                     component={Link}
-                                    href="/dashboard"
+                                    href="/login"
                                     size="lg"
                                     radius="xl"
                                     variant="gradient"

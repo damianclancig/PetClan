@@ -30,7 +30,7 @@ export function BenefitsSection() {
     ];
 
     return (
-        <Box component="section" py={rem(80)}>
+        <Box component="section" id="benefits" py={rem(80)}>
             <Container size="lg">
                 <Title order={2} ta="center" mb={60}>
                     {t('title')}
