@@ -10,6 +10,7 @@ import { sortHealthRecords } from '@/utils/recordUtils'
 import { SmartHealthRecordModal } from './SmartHealthRecordModal'
 import { IHealthRecord } from '@/models/HealthRecord'
 import { HealthTimelineSkeleton } from '@/components/ui/Skeletons'
+import { LinkifiedText } from '@/components/ui/LinkifiedText'
 import { IconCirclePlus, IconPencil, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
 
@@ -254,9 +255,7 @@ export function HealthTimeline({
                     </Menu>
                   )}
                 </Group>
-                <Text c="dimmed" size="xs" mt={4}>
-                  {record.description}
-                </Text>
+                <LinkifiedText text={record.description} c="dimmed" size="xs" mt={4} />
                 {(record.vetName || record.clinicName) && (
                   <Text size="xs" mt={2} c="dimmed">
                     {t('Timeline.vetClinic')}: {record.vetName || record.clinicName}

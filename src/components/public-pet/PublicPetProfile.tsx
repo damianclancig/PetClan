@@ -13,6 +13,7 @@ import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { formatAgeTranslated } from '@/lib/dateUtils';
 import { useTranslations } from 'next-intl';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
+import { LinkifiedText } from '@/components/ui/LinkifiedText';
 
 interface PublicPetProfileProps {
     pet: any;
@@ -241,7 +242,7 @@ export default function PublicPetProfile({
                                         </ThemeIcon>
                                         <div>
                                             <Text size="xs" fw={700} c="dimmed" tt="uppercase">{tExtra('notes')}</Text>
-                                            <Text size="sm">{pet.notes}</Text>
+                                            <LinkifiedText size="sm" text={pet.notes} />
                                         </div>
                                     </Group>
                                 )}
