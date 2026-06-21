@@ -37,4 +37,4 @@ next-env.d.ts
 *.log
 *.txt
 
-.agent
+.directory
