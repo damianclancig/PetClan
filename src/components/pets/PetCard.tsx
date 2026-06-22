@@ -142,7 +142,6 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                             {/* <Badge circle size="sm" color="green" title="Vacunas al día">✓</Badge> */}
                         </Stack>
 
-                        {/* Deceased Date Overlay */}
                         {pet.status === 'deceased' && (
                             <Box
                                 style={{
@@ -151,12 +150,12 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                     left: '50%',
                                     transform: 'translate(-50%, -50%)',
                                     textAlign: 'center',
-                                    width: '90%',
-                                    maxWidth: '180px',
-                                    padding: '6px 10px',
+                                    width: 'max-content',
+                                    maxWidth: '92%',
+                                    padding: '6px 12px',
                                     zIndex: 10,
-                                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                                    borderRadius: '12px',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                    borderRadius: '16px',
                                     backdropFilter: 'blur(2px)',
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -165,11 +164,11 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                     justifyContent: 'center'
                                 }}
                             >
-                                <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
                                     🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')}
                                 </Text>
-                                <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    † {pet.deathDate ? dayjs(pet.deathDate).format('DD/MM/YYYY') : '...'}
+                                <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
+                                    † {pet.deathDate ? dayjs(pet.deathDate).format('DD/MM/YYYY') : '-'}
                                 </Text>
                             </Box>
                         )}

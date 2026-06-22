@@ -38,6 +38,19 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
     const isDeceased = pet.status === 'deceased';
     const { updatePhoto, isUploading } = useUpdatePetPhoto(pet._id);
 
+    const getDeceasedAgeStr = () => {
+        if (!pet.birthDate || !pet.deathDate) return '';
+        const birth = dayjs(pet.birthDate);
+        const death = dayjs(pet.deathDate);
+        const years = death.diff(birth, 'years');
+        const days = death.startOf('day').diff(birth.startOf('day'), 'days');
+        const months = death.diff(birth, 'months');
+
+        if (years >= 1) return tPets('ageYears', { count: years });
+        if (days > 60) return tPets('ageMonths', { count: months });
+        return tPets('ageDays', { count: days === 0 ? 1 : days });
+    };
+
     const colorScheme = useComputedColorScheme('light');
     const isDark = colorScheme === 'dark';
     const isMobile = useMediaQuery('(max-width: 480px)');
@@ -216,7 +229,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                             h="100%"
                             align="flex-end"
                             justify="flex-start"
-                            pb={16}
+                            pb={6}
                             pl={160}
                         >
                             <Title
@@ -360,7 +373,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                 <Container size="lg" style={{ marginTop: -60, paddingBottom: 0, position: 'relative' }}>
                     <Flex
                         direction="row" // Always row for mobile and desktop (Mobile: Avatar left, Name right)
-                        align={{ base: 'center', xs: 'flex-start' }} // Center vertically on mobile (for half-color alignment), Top on desktop
+                        align="flex-start" // Align top to keep avatar center fixed on color split line
                         gap={{ base: 'sm', xs: 'md' }}
                     >
                         <Box style={{ position: 'relative', display: 'inline-block' }}>
@@ -412,12 +425,13 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 </FileButton>
                             )}
                         </Box>
-
                         <Box
                             style={{ flex: 1, minWidth: 0, zIndex: 10 }}
-                            mt={{ base: 0, xs: 72 }} // Display badges below separate title on Desktop
+                            mt={{ base: 5, xs: 82 }} // Display badges below separate title on Desktop
                             ta="left"
-                            h={{ base: 130, xs: 'auto' }} // Fix height in mobile (slightly > 120 for spacing)
+                            mih={{ base: 90, xs: 'auto' }}
+                            h="auto"
+                            pb={{ base: 12, xs: 0 }}
                             display={{ base: 'flex', xs: 'block' }} // Flex col in mobile
                         >
                             <Flex
@@ -426,26 +440,14 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 h="100%"
                                 w="100%"
                             >
-                                {/* MOBILE TITLE: Visible only on mobile, right next to avatar */}
-                                <Title
-                                    order={1}
-                                    fw={800}
-                                    c="white"
-                                    display={{ base: 'block', xs: 'none' }} // Mobile Only
-                                    style={{
-                                        textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                                        lineHeight: 1.1,
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        paddingTop: 20 // Increased padding to lower the name
-                                    }}
-                                    fz={28}
+                                {/* Desktop Layout for Badges */}
+                                <Flex
+                                    display={{ base: 'none', xs: 'flex' }}
+                                    gap={8}
+                                    justify="flex-start"
+                                    wrap="wrap"
+                                    align="center"
                                 >
-                                    {pet.name}
-                                </Title>
-
-                                <Flex gap={8} justify="flex-start" wrap="wrap" align="center" pb={{ base: 4, xs: 0 }}>
                                     <PetSpeciesBadge
                                         species={pet.species}
                                         sex={pet.sex}
@@ -456,8 +458,8 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                     <Badge
                                         size="md"
                                         radius="md"
-                                        variant="light" // Light variant looks good on surface
-                                        color={identityColor} // Use identity color for consistency
+                                        variant="light"
+                                        color={identityColor}
                                         leftSection={<IconDna size={14} style={{ marginTop: 4 }} />}
                                         style={{ textTransform: 'none' }}
                                     >
@@ -470,17 +472,16 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             radius="md"
                                             variant="light"
                                             color="gray"
-                                            leftSection={<Text size="xs">🕊️</Text>}
                                             style={{ textTransform: 'none' }}
                                         >
-                                            {dayjs(pet.birthDate).utc().format('YYYY')} - {pet.deathDate ? dayjs(pet.deathDate).utc().format('YYYY') : '...'}
+                                            🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')} - † {pet.deathDate ? dayjs(pet.deathDate).format('DD/MM/YYYY') : '-'} {pet.deathDate ? `(${getDeceasedAgeStr()})` : ''}
                                         </Badge>
                                     ) : (
                                         <Badge
                                             size="md"
                                             radius="md"
                                             variant="light"
-                                            color="gray" // Gray for date
+                                            color="gray"
                                             leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
                                             style={{ textTransform: 'none' }}
                                         >
@@ -488,10 +489,90 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                         </Badge>
                                     )}
                                 </Flex>
+
+                                {/* Mobile Layout: Name (Above color split) */}
+                                <Flex
+                                    display={{ base: 'flex', xs: 'none' }}
+                                    direction="column"
+                                >
+                                    <Title
+                                        order={1}
+                                        fw={800}
+                                        c="white"
+                                        style={{
+                                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                            lineHeight: 1.1,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            paddingTop: 16
+                                        }}
+                                        fz={28}
+                                    >
+                                        {pet.name}
+                                    </Title>
+                                </Flex>
+
+                                {/* Mobile Layout: Badges (Below color split) */}
+                                <Flex
+                                    display={{ base: 'flex', xs: 'none' }}
+                                    direction="row"
+                                    gap={6}
+                                    align="center"
+                                    wrap="wrap"
+                                    pb={4}
+                                    pt={10}
+                                >
+                                    <PetSpeciesBadge
+                                        species={pet.species}
+                                        sex={pet.sex}
+                                        color={identityColor}
+                                        size="md"
+                                    />
+                                    <Badge
+                                        size="md"
+                                        radius="md"
+                                        variant="light"
+                                        color={identityColor}
+                                        leftSection={<IconDna size={14} style={{ marginTop: 4 }} />}
+                                        style={{ textTransform: 'none' }}
+                                    >
+                                        {pet.breed}
+                                    </Badge>
+                                </Flex>
                             </Flex>
                         </Box>
                     </Flex>
 
+                    {/* Dates Badge Mobile (Below avatar & info) */}
+                    <Box display={{ base: 'block', xs: 'none' }} mt={12} pb={8}>
+                        {pet.status === 'deceased' ? (
+                            <Badge
+                                size="md"
+                                radius="md"
+                                variant="light"
+                                color="gray"
+                                style={{ textTransform: 'none', width: 'max-content', maxWidth: '100%' }}
+                            >
+                                <Text size="xs" fw={600} style={{ whiteSpace: 'nowrap' }}>
+                                    🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')} - † {pet.deathDate ? `${dayjs(pet.deathDate).format('DD/MM/YYYY')} (${getDeceasedAgeStr()})` : '-'}
+                                </Text>
+                            </Badge>
+                        ) : (
+                            <Badge
+                                size="md"
+                                radius="md"
+                                variant="light"
+                                color="gray"
+                                leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
+                                style={{ textTransform: 'none', width: 'max-content', maxWidth: '100%' }}
+                            >
+                                <Text size="xs" fw={600} style={{ whiteSpace: 'nowrap' }}>
+                                    {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({formatAgeTranslated(pet.birthDate, tPets)})
+                                </Text>
+                            </Badge>
+                        )}
+                    </Box>
                 </Container>
 
                 {pet.status !== 'deceased' && (
