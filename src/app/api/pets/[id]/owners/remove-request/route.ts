@@ -37,7 +37,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         // Generate Request Token (reusing Invitation model)
         const token = crypto.randomBytes(32).toString('hex');
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+        expiresAt.setHours(expiresAt.getHours() + 72); // 72 hours (3 days) expiration
 
         await Invitation.create({
             token,

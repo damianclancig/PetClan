@@ -73,6 +73,11 @@ export default function NotificationItem({ notification, onClose, onDelete, isDe
         displayTitle = tDetails('remove_request_title');
         displayMessage = tDetails('remove_request_message', { name, pet });
     }
+    else if (notification.message?.startsWith('REMOVE_REQUEST_EXPIRED|')) {
+        const [, pet] = notification.message.split('|');
+        displayTitle = tDetails('remove_request_expired_title');
+        displayMessage = tDetails('remove_request_expired_message', { pet });
+    }
     // 2. Handle legacy hardcoded Spanish strings from DB
     else {
         if (displayTitle === 'Nueva Invitación') displayTitle = tInvitations('title');
@@ -87,7 +92,8 @@ export default function NotificationItem({ notification, onClose, onDelete, isDe
         const msg = notification.message || '';
         const isStructured = msg.startsWith('PET_UPDATE_V2|') ||
             msg.startsWith('INVITATION_') ||
-            msg.startsWith('REMOVE_REQUEST|');
+            msg.startsWith('REMOVE_REQUEST|') ||
+            msg.startsWith('REMOVE_REQUEST_EXPIRED|');
 
         const isRequestResult =
             isStructured ||

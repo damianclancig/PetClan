@@ -14,8 +14,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ token: s
         return NextResponse.json({ error: 'Request not found' }, { status: 404 });
     }
 
+    // Check if the pending request has expired
+    if (request.status === 'pending' && request.expiresAt && request.expiresAt < new Date()) {
+        request.status = 'expired';
+        await request.save();
+    }
+
     if (request.status !== 'pending') {
-        return NextResponse.json({ error: 'Request already processed' }, { status: 400 });
+        return NextResponse.json({ error: 'Request not found or expired' }, { status: 404 });
     }
 
     // Return safe public info for the landing page

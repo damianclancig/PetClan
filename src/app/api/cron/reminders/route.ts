@@ -4,7 +4,8 @@ import HealthRecord from '@/models/HealthRecord';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
 import Notification from '@/models/Notification';
-import { sendReminderEmail } from '@/lib/email';
+import { sendReminderEmail, sendRemovalExpiredEmail } from '@/lib/email';
+import Invitation from '@/models/Invitation';
 import { getTomorrowRange, now } from '@/lib/dateUtils';
 import dayjs from 'dayjs';
 import { getVaccinationStatus } from '@/utils/vaccinationLogic';
@@ -248,6 +249,92 @@ export async function GET(request: Request) {
                             pNotificationsCreated++;
                         }
                     }
+                }
+            }
+        }
+
+        // --- 5. Clean up expired removal requests ---
+        const expiredRemovals = await Invitation.find({
+            type: 'removal',
+            status: 'pending',
+            expiresAt: { $lte: new Date() }
+        }).populate('inviterId');
+
+        for (const request of expiredRemovals) {
+            request.status = 'expired';
+            await request.save();
+
+            const requester = request.inviterId as any;
+            const pet = await Pet.findById(request.petId);
+            if (!pet) continue;
+
+            const targetUser = await User.findOne({ email: request.email });
+
+            // A. Notify Requester (Inviter)
+            if (requester) {
+                const wantsInApp = requester.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: requester._id,
+                        type: 'social',
+                        title: 'REMOVE_REQUEST_EXPIRED',
+                        message: `REMOVE_REQUEST_EXPIRED|${pet.name}|${requester.name}|${targetUser?.name || request.email}`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                }
+
+                const wantsEmail = requester.notificationPreferences?.email !== false;
+                if (wantsEmail && requester.email && requester.name) {
+                    try {
+                        await sendRemovalExpiredEmail(
+                            requester.email,
+                            requester.name,
+                            targetUser?.name || request.email,
+                            pet.name,
+                            true // isRequester
+                        );
+                    } catch (e) {
+                        console.error('[CRON] Error sending expired email to requester:', e);
+                    }
+                }
+            }
+
+            // B. Notify Target User
+            if (targetUser) {
+                const wantsInApp = targetUser.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: targetUser._id,
+                        type: 'social',
+                        title: 'REMOVE_REQUEST_EXPIRED',
+                        message: `REMOVE_REQUEST_EXPIRED|${pet.name}|${requester?.name || 'Otro usuario'}|${targetUser.name}`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                }
+
+                const wantsEmail = targetUser.notificationPreferences?.email !== false;
+                if (wantsEmail && targetUser.email && targetUser.name) {
+                    try {
+                        await sendRemovalExpiredEmail(
+                            targetUser.email,
+                            targetUser.name,
+                            requester?.name || 'Otro usuario',
+                            pet.name,
+                            false // isRequester = false
+                        );
+                    } catch (e) {
+                        console.error('[CRON] Error sending expired email to target:', e);
+                    }
+                }
+
+                // Auto-delete the pending removal request notification for target user
+                try {
+                    await Notification.findOneAndDelete({
+                        userId: targetUser._id,
+                        link: { $regex: new RegExp(`/requests/${request.token}$`) }
+                    });
+                } catch (e) {
+                    console.error('[CRON] Failed to delete target pending notification:', e);
                 }
             }
         }

@@ -801,6 +801,8 @@
     "invitation_rejected_title": "Invitación Rechazada",
     "invitation_rejected_message": "{name} rechazó tu invitación para {pet}",
     "remove_request_title": "Solicitud de Baja",
-    "remove_request_message": "{name} solicita que dejes de ser dueño de {pet}"
+    "remove_request_message": "{name} solicita que dejes de ser dueño de {pet}",
+    "remove_request_expired_title": "Solicitud de Baja Expirada",
+    "remove_request_expired_message": "La solicitud de baja para {pet} ha expirado tras 72 horas sin respuesta."
   }
 }

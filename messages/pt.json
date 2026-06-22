@@ -801,6 +801,8 @@
     "invitation_rejected_title": "Convite Rejeitado",
     "invitation_rejected_message": "{name} rejeitou seu convite para {pet}",
     "remove_request_title": "Solicitação de Baixa",
-    "remove_request_message": "{name} solicita que você deixe de ser proprietário de {pet}"
+    "remove_request_message": "{name} solicita que você deixe de ser proprietário de {pet}",
+    "remove_request_expired_title": "Solicitação de Remoção Expirada",
+    "remove_request_expired_message": "A solicitação de remoção de {pet} expirou após 72 horas sem resposta."
   }
 }

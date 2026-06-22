@@ -6,7 +6,7 @@ export interface IInvitation extends Document {
     inviterId: mongoose.Types.ObjectId;
     type?: 'invitation' | 'removal';
     email: string;
-    status: 'pending' | 'accepted' | 'rejected';
+    status: 'pending' | 'accepted' | 'rejected' | 'expired';
     createdAt: Date;
     expiresAt?: Date;
 }
@@ -39,7 +39,7 @@ const InvitationSchema = new Schema<IInvitation>(
         },
         status: {
             type: String,
-            enum: ['pending', 'accepted', 'rejected'],
+            enum: ['pending', 'accepted', 'rejected', 'expired'],
             default: 'pending',
         },
         expiresAt: {

@@ -39,7 +39,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const pendingRequests = await Invitation.find({
         petId: id,
         type: 'removal',
-        status: 'pending'
+        status: 'pending',
+        expiresAt: { $gt: new Date() }
     });
 
     const petObj = pet.toObject();

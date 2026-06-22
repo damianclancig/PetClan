@@ -801,6 +801,8 @@
     "invitation_rejected_title": "Invitation Rejected",
     "invitation_rejected_message": "{name} rejected your invitation for {pet}",
     "remove_request_title": "Removal Request",
-    "remove_request_message": "{name} requests that you stop being an owner of {pet}"
+    "remove_request_message": "{name} requests that you stop being an owner of {pet}",
+    "remove_request_expired_title": "Ownership Removal Request Expired",
+    "remove_request_expired_message": "The ownership removal request for {pet} has expired after 72 hours with no response."
   }
 }
