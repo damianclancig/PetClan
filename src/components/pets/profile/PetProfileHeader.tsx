@@ -575,102 +575,106 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                     </Box>
                 </Container>
 
-                {pet.status !== 'deceased' && (
-                    <Box style={{
-                        background: isDark
-                            ? 'linear-gradient(to top, rgba(0, 0, 0, 0.25) 80%, rgba(0, 0, 0, 0) 100%)'
-                            : 'linear-gradient(to top, rgba(227, 227, 227, 0.5) 80%, rgba(255, 255, 255, 0) 100%)',
-                        backdropFilter: 'blur(10px)',
-                        width: '100%',
-                        marginTop: 10,
-                    }}>
-                        <Container size="lg" px="md">
-                            <Tabs
-                                value={activeTab}
-                                onChange={onTabChange}
-                                variant="unstyled"
+                <Box style={{
+                    background: isDark
+                        ? 'linear-gradient(to top, rgba(0, 0, 0, 0.25) 80%, rgba(0, 0, 0, 0) 100%)'
+                        : 'linear-gradient(to top, rgba(227, 227, 227, 0.5) 80%, rgba(255, 255, 255, 0) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    width: '100%',
+                    marginTop: 10,
+                }}>
+                    <Container size="lg" px="md">
+                        <Tabs
+                            value={activeTab}
+                            onChange={onTabChange}
+                            variant="unstyled"
+                        >
+                            <Tabs.List
+                                ref={tabsListRef}
+                                style={{
+                                    display: 'flex',
+                                    flexWrap: 'nowrap',
+                                    justifyContent: 'flex-start',
+                                    overflowX: 'auto',
+                                    scrollbarWidth: 'none',
+                                    WebkitOverflowScrolling: 'touch',
+                                    gap: tabGap,
+                                    position: 'relative',
+                                    padding: '12px 16px 0px 16px'
+                                }}
                             >
-                                <Tabs.List
-                                    ref={tabsListRef}
-                                    style={{
-                                        display: 'flex',
-                                        flexWrap: 'nowrap',
-                                        justifyContent: 'flex-start',
-                                        overflowX: 'auto',
-                                        scrollbarWidth: 'none',
-                                        WebkitOverflowScrolling: 'touch',
-                                        gap: tabGap,
-                                        position: 'relative',
-                                        padding: '12px 16px 0px 16px'
-                                    }}
-                                >
-                                    {[
+                                {(pet.status === 'deceased'
+                                    ? [
+                                        { value: 'timeline', label: t('Deceased.memories') },
+                                        { value: 'gallery', label: t('tabs.gallery') },
+                                      ]
+                                    : [
                                         { value: 'summary', label: t('tabs.summary') },
                                         { value: 'timeline', label: t('tabs.timeline') },
                                         { value: 'health', label: t('tabs.health') },
                                         { value: 'gallery', label: t('tabs.gallery') },
-                                    ].map((tab) => {
-                                        const isActive = activeTab === tab.value;
-                                        return (
-                                            <MagicParticles key={tab.value} color={isActive ? `var(--mantine-color-${identityColor}-filled)` : []}>
-                                                <Tabs.Tab
-                                                    value={tab.value}
-                                                    style={{
-                                                        flex: '0 1 auto',
-                                                        minWidth: 'fit-content',
-                                                        padding: tabPadding,
-                                                        textTransform: 'uppercase',
-                                                        letterSpacing: '1px',
-                                                        fontSize: '0.75rem',
-                                                        fontWeight: 700,
-                                                        borderRadius: '12px 12px 0 0',
-                                                        transition: 'color 0.4s ease',
-                                                        cursor: 'pointer',
-                                                        position: 'relative',
-                                                        color: isActive
-                                                            ? (isDark ? '#fff' : '#000')
-                                                            : (isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)'),
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                    }}
-                                                >
-                                                    <span style={{ position: 'relative', zIndex: 2 }}>
-                                                        {tab.label}
-                                                    </span>
-                                                    {isActive && (
-                                                        <motion.div
-                                                            layoutId="aurora-pill"
-                                                            style={{
-                                                                position: 'absolute',
-                                                                inset: 0,
-                                                                borderTopLeftRadius: '12px',
-                                                                borderTopRightRadius: '12px',
-                                                                borderBottomLeftRadius: '0px',
-                                                                borderBottomRightRadius: '0px',
-                                                                background: isDark
-                                                                    ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-8) 0%, var(--mantine-color-${identityColor}-7) 100%)`
-                                                                    : `linear-gradient(135deg, var(--mantine-color-${identityColor}-1) 0%, var(--mantine-color-${identityColor}-2) 100%)`,
-                                                                boxShadow: isDark
-                                                                    ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1)`
-                                                                    : `0 4px 12px var(--mantine-color-${identityColor}-light-color), inset 0 1px 1px rgba(255,255,255,0.8)`,
-                                                                zIndex: 1
-                                                            }}
-                                                            transition={{
-                                                                type: 'spring',
-                                                                bounce: 0.15,
-                                                                duration: 0.4,
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Tabs.Tab>
-                                            </MagicParticles>
-                                        );
-                                    })}
-                                </Tabs.List>
-                            </Tabs>
-                        </Container>
-                    </Box>
-                )}
+                                      ]
+                                ).map((tab) => {
+                                    const isActive = activeTab === tab.value;
+                                    return (
+                                        <MagicParticles key={tab.value} color={isActive ? `var(--mantine-color-${identityColor}-filled)` : []}>
+                                            <Tabs.Tab
+                                                value={tab.value}
+                                                style={{
+                                                    flex: '0 1 auto',
+                                                    minWidth: 'fit-content',
+                                                    padding: tabPadding,
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 700,
+                                                    borderRadius: '12px 12px 0 0',
+                                                    transition: 'color 0.4s ease',
+                                                    cursor: 'pointer',
+                                                    position: 'relative',
+                                                    color: isActive
+                                                        ? (isDark ? '#fff' : '#000')
+                                                        : (isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)'),
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                }}
+                                            >
+                                                <span style={{ position: 'relative', zIndex: 2 }}>
+                                                    {tab.label}
+                                                </span>
+                                                {isActive && (
+                                                    <motion.div
+                                                        layoutId="aurora-pill"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            inset: 0,
+                                                            borderTopLeftRadius: '12px',
+                                                            borderTopRightRadius: '12px',
+                                                            borderBottomLeftRadius: '0px',
+                                                            borderBottomRightRadius: '0px',
+                                                            background: isDark
+                                                                ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-8) 0%, var(--mantine-color-${identityColor}-7) 100%)`
+                                                                : `linear-gradient(135deg, var(--mantine-color-${identityColor}-1) 0%, var(--mantine-color-${identityColor}-2) 100%)`,
+                                                            boxShadow: isDark
+                                                                ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1)`
+                                                                : `0 4px 12px var(--mantine-color-${identityColor}-light-color), inset 0 1px 1px rgba(255,255,255,0.8)`,
+                                                            zIndex: 1
+                                                        }}
+                                                        transition={{
+                                                            type: 'spring',
+                                                            bounce: 0.15,
+                                                            duration: 0.4,
+                                                        }}
+                                                    />
+                                                )}
+                                            </Tabs.Tab>
+                                        </MagicParticles>
+                                    );
+                                })}
+                            </Tabs.List>
+                        </Tabs>
+                    </Container>
+                </Box>
             </Paper>
 
             {onAddRecord && (

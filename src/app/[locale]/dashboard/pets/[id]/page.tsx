@@ -33,7 +33,8 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
     const [opened, { open, close }] = useDisclosure(false);
     const [weightModalOpened, { open: openWeightModal, close: closeWeightModal }] = useDisclosure(false);
     const [quickAddModalOpened, { open: openQuickAddModal, close: closeQuickAddModal }] = useDisclosure(false);
-    const [activeTab, setActiveTab] = useState<string | null>('summary');
+    const [activeTab, setActiveTab] = useState<string | null>(null);
+    const currentTab = activeTab || (pet?.status === 'deceased' ? 'timeline' : 'summary');
 
     // Filter weight records
     const weightRecords = records?.filter((r: any) => r.type === 'weight') || [];
@@ -100,55 +101,26 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
 
 
 
-    // --- Deceased View (In Memoriam) ---
-    if (pet.status === 'deceased') {
-        return (
-            <PageContainer>
-                <PetProfileHeader
-                    pet={pet}
-                    activeTab="timeline"
-                    onTabChange={() => { }}
-                    onShare={() => { }}
-                    onAddRecord={undefined}
-                />
-
-                <Stack gap="xl">
-                    <Paper withBorder p="md" radius="md">
-                        <Title order={4} mb="md">{t('Deceased.memories')}</Title>
-                        <HealthTimeline
-                            petId={pet._id as unknown as string}
-                            petSpecies={pet.species}
-                            petBirthDate={pet.birthDate}
-                            petDeathDate={pet.deathDate}
-                            readOnly={true}
-                        />
-                    </Paper>
-
-                    <PetExtraInfoCard pet={pet as any} />
-                </Stack>
-            </PageContainer>
-        );
-    }
     return (
         <PageContainer>
             <PetProfileHeader
                 pet={pet}
-                activeTab={activeTab || 'summary'}
+                activeTab={currentTab}
                 onTabChange={setActiveTab}
                 onShare={open}
-                onAddRecord={openQuickAddModal}
+                onAddRecord={pet.status === 'deceased' ? undefined : openQuickAddModal}
             />
 
             <AnimatePresence mode="wait">
                 <motion.div
-                    key={activeTab}
+                    key={currentTab}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
                     style={{ marginTop: '20px' }}
                 >
-                    {activeTab === 'summary' && (
+                    {currentTab === 'summary' && (
                         <Grid>
                             <Grid.Col span={{ base: 12, md: 4 }}>
                                 <Stack>
@@ -270,18 +242,28 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         </Grid>
                     )}
 
-                    {activeTab === 'timeline' && (
-                        <Paper withBorder p="md" radius="md">
-                            <HealthTimeline
-                                petId={pet._id as unknown as string}
-                                petSpecies={pet.species}
-                                petBirthDate={pet.birthDate}
-                                onAddRecord={openQuickAddModal}
-                            />
-                        </Paper>
+                    {currentTab === 'timeline' && (
+                        <Stack gap="xl">
+                            <Paper withBorder p="md" radius="md">
+                                {pet.status === 'deceased' && (
+                                    <Title order={4} mb="md">{t('Deceased.memories')}</Title>
+                                )}
+                                <HealthTimeline
+                                    petId={pet._id as unknown as string}
+                                    petSpecies={pet.species}
+                                    petBirthDate={pet.birthDate}
+                                    petDeathDate={pet.status === 'deceased' ? pet.deathDate : undefined}
+                                    readOnly={pet.status === 'deceased'}
+                                    onAddRecord={pet.status === 'deceased' ? undefined : openQuickAddModal}
+                                />
+                            </Paper>
+                            {pet.status === 'deceased' && (
+                                <PetExtraInfoCard pet={pet as any} />
+                            )}
+                        </Stack>
                     )}
 
-                    {activeTab === 'health' && (
+                    {currentTab === 'health' && (
                         <Grid>
                             <Grid.Col span={12}>
                                 <WeightControl
@@ -301,7 +283,7 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                         </Grid>
                     )}
 
-                    {activeTab === 'gallery' && (
+                    {currentTab === 'gallery' && (
                         <PetPhotoGallery photos={pet.photos || []} />
                     )}
                 </motion.div>
