@@ -10,7 +10,7 @@ import { Link } from '@/i18n/routing';
 import dayjs from 'dayjs';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
-import { formatAgeTranslated } from '@/lib/dateUtils';
+import { formatAgeTranslated, formatDate } from '@/lib/dateUtils';
 import { useTranslations } from 'next-intl';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { LinkifiedText } from '@/components/ui/LinkifiedText';
@@ -45,8 +45,11 @@ export default function PublicPetProfile({
         const latest = categoryRecords[0];
         if (!latest) return { status: 'pending', date: null, expiry: null };
 
-        const today = dayjs();
-        const expiry = latest.nextDueAt ? dayjs(latest.nextDueAt) : null;
+        const todayStr = dayjs().format('YYYY-MM-DD');
+        const expiryStr = latest.nextDueAt ? dayjs(latest.nextDueAt).utc().format('YYYY-MM-DD') : null;
+
+        const today = dayjs.utc(todayStr);
+        const expiry = expiryStr ? dayjs.utc(expiryStr) : null;
 
         // Basic overdue logic for the public view (could be more complex, but this is for quick reading)
         const isOverdue = expiry && today.isAfter(expiry);
@@ -318,14 +321,14 @@ export default function PublicPetProfile({
                                             <Group justify="space-between">
                                                 <Text size="xs" c="dimmed" fw={600}>{t('lastApplied')}</Text>
                                                 <Text size="sm" fw={500}>
-                                                    {cat.date ? dayjs(cat.date).format('DD/MM/YYYY') : t('pending')}
+                                                    {cat.date ? formatDate(cat.date) : t('pending')}
                                                 </Text>
                                             </Group>
                                             {cat.expiry && (
                                                 <Group justify="space-between">
                                                     <Text size="xs" c="dimmed" fw={600}>{t('expires')}</Text>
                                                     <Text size="sm" fw={700} color={cat.status === 'overdue' ? 'red' : (cat.status === 'due_soon' ? 'orange' : 'teal')}>
-                                                        {dayjs(cat.expiry).format('DD/MM/YYYY')}
+                                                        {formatDate(cat.expiry)}
                                                     </Text>
                                                 </Group>
                                             )}

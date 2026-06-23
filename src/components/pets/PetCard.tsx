@@ -3,7 +3,7 @@ import { IconCat, IconDog, IconGenderFemale, IconGenderMale, IconPaw, IconGhost,
 import { Link } from '@/i18n/routing';
 import { getPetIdentityColor } from '@/utils/pet-identity';
 import { MagicTap } from '@/components/ui/MagicWrappers';
-import { getPetAge, formatAgeTranslated } from '@/lib/dateUtils';
+import { getPetAge, formatAgeTranslated, formatDate } from '@/lib/dateUtils';
 import { PetSpeciesBadge } from './PetSpeciesBadge';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
@@ -165,10 +165,10 @@ export function PetCard({ pet, onClick, layoutId }: PetCardProps) {
                                 }}
                             >
                                 <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
-                                    🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')}
+                                    🕊️ {formatDate(pet.birthDate)}
                                 </Text>
                                 <Text size="xs" c="white" fw={600} style={{ display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
-                                    † {pet.deathDate ? dayjs(pet.deathDate).format('DD/MM/YYYY') : '-'}
+                                    † {formatDate(pet.deathDate) || '-'}
                                 </Text>
                             </Box>
                         )}

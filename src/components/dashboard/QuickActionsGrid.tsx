@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useTranslations } from 'next-intl';
 import 'dayjs/locale/es';
+import { formatDate } from '@/lib/dateUtils';
 
 dayjs.extend(relativeTime);
 dayjs.locale('es');
@@ -140,7 +141,7 @@ export function QuickActionsGrid({ pets = [] }: QuickActionsGridProps) {
                                         {pet.lastWeightDate && (
                                             <Text size="xs" c="dimmed" mt={4} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                                 <IconScale size={14} style={{ opacity: 0.7 }} />
-                                                {tPets('lastWeightPrefix')} {dayjs(pet.lastWeightDate).format('DD/MM/YYYY')} • {dayjs(pet.lastWeightDate).fromNow()}
+                                                {tPets('lastWeightPrefix')} {formatDate(pet.lastWeightDate)} • {dayjs(pet.lastWeightDate).fromNow()}
                                             </Text>
                                         )}
                                     </div>

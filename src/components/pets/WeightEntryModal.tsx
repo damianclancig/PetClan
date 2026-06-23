@@ -7,6 +7,7 @@ import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query'; // Or equivalent hook
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import dayjs from 'dayjs';
 
 interface WeightEntryModalProps {
     opened: boolean;
@@ -36,7 +37,7 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
                     type: 'weight',
                     title: t('recordTitle'),
                     description: notes,
-                    appliedAt: new Date(),
+                    appliedAt: dayjs().format('YYYY-MM-DD'),
                     weightValue: Number(weight),
                 }),
             });

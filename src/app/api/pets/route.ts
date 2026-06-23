@@ -87,7 +87,7 @@ export async function POST(req: Request) {
                 petId: pet._id,
                 type: 'weight',
                 title: tForm('initialWeight'),
-                appliedAt: new Date(),
+                appliedAt: body.clientDate ? new Date(body.clientDate) : new Date(),
                 weightValue: body.weight,
                 description: tForm('initialWeightDesc'),
                 createdBy: user._id

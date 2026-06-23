@@ -9,7 +9,7 @@ import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/u
 import { MagicParticles } from '@/components/ui/MagicWrappers';
 import { useTranslations, useFormatter } from 'next-intl';
 import dayjs from 'dayjs';
-import { getPetAge, formatAgeTranslated } from '@/lib/dateUtils';
+import { getPetAge, formatAgeTranslated, formatDate } from '@/lib/dateUtils';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
 import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
@@ -40,10 +40,10 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
 
     const getDeceasedAgeStr = () => {
         if (!pet.birthDate || !pet.deathDate) return '';
-        const birth = dayjs(pet.birthDate);
-        const death = dayjs(pet.deathDate);
+        const birth = dayjs(pet.birthDate).utc();
+        const death = dayjs(pet.deathDate).utc();
         const years = death.diff(birth, 'years');
-        const days = death.startOf('day').diff(birth.startOf('day'), 'days');
+        const days = death.diff(birth, 'days');
         const months = death.diff(birth, 'months');
 
         if (years >= 1) return tPets('ageYears', { count: years });
@@ -474,7 +474,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             color="gray"
                                             style={{ textTransform: 'none' }}
                                         >
-                                            🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')} - † {pet.deathDate ? dayjs(pet.deathDate).format('DD/MM/YYYY') : '-'} {pet.deathDate ? `(${getDeceasedAgeStr()})` : ''}
+                                            🕊️ {formatDate(pet.birthDate)} - † {formatDate(pet.deathDate) || '-'} {pet.deathDate ? `(${getDeceasedAgeStr()})` : ''}
                                         </Badge>
                                     ) : (
                                         <Badge
@@ -485,7 +485,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
                                             style={{ textTransform: 'none' }}
                                         >
-                                            {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({formatAgeTranslated(pet.birthDate, tPets)})
+                                            {formatDate(pet.birthDate)} ({formatAgeTranslated(pet.birthDate, tPets)})
                                         </Badge>
                                     )}
                                 </Flex>
@@ -555,7 +555,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 style={{ textTransform: 'none', width: 'max-content', maxWidth: '100%' }}
                             >
                                 <Text size="xs" fw={600} style={{ whiteSpace: 'nowrap' }}>
-                                    🕊️ {dayjs(pet.birthDate).format('DD/MM/YYYY')} - † {pet.deathDate ? `${dayjs(pet.deathDate).format('DD/MM/YYYY')} (${getDeceasedAgeStr()})` : '-'}
+                                    🕊️ {formatDate(pet.birthDate)} - † {pet.deathDate ? `${formatDate(pet.deathDate)} (${getDeceasedAgeStr()})` : '-'}
                                 </Text>
                             </Badge>
                         ) : (
@@ -568,7 +568,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 style={{ textTransform: 'none', width: 'max-content', maxWidth: '100%' }}
                             >
                                 <Text size="xs" fw={600} style={{ whiteSpace: 'nowrap' }}>
-                                    {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({formatAgeTranslated(pet.birthDate, tPets)})
+                                    {formatDate(pet.birthDate)} ({formatAgeTranslated(pet.birthDate, tPets)})
                                 </Text>
                             </Badge>
                         )}
