@@ -55,12 +55,20 @@ export default function RequestActions({ token }: { token: string }) {
     };
 
     return (
-        <Flex direction={{ base: 'column-reverse', sm: 'row' }} gap="sm" mt="md">
+        <Flex 
+            direction={{ base: 'column-reverse', sm: 'row' }} 
+            gap="md" 
+            mt="md"
+            justify="center"
+            align={{ base: 'stretch', sm: 'center' }}
+            w="100%"
+        >
             <Button
-                style={{ flex: 1 }}
                 color="gray"
                 variant="subtle"
                 size="md"
+                w={{ base: '100%', sm: 'auto' }}
+                miw={{ sm: 160 }}
                 leftSection={<IconX size={20} />}
                 loading={loading === 'reject'}
                 disabled={loading === 'accept'}
@@ -69,9 +77,10 @@ export default function RequestActions({ token }: { token: string }) {
                 {t('reject')}
             </Button>
             <Button
-                style={{ flex: 1 }}
                 color="red"
                 size="md"
+                w={{ base: '100%', sm: 'auto' }}
+                miw={{ sm: 160 }}
                 leftSection={<IconCheck size={20} />}
                 loading={loading === 'accept'}
                 disabled={loading === 'reject'}

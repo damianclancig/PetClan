@@ -93,12 +93,20 @@ export default function NotificationActions({ notificationId, actionType, action
     };
 
     return (
-        <Flex direction={{ base: 'column-reverse', sm: 'row' }} gap="sm" mt="xl" justify="center">
+        <Flex 
+            direction={{ base: 'column-reverse', sm: 'row' }} 
+            gap="md" 
+            mt="xl" 
+            justify="center"
+            align={{ base: 'stretch', sm: 'center' }}
+            w="100%"
+        >
             <Button
-                style={{ flex: 1 }}
                 variant="default"
                 size="md"
                 radius="xl"
+                w={{ base: '100%', sm: 'auto' }}
+                miw={{ sm: 160 }}
                 leftSection={<IconArrowLeft size={18} />}
                 onClick={() => router.push('/dashboard')}
                 disabled={isPending}
@@ -109,11 +117,12 @@ export default function NotificationActions({ notificationId, actionType, action
             {actionType && actionToken ? (
                 <>
                     <Button
-                        style={{ flex: 1 }}
                         variant="light"
                         color="red"
                         size="md"
                         radius="xl"
+                        w={{ base: '100%', sm: 'auto' }}
+                        miw={{ sm: 160 }}
                         leftSection={<IconX size={18} />}
                         loading={isPending}
                         onClick={() => handleAction('reject')}
@@ -121,11 +130,12 @@ export default function NotificationActions({ notificationId, actionType, action
                         {t('reject')}
                     </Button>
                     <Button
-                        style={{ flex: 1 }}
                         variant="filled"
                         color="green"
                         size="md"
                         radius="xl"
+                        w={{ base: '100%', sm: 'auto' }}
+                        miw={{ sm: 160 }}
                         leftSection={<IconCheck size={18} />}
                         loading={isPending}
                         onClick={() => handleAction('accept')}
@@ -135,11 +145,12 @@ export default function NotificationActions({ notificationId, actionType, action
                 </>
             ) : (
                 <Button
-                    style={{ flex: 1 }}
                     variant="filled"
                     color="red"
                     size="md"
                     radius="xl"
+                    w={{ base: '100%', sm: 'auto' }}
+                    miw={{ sm: 160 }}
                     leftSection={<IconTrash size={18} />}
                     loading={isPending}
                     onClick={handleDelete}

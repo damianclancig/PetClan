@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group } from '@mantine/core';
+import { Button, Flex } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
@@ -56,11 +56,20 @@ export default function InvitationActions({ token }: { token: string }) {
     };
 
     return (
-        <Group mt="md" grow>
+        <Flex 
+            direction={{ base: 'column-reverse', sm: 'row' }} 
+            gap="md" 
+            mt="md"
+            justify="center"
+            align={{ base: 'stretch', sm: 'center' }}
+            w="100%"
+        >
             <Button
                 color="red"
                 variant="light"
                 size="md"
+                w={{ base: '100%', sm: 'auto' }}
+                miw={{ sm: 160 }}
                 leftSection={<IconX size={20} />}
                 loading={loading === 'reject'}
                 disabled={loading === 'accept'}
@@ -71,6 +80,8 @@ export default function InvitationActions({ token }: { token: string }) {
             <Button
                 color="green"
                 size="md"
+                w={{ base: '100%', sm: 'auto' }}
+                miw={{ sm: 160 }}
                 leftSection={<IconCheck size={20} />}
                 loading={loading === 'accept'}
                 disabled={loading === 'reject'}
@@ -78,6 +89,6 @@ export default function InvitationActions({ token }: { token: string }) {
             >
                 {t('accept')}
             </Button>
-        </Group>
+        </Flex>
     );
 }
