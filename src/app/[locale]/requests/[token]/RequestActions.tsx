@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group } from '@mantine/core';
+import { Button, Flex } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconX } from '@tabler/icons-react';
@@ -55,8 +55,9 @@ export default function RequestActions({ token }: { token: string }) {
     };
 
     return (
-        <Group mt="md" grow>
+        <Flex direction={{ base: 'column-reverse', sm: 'row' }} gap="sm" mt="md">
             <Button
+                style={{ flex: 1 }}
                 color="gray"
                 variant="subtle"
                 size="md"
@@ -68,6 +69,7 @@ export default function RequestActions({ token }: { token: string }) {
                 {t('reject')}
             </Button>
             <Button
+                style={{ flex: 1 }}
                 color="red"
                 size="md"
                 leftSection={<IconCheck size={20} />}
@@ -77,6 +79,6 @@ export default function RequestActions({ token }: { token: string }) {
             >
                 {t('accept')}
             </Button>
-        </Group>
+        </Flex>
     );
 }

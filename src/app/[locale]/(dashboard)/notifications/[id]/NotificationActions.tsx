@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Group } from '@mantine/core';
+import { Button, Flex } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -93,8 +93,9 @@ export default function NotificationActions({ notificationId, actionType, action
     };
 
     return (
-        <Group justify="center" mt="xl" gap="md">
+        <Flex direction={{ base: 'column-reverse', sm: 'row' }} gap="sm" mt="xl" justify="center">
             <Button
+                style={{ flex: 1 }}
                 variant="default"
                 size="md"
                 radius="xl"
@@ -108,6 +109,7 @@ export default function NotificationActions({ notificationId, actionType, action
             {actionType && actionToken ? (
                 <>
                     <Button
+                        style={{ flex: 1 }}
                         variant="light"
                         color="red"
                         size="md"
@@ -119,6 +121,7 @@ export default function NotificationActions({ notificationId, actionType, action
                         {t('reject')}
                     </Button>
                     <Button
+                        style={{ flex: 1 }}
                         variant="filled"
                         color="green"
                         size="md"
@@ -132,6 +135,7 @@ export default function NotificationActions({ notificationId, actionType, action
                 </>
             ) : (
                 <Button
+                    style={{ flex: 1 }}
                     variant="filled"
                     color="red"
                     size="md"
@@ -143,7 +147,7 @@ export default function NotificationActions({ notificationId, actionType, action
                     {t('delete')}
                 </Button>
             )}
-        </Group>
+        </Flex>
     );
 }
 
