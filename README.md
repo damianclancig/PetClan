@@ -363,7 +363,7 @@ Sigue estos pasos para correr el proyecto localmente:
 
 Asegúrate de tener instalado:
 - **Node.js 18+** (Recomendado: LTS 20.x)
-- **npm 9+** o **yarn 1.22+**
+- **pnpm 11+** (o npm/yarn)
 - **MongoDB** (Local o cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
 - **Git** para clonar el repositorio
 
@@ -377,9 +377,7 @@ cd PetClan
 ### 📦 2. Instalar Dependencias
 
 ```bash
-npm install
-# o
-yarn install
+pnpm install
 ```
 
 ### 🔐 3. Configurar Variables de Entorno
@@ -448,9 +446,7 @@ CLOUDINARY_API_SECRET=tu-api-secret
 ### 🚀 4. Iniciar Servidor de Desarrollo
 
 ```bash
-npm run dev
-# o
-yarn dev
+pnpm dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
@@ -461,14 +457,14 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 
 ```bash
 # 🚀 Desarrollo
-npm run dev          # Inicia servidor de desarrollo (http://localhost:3000)
+pnpm dev             # Inicia servidor de desarrollo (http://localhost:3000)
 
 # 🏗️ Producción
-npm run build        # Genera build optimizado para producción
-npm run start        # Inicia servidor de producción
+pnpm build           # Genera build optimizado para producción
+pnpm start           # Inicia servidor de producción
 
 # 🧹 Linting
-npm run lint         # Ejecuta ESLint para verificar código
+pnpm lint            # Ejecuta ESLint para verificar código
 ```
 
 ---
