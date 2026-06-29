@@ -546,13 +546,14 @@
     },
     "Support": {
       "title": "Apoyá el Proyecto",
-      "description": "PetClan es un proyecto gratuito y de código abierto, \\nhecho con ❤ desde Argentina.",
+      "description": "PetClan es un proyecto gratuito y de código abierto, hecho con ❤ desde Argentina.",
       "share": "Si esta app te resulta útil, considerá compartirla con tus amigos y familiares. ¡Ayuda un montón!",
       "help": "Si deseás colaborar con su mantenimiento y futuras mejoras, podés hacerlo desde los siguientes enlaces.",
       "copyLink": "Copiar Enlace",
       "linkCopied": "Enlace Copiado",
       "cafecito": "Invitame un Cafecito",
       "paypal": "Colaborar con PayPal",
+      "mercadopago": "Donar con Mercado Pago",
       "portfolio": "Visitar mi Portfolio",
       "github": "Ver en GitHub"
     }
