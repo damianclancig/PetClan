@@ -59,26 +59,26 @@ export function useHealthRecords(petId: string) {
     retry: false,
   })
 
+  const invalidatePetData = () => {
+    queryClient.invalidateQueries({ queryKey: ['healthRecords', petId] })
+    queryClient.invalidateQueries({ queryKey: ['pet', petId] })
+    queryClient.invalidateQueries({ queryKey: ['pets'] })
+  }
+
   const createRecordMutation = useMutation({
     mutationFn: createHealthRecord,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['healthRecords', petId] })
-    },
+    onSuccess: invalidatePetData,
   })
 
   const updateRecordMutation = useMutation({
     mutationFn: ({ recordId, data }: { recordId: string; data: any }) =>
       updateHealthRecord(recordId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['healthRecords', petId] })
-    },
+    onSuccess: invalidatePetData,
   })
 
   const deleteRecordMutation = useMutation({
     mutationFn: (recordId: string) => deleteHealthRecord(recordId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['healthRecords', petId] })
-    },
+    onSuccess: invalidatePetData,
   })
 
   return {

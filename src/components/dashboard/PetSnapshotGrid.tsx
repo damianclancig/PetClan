@@ -102,11 +102,20 @@ export function PetSnapshotGrid({ pets, alerts }: PetSnapshotGridProps) {
                                     style={{
                                         overflow: 'hidden',
                                         justifyContent: 'center',
-                                        flex: isDesktop ? 'none' : 1, // On mobile, take all available space
-                                        textAlign: isDesktop ? 'center' : 'left' // Align text left on mobile for better reading flow
+                                        flex: 1,
+                                        minWidth: 0,
+                                        textAlign: isDesktop ? 'center' : 'left'
                                     }}
                                 >
-                                    <Text fw={600} size="sm" lineClamp={1} style={{ lineHeight: 1.1 }}>{pet.name}</Text>
+                                    <Text
+                                        fw={600}
+                                        size="sm"
+                                        lineClamp={2}
+                                        title={pet.name}
+                                        style={{ lineHeight: 1.2, wordBreak: 'break-word' }}
+                                    >
+                                        {pet.name}
+                                    </Text>
                                     <Text size="xs" c="dimmed" style={{ lineHeight: 1.1 }}>
                                         {pet.ageLabel}
                                     </Text>

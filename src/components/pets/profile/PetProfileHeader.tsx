@@ -7,6 +7,7 @@ import { getPetIdentityColor } from '@/utils/pet-identity';
 import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
 import { MagicParticles } from '@/components/ui/MagicWrappers';
+import { MarqueeText } from '@/components/ui/MarqueeText';
 import { useTranslations, useFormatter } from 'next-intl';
 import dayjs from 'dayjs';
 import { getPetAge, formatAgeTranslated, formatDate } from '@/lib/dateUtils';
@@ -494,23 +495,25 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 <Flex
                                     display={{ base: 'flex', xs: 'none' }}
                                     direction="column"
+                                    w="100%"
+                                    style={{ overflow: 'hidden' }}
                                 >
-                                    <Title
-                                        order={1}
-                                        fw={800}
-                                        c="white"
-                                        style={{
-                                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                                            lineHeight: 1.1,
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            paddingTop: 16
-                                        }}
-                                        fz={28}
-                                    >
-                                        {pet.name}
-                                    </Title>
+                                    <MarqueeText style={{ paddingTop: 16 }}>
+                                        <Title
+                                            order={1}
+                                            fw={800}
+                                            c="white"
+                                            style={{
+                                                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                                lineHeight: 1.1,
+                                                whiteSpace: 'nowrap',
+                                                display: 'inline-block'
+                                            }}
+                                            fz={28}
+                                        >
+                                            {pet.name}
+                                        </Title>
+                                    </MarqueeText>
                                 </Flex>
 
                                 {/* Mobile Layout: Badges (Below color split) */}
