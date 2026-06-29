@@ -34,21 +34,17 @@ export async function GET(request: Request) {
 
         for (const record of recordsDueTomorrow) {
             const pet = record.petId as any;
-            if (!pet) continue;
+            if (!pet || pet.status === 'archived' || pet.status === 'deceased') continue;
 
             // Notify ALL owners
-            // We need to fetch owners if not populated in Pet (Pet model usually has IDs)
-            // But HealthRecord.populate('petId') populates the Pet document.
-            // Be careful: pet.owners might be just IDs.
-
-            // Let's assume pet.owners are IDs.
             const owners = await User.find({ _id: { $in: pet.owners } });
 
             for (const owner of owners) {
-                // Email (Only if we want to span all owners, originally was just creator)
-                // Let's keep original behavior for Email (or upgrade? User asked for notification system updates).
-                // Let's send Email to ALL owners for robustness.
-                if (owner.email && record.nextDueAt) {
+                const wantsEmail = owner.notificationPreferences?.email !== false;
+                const wantsInApp = owner.notificationPreferences?.inApp !== false;
+
+                // Email
+                if (wantsEmail && owner.email && record.nextDueAt) {
                     await sendReminderEmail(
                         { email: owner.email, name: owner.name },
                         pet.name,
@@ -59,14 +55,16 @@ export async function GET(request: Request) {
                 }
 
                 // In-App Notification
-                await Notification.create({
-                    userId: owner._id,
-                    type: 'health',
-                    title: 'Recordatorio de Salud',
-                    message: `Mañana vence: ${record.title} para ${pet.name}.`,
-                    link: `/dashboard/pets/${pet._id}`
-                });
-                pNotificationsCreated++;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: owner._id,
+                        type: 'health',
+                        title: 'Recordatorio de Salud',
+                        message: `Mañana vence: ${record.title} para ${pet.name}.`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                    pNotificationsCreated++;
+                }
             }
         }
 
@@ -82,18 +80,21 @@ export async function GET(request: Request) {
 
         for (const record of recordsOverdue) {
             const pet = record.petId as any;
-            if (!pet) continue;
+            if (!pet || pet.status === 'archived' || pet.status === 'deceased') continue;
             const owners = await User.find({ _id: { $in: pet.owners } });
 
             for (const owner of owners) {
-                await Notification.create({
-                    userId: owner._id,
-                    type: 'health',
-                    title: 'Vacuna Vencida',
-                    message: `La vacuna ${record.title} de ${pet.name} venció ayer. ¡Actualízala!`,
-                    link: `/dashboard/pets/${pet._id}`
-                });
-                pNotificationsCreated++;
+                const wantsInApp = owner.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: owner._id,
+                        type: 'health',
+                        title: 'Vacuna Vencida',
+                        message: `La vacuna ${record.title} de ${pet.name} venció ayer. ¡Actualízala!`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                    pNotificationsCreated++;
+                }
             }
         }
 
@@ -106,6 +107,11 @@ export async function GET(request: Request) {
         const day = today.date();
 
         const birthdayPets = await Pet.aggregate([
+            {
+                $match: {
+                    status: { $nin: ['archived', 'deceased'] }
+                }
+            },
             {
                 $project: {
                     name: 1,
@@ -125,14 +131,17 @@ export async function GET(request: Request) {
         for (const pet of birthdayPets) {
             const owners = await User.find({ _id: { $in: pet.owners } });
             for (const owner of owners) {
-                await Notification.create({
-                    userId: owner._id,
-                    type: 'social',
-                    title: '¡Feliz Cumpleaños! 🎂',
-                    message: `Hoy es el cumpleaños de ${pet.name}. ¡Dale un abrazo de nuestra parte!`,
-                    link: `/dashboard/pets/${pet._id}`
-                });
-                pNotificationsCreated++;
+                const wantsInApp = owner.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: owner._id,
+                        type: 'social',
+                        title: '¡Feliz Cumpleaños! 🎂',
+                        message: `Hoy es el cumpleaños de ${pet.name}. ¡Dale un abrazo de nuestra parte!`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                    pNotificationsCreated++;
+                }
             }
         }
 
