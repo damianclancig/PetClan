@@ -721,7 +721,8 @@
     "ServerError": {
       "title": "Something went wrong",
       "description": "We are having some technical issues. Our system vets are already working on it.",
-      "button": "Try Again"
+      "button": "Try Again",
+      "backHome": "Back to Home"
     },
     "PetNotFound": {
       "title": "Pet Not Found",

@@ -721,7 +721,8 @@
     "ServerError": {
       "title": "Algo salió mal",
       "description": "Estamos teniendo algunos problemas técnicos. Nuestros veterinarios de sistemas ya están trabajando en ello.",
-      "button": "Reintentar"
+      "button": "Reintentar",
+      "backHome": "Volver al Inicio"
     },
     "PetNotFound": {
       "title": "Mascota no encontrada",
