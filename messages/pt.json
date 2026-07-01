@@ -503,7 +503,7 @@
     "liability2": "Perda de dados, interrupções de serviço ou falhas técnicas.",
     "liability3": "Custos de serviços veterinários incorridos ou não incorridos baseados nos lembretes do Aplicativo.",
     "section5Title": "5. Propriedade Intelectual",
-    "section5Body": "Todo conteúdo, design, código-fonte e logotipos do PetClan são propriedade intelectual exclusiva de seus desenvolvedores, salvo indicação em contrário (como bibliotecas de código aberto). É proibida a reprodução, distribuição ou modificação não autorizada.",
+    "section5Body": "O software e código-fonte que opera a plataforma PetClan é distribuído publicamente sob a Licença Apache 2.0. No entanto, os conteúdos, logotipos, marcas registradas associadas e os dados dos usuários registrados na plataforma mantêm suas respectivas políticas de privacidade e direitos de propriedade intelectual, sendo proibida sua reprodução ou uso não autorizado fora dos termos de tais licenças e políticas.",
     "section6Title": "6. Privacidade e Dados",
     "section6Body": "Respeitamos sua privacidade. Os dados coletados são utilizados exclusivamente para a operação do Aplicativo (gestão de perfis de pets). Não vendemos nem compartilhamos seus dados pessoais com terceiros para fins publicitários.",
     "section7Title": "7. Lei Aplicável e Jurisdição",
@@ -512,7 +512,7 @@
   "TermsPage": {
     "title": "Termos e Condições",
     "backDefault": "Voltar",
-    "lastUpdated": "Última atualização: 26 de fevereiro de 2026",
+    "lastUpdated": "Última atualização: 1 de julho de 2026",
     "questions": "Si tiver alguma pregunta sobre estes Termos, por favor contate-nos."
   },
   "Privacy": {
@@ -534,11 +534,11 @@
   "PrivacyPage": {
     "title": "Política de Privacidade",
     "backDefault": "Voltar",
-    "lastUpdated": "Última atualização: 26 de fevereiro de 2026"
+    "lastUpdated": "Última atualização: 1 de julho de 2026"
   },
   "Layout": {
     "Footer": {
-      "rights": "© 2025 Todos os direitos reservados - Licença MIT",
+      "rights": "© 2026 Clancig FullstackWeb. Distribuído sob Licença Apache 2.0.",
       "design": "Design e desenvolvimento por",
       "termsPrefix": "Ao navegar no site, você aceita nossos",
       "termsLink": "Termos e Condições",

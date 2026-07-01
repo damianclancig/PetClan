@@ -503,7 +503,7 @@
     "liability2": "Loss of data, service interruptions, or technical failures.",
     "liability3": "Costs of veterinary services incurred or not incurred based on the Application's reminders.",
     "section5Title": "5. Intellectual Property",
-    "section5Body": "All content, design, source code, and logos of PetClan are the exclusive intellectual property of its developers, unless otherwise indicated (such as open-source libraries). Unauthorized reproduction, distribution, or modification is prohibited.",
+    "section5Body": "The software and source code operating the PetClan platform is publicly distributed under the Apache License 2.0. However, the content, logos, associated trademarks, and user data registered on the platform maintain their respective privacy policies and intellectual property rights, and their unauthorized reproduction or use outside the terms of those licenses and policies is prohibited.",
     "section6Title": "6. Privacy and Data",
     "section6Body": "We respect your privacy. The data collected is used exclusively for the operation of the Application (management of pet profiles). We do not sell or share your personal data with third parties for advertising purposes.",
     "section7Title": "7. Applicable Law and Jurisdiction",
@@ -512,7 +512,7 @@
   "TermsPage": {
     "title": "Terms and Conditions of Use",
     "backDefault": "Go Back",
-    "lastUpdated": "Last updated: February 26, 2026",
+    "lastUpdated": "Last updated: July 1, 2026",
     "questions": "If you have any questions about these terms, please contact us through our support channels."
   },
   "Privacy": {
@@ -534,11 +534,11 @@
   "PrivacyPage": {
     "title": "Privacy Policy",
     "backDefault": "Go Back",
-    "lastUpdated": "Last updated: February 26, 2026"
+    "lastUpdated": "Last updated: July 1, 2026"
   },
   "Layout": {
     "Footer": {
-      "rights": "© 2025 All rights reserved - MIT License",
+      "rights": "© 2026 Clancig FullstackWeb. Distributed under Apache License 2.0.",
       "design": "Designed and developed by",
       "termsPrefix": "By browsing this site, you agree to our",
       "termsLink": "Terms and Conditions",

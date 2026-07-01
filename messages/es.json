@@ -503,7 +503,7 @@
     "liability2": "Pérdida de datos, interrupciones del servicio o fallos técnicos.",
     "liability3": "Costos de servicios veterinarios incurridos o no incurridos basados en los recordatorios de la Aplicación.",
     "section5Title": "5. Propiedad Intelectual",
-    "section5Body": "Todo el contenido, diseño, código fuente y logotipos de PetClan son propiedad intelectual exclusiva de sus desarrolladores, salvo que se indique lo contrario (como bibliotecas de código abierto). Queda prohibida la reproducción, distribución o modificación no autorizada.",
+    "section5Body": "El software y código fuente que opera la plataforma PetClan se distribuye de forma pública bajo la Licencia Apache 2.0. Sin embargo, los contenidos, logotipos, marcas comerciales asociadas y los datos de usuario registrados en la plataforma mantienen sus respectivas políticas de privacidad y derechos de propiedad intelectual, quedando prohibida su reproducción o uso no autorizado fuera de los términos de dichas licencias y políticas.",
     "section6Title": "6. Privacidad y Datos",
     "section6Body": "Respetamos su privacidad. Los datos recopilados se utilizan exclusivamente para el funcionamiento de la Aplicación (gestión de perfiles de mascotas). No vendemos ni compartimos sus datos personales con terceros con fines publicitarios.",
     "section7Title": "7. Ley Aplicable y Jurisdicción",
@@ -512,7 +512,7 @@
   "TermsPage": {
     "title": "Términos y Condiciones de Uso",
     "backDefault": "Volver",
-    "lastUpdated": "Última actualización: 26 de febrero de 2026",
+    "lastUpdated": "Última actualización: 1 de julio de 2026",
     "questions": "Si tiene alguna pregunta sobre estos Términos, por favor contáctenos."
   },
   "Privacy": {
@@ -534,11 +534,11 @@
   "PrivacyPage": {
     "title": "Política de Privacidad",
     "backDefault": "Volver",
-    "lastUpdated": "Última actualización: 26 de febrero de 2026"
+    "lastUpdated": "Última actualización: 1 de julio de 2026"
   },
   "Layout": {
     "Footer": {
-      "rights": "© 2025 Todos los derechos reservados - Licencia MIT",
+      "rights": "© 2026 Clancig FullstackWeb. Distribuido bajo Licencia Apache 2.0.",
       "design": "Diseño y desarrollo por",
       "termsPrefix": "Al navegar por el sitio aceptas nuestros",
       "termsLink": "Términos y Condiciones",
