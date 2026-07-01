@@ -77,6 +77,25 @@ export function SupportProjectModal({ opened, onClose, ...props }: SupportProjec
 
                     <Button
                         component="a"
+                        href={process.env.NEXT_PUBLIC_MERCADOPAGO_URL || '#'}
+                        target="_blank"
+                        color="cyan" // MercadoPago blue-ish
+                        fullWidth
+                        leftSection={
+                            <img
+                                src="/assets/mp.svg"
+                                alt="Mercado Pago"
+                                style={{ height: 18, width: 'auto', filter: 'brightness(0) invert(1)' }}
+                            />
+                        }
+                        variant="filled"
+                        disabled={!process.env.NEXT_PUBLIC_MERCADOPAGO_URL}
+                    >
+                        {t('mercadopago')}
+                    </Button>
+
+                    <Button
+                        component="a"
                         href={process.env.NEXT_PUBLIC_PORTFOLIO_URL || '#'}
                         target="_blank"
                         color="gray"

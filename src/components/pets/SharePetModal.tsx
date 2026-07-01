@@ -233,8 +233,13 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                                 </Tooltip>
                                             )
                                         ) : owner.hasPendingRemoval ? (
-                                            <Tooltip label={tModalShare('ownersTab.pendingRemovalTooltip')}>
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28 }}>
+                                            <Tooltip label={tModalShare('ownersTab.pendingRemovalTooltip')} events={{ hover: true, focus: true, touch: true }}>
+                                                <div 
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 44, cursor: 'pointer' }}
+                                                    tabIndex={0}
+                                                    role="button"
+                                                    aria-label={tModalShare('ownersTab.pendingRemovalTooltip')}
+                                                >
                                                     <style>{hourglassAnimation}</style>
                                                     <IconHourglassHigh
                                                         size={18}

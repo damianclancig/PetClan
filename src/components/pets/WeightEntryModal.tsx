@@ -2,11 +2,11 @@
 
 import { Modal, Button, Group, Stack, Textarea, Text } from '@mantine/core';
 import { WeightInput } from './form/WeightInput';
-import { useForm } from 'react-hook-form';
 import { notifications } from '@mantine/notifications';
-import { useQueryClient } from '@tanstack/react-query'; // Or equivalent hook
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import dayjs from 'dayjs';
+import { useHealthRecords } from '@/hooks/useHealthRecords';
 
 interface WeightEntryModalProps {
     opened: boolean;
@@ -16,32 +16,30 @@ interface WeightEntryModalProps {
 }
 
 export function WeightEntryModal({ opened, onClose, petId, currentWeight }: WeightEntryModalProps) {
-    const [loading, setLoading] = useState(false);
+    const { createRecord, isCreating } = useHealthRecords(petId);
     const [weight, setWeight] = useState<number | string>(currentWeight || '');
     const [notes, setNotes] = useState('');
     const t = useTranslations('PetForm.weightModal');
     const tCommon = useTranslations('Common');
-    // const queryClient = useQueryClient(); // If using react-query context
+
+    useEffect(() => {
+        if (opened && currentWeight !== undefined) {
+            setWeight(currentWeight);
+        }
+    }, [opened, currentWeight]);
 
     const handleSubmit = async () => {
         if (!weight) return;
 
-        setLoading(true);
         try {
-            const res = await fetch('/api/records', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    petId,
-                    type: 'weight',
-                    title: t('recordTitle'),
-                    description: notes,
-                    appliedAt: new Date(),
-                    weightValue: Number(weight),
-                }),
+            await createRecord({
+                petId,
+                type: 'weight',
+                title: t('recordTitle'),
+                description: notes,
+                appliedAt: dayjs().format('YYYY-MM-DD'),
+                weightValue: Number(weight),
             });
-
-            if (!res.ok) throw new Error('Failed to save weight');
 
             notifications.show({
                 title: t('successTitle'),
@@ -49,12 +47,7 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
                 color: 'green',
             });
 
-            // Invalidate queries or refresh page
-            // queryClient.invalidateQueries({ queryKey: ['pet', petId] });
-            // For now simple reload or callback could work, but using window.location.reload is eager.
-            // Better to rely on parent to refresh data.
-            window.location.reload(); // Temporary simple fix until query invalidation is passed
-
+            setNotes('');
             onClose();
         } catch (error) {
             notifications.show({
@@ -62,8 +55,6 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
                 message: t('errorMsg'),
                 color: 'red',
             });
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -87,7 +78,7 @@ export function WeightEntryModal({ opened, onClose, petId, currentWeight }: Weig
 
                 <Group justify="flex-end" mt="md">
                     <Button variant="default" onClick={onClose}>{tCommon('cancel')}</Button>
-                    <Button onClick={handleSubmit} loading={loading} disabled={!weight}>{tCommon('save')}</Button>
+                    <Button onClick={handleSubmit} loading={isCreating} disabled={!weight}>{tCommon('save')}</Button>
                 </Group>
             </Stack>
         </Modal>

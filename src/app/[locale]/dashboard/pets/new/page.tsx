@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { notifications } from '@mantine/notifications';
 import { PetWizard } from '@/components/pets/wizard/PetWizard';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
 
 export default function NewPetPage() {
     const t = useTranslations('NewPet');
@@ -18,7 +19,10 @@ export default function NewPetPage() {
             const res = await fetch('/api/pets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values),
+                body: JSON.stringify({
+                    ...values,
+                    clientDate: dayjs().format('YYYY-MM-DD'),
+                }),
             });
             if (!res.ok) throw new Error('Failed to create pet');
             return res.json();

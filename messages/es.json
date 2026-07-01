@@ -546,13 +546,14 @@
     },
     "Support": {
       "title": "Apoyá el Proyecto",
-      "description": "PetClan es un proyecto gratuito y de código abierto, \\nhecho con ❤ desde Argentina.",
+      "description": "PetClan es un proyecto gratuito y de código abierto, hecho con ❤ desde Argentina.",
       "share": "Si esta app te resulta útil, considerá compartirla con tus amigos y familiares. ¡Ayuda un montón!",
       "help": "Si deseás colaborar con su mantenimiento y futuras mejoras, podés hacerlo desde los siguientes enlaces.",
       "copyLink": "Copiar Enlace",
       "linkCopied": "Enlace Copiado",
       "cafecito": "Invitame un Cafecito",
       "paypal": "Colaborar con PayPal",
+      "mercadopago": "Donar con Mercado Pago",
       "portfolio": "Visitar mi Portfolio",
       "github": "Ver en GitHub"
     }
@@ -721,7 +722,8 @@
     "ServerError": {
       "title": "Algo salió mal",
       "description": "Estamos teniendo algunos problemas técnicos. Nuestros veterinarios de sistemas ya están trabajando en ello.",
-      "button": "Reintentar"
+      "button": "Reintentar",
+      "backHome": "Volver al Inicio"
     },
     "PetNotFound": {
       "title": "Mascota no encontrada",
@@ -801,6 +803,8 @@
     "invitation_rejected_title": "Invitación Rechazada",
     "invitation_rejected_message": "{name} rechazó tu invitación para {pet}",
     "remove_request_title": "Solicitud de Baja",
-    "remove_request_message": "{name} solicita que dejes de ser dueño de {pet}"
+    "remove_request_message": "{name} solicita que dejes de ser dueño de {pet}",
+    "remove_request_expired_title": "Solicitud de Baja Expirada",
+    "remove_request_expired_message": "La solicitud de baja para {pet} ha expirado tras 72 horas sin respuesta."
   }
 }

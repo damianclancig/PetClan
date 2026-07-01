@@ -7,9 +7,10 @@ import { getPetIdentityColor } from '@/utils/pet-identity';
 import { PetSpeciesBadge } from '../PetSpeciesBadge';
 import { HoverScale, ActionIconMotion, MagicTabBackground } from '@/components/ui/MotionWrappers';
 import { MagicParticles } from '@/components/ui/MagicWrappers';
+import { MarqueeText } from '@/components/ui/MarqueeText';
 import { useTranslations, useFormatter } from 'next-intl';
 import dayjs from 'dayjs';
-import { getPetAge, formatAgeTranslated } from '@/lib/dateUtils';
+import { getPetAge, formatAgeTranslated, formatDate } from '@/lib/dateUtils';
 import { IconPencil, IconShare, IconDotsVertical, IconCheck, IconArrowBackUp, IconHistory, IconCake, IconDna, IconPlus, IconCamera } from '@tabler/icons-react';
 import { CloudinaryUploadButton } from '@/components/ui/CloudinaryUploadButton';
 import { Link } from '@/i18n/routing';
@@ -37,6 +38,19 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
     const [isFooterVisible, setIsFooterVisible] = useState(false);
     const isDeceased = pet.status === 'deceased';
     const { updatePhoto, isUploading } = useUpdatePetPhoto(pet._id);
+
+    const getDeceasedAgeStr = () => {
+        if (!pet.birthDate || !pet.deathDate) return '';
+        const birth = dayjs(pet.birthDate).utc();
+        const death = dayjs(pet.deathDate).utc();
+        const years = death.diff(birth, 'years');
+        const days = death.diff(birth, 'days');
+        const months = death.diff(birth, 'months');
+
+        if (years >= 1) return tPets('ageYears', { count: years });
+        if (days > 60) return tPets('ageMonths', { count: months });
+        return tPets('ageDays', { count: days === 0 ? 1 : days });
+    };
 
     const colorScheme = useComputedColorScheme('light');
     const isDark = colorScheme === 'dark';
@@ -216,7 +230,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                             h="100%"
                             align="flex-end"
                             justify="flex-start"
-                            pb={16}
+                            pb={6}
                             pl={160}
                         >
                             <Title
@@ -360,7 +374,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                 <Container size="lg" style={{ marginTop: -60, paddingBottom: 0, position: 'relative' }}>
                     <Flex
                         direction="row" // Always row for mobile and desktop (Mobile: Avatar left, Name right)
-                        align={{ base: 'center', xs: 'flex-start' }} // Center vertically on mobile (for half-color alignment), Top on desktop
+                        align="flex-start" // Align top to keep avatar center fixed on color split line
                         gap={{ base: 'sm', xs: 'md' }}
                     >
                         <Box style={{ position: 'relative', display: 'inline-block' }}>
@@ -412,12 +426,13 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 </FileButton>
                             )}
                         </Box>
-
                         <Box
                             style={{ flex: 1, minWidth: 0, zIndex: 10 }}
-                            mt={{ base: 0, xs: 72 }} // Display badges below separate title on Desktop
+                            mt={{ base: 5, xs: 82 }} // Display badges below separate title on Desktop
                             ta="left"
-                            h={{ base: 130, xs: 'auto' }} // Fix height in mobile (slightly > 120 for spacing)
+                            mih={{ base: 90, xs: 'auto' }}
+                            h="auto"
+                            pb={{ base: 12, xs: 0 }}
                             display={{ base: 'flex', xs: 'block' }} // Flex col in mobile
                         >
                             <Flex
@@ -426,26 +441,14 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                 h="100%"
                                 w="100%"
                             >
-                                {/* MOBILE TITLE: Visible only on mobile, right next to avatar */}
-                                <Title
-                                    order={1}
-                                    fw={800}
-                                    c="white"
-                                    display={{ base: 'block', xs: 'none' }} // Mobile Only
-                                    style={{
-                                        textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                                        lineHeight: 1.1,
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        paddingTop: 20 // Increased padding to lower the name
-                                    }}
-                                    fz={28}
+                                {/* Desktop Layout for Badges */}
+                                <Flex
+                                    display={{ base: 'none', xs: 'flex' }}
+                                    gap={8}
+                                    justify="flex-start"
+                                    wrap="wrap"
+                                    align="center"
                                 >
-                                    {pet.name}
-                                </Title>
-
-                                <Flex gap={8} justify="flex-start" wrap="wrap" align="center" pb={{ base: 4, xs: 0 }}>
                                     <PetSpeciesBadge
                                         species={pet.species}
                                         sex={pet.sex}
@@ -456,8 +459,8 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                     <Badge
                                         size="md"
                                         radius="md"
-                                        variant="light" // Light variant looks good on surface
-                                        color={identityColor} // Use identity color for consistency
+                                        variant="light"
+                                        color={identityColor}
                                         leftSection={<IconDna size={14} style={{ marginTop: 4 }} />}
                                         style={{ textTransform: 'none' }}
                                     >
@@ -470,126 +473,211 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                                             radius="md"
                                             variant="light"
                                             color="gray"
-                                            leftSection={<Text size="xs">🕊️</Text>}
                                             style={{ textTransform: 'none' }}
                                         >
-                                            {dayjs(pet.birthDate).utc().format('YYYY')} - {pet.deathDate ? dayjs(pet.deathDate).utc().format('YYYY') : '...'}
+                                            🕊️ {formatDate(pet.birthDate)} - † {formatDate(pet.deathDate) || '-'} {pet.deathDate ? `(${getDeceasedAgeStr()})` : ''}
                                         </Badge>
                                     ) : (
                                         <Badge
                                             size="md"
                                             radius="md"
                                             variant="light"
-                                            color="gray" // Gray for date
+                                            color="gray"
                                             leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
                                             style={{ textTransform: 'none' }}
                                         >
-                                            {format.dateTime(new Date(pet.birthDate), { year: 'numeric', month: '2-digit', day: '2-digit' })} ({formatAgeTranslated(pet.birthDate, tPets)})
+                                            {formatDate(pet.birthDate)} ({formatAgeTranslated(pet.birthDate, tPets)})
                                         </Badge>
                                     )}
+                                </Flex>
+
+                                {/* Mobile Layout: Name (Above color split) */}
+                                <Flex
+                                    display={{ base: 'flex', xs: 'none' }}
+                                    direction="column"
+                                    w="100%"
+                                    style={{ overflow: 'hidden' }}
+                                >
+                                    <MarqueeText style={{ paddingTop: 16 }}>
+                                        <Title
+                                            order={1}
+                                            fw={800}
+                                            c="white"
+                                            style={{
+                                                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                                lineHeight: 1.1,
+                                                whiteSpace: 'nowrap',
+                                                display: 'inline-block'
+                                            }}
+                                            fz={28}
+                                        >
+                                            {pet.name}
+                                        </Title>
+                                    </MarqueeText>
+                                </Flex>
+
+                                {/* Mobile Layout: Badges (Below color split) */}
+                                <Flex
+                                    display={{ base: 'flex', xs: 'none' }}
+                                    direction="row"
+                                    gap={6}
+                                    align="center"
+                                    wrap="wrap"
+                                    pb={4}
+                                    pt={10}
+                                >
+                                    <PetSpeciesBadge
+                                        species={pet.species}
+                                        sex={pet.sex}
+                                        color={identityColor}
+                                        size="md"
+                                    />
+                                    <Badge
+                                        size="md"
+                                        radius="md"
+                                        variant="light"
+                                        color={identityColor}
+                                        leftSection={<IconDna size={14} style={{ marginTop: 4 }} />}
+                                        style={{ textTransform: 'none' }}
+                                    >
+                                        {pet.breed}
+                                    </Badge>
                                 </Flex>
                             </Flex>
                         </Box>
                     </Flex>
 
+                    {/* Dates Badge Mobile (Below avatar & info) */}
+                    <Box display={{ base: 'block', xs: 'none' }} mt={12} pb={8}>
+                        {pet.status === 'deceased' ? (
+                            <Badge
+                                size="md"
+                                radius="md"
+                                variant="light"
+                                color="gray"
+                                style={{ textTransform: 'none', width: 'max-content', maxWidth: '100%' }}
+                            >
+                                <Text size="xs" fw={600} style={{ whiteSpace: 'nowrap' }}>
+                                    🕊️ {formatDate(pet.birthDate)} - † {pet.deathDate ? `${formatDate(pet.deathDate)} (${getDeceasedAgeStr()})` : '-'}
+                                </Text>
+                            </Badge>
+                        ) : (
+                            <Badge
+                                size="md"
+                                radius="md"
+                                variant="light"
+                                color="gray"
+                                leftSection={<IconCake size={14} style={{ marginTop: 2 }} />}
+                                style={{ textTransform: 'none', width: 'max-content', maxWidth: '100%' }}
+                            >
+                                <Text size="xs" fw={600} style={{ whiteSpace: 'nowrap' }}>
+                                    {formatDate(pet.birthDate)} ({formatAgeTranslated(pet.birthDate, tPets)})
+                                </Text>
+                            </Badge>
+                        )}
+                    </Box>
                 </Container>
 
-                {pet.status !== 'deceased' && (
-                    <Box style={{
-                        background: isDark
-                            ? 'linear-gradient(to top, rgba(0, 0, 0, 0.25) 80%, rgba(0, 0, 0, 0) 100%)'
-                            : 'linear-gradient(to top, rgba(227, 227, 227, 0.5) 80%, rgba(255, 255, 255, 0) 100%)',
-                        backdropFilter: 'blur(10px)',
-                        width: '100%',
-                        marginTop: 10,
-                    }}>
-                        <Container size="lg" px="md">
-                            <Tabs
-                                value={activeTab}
-                                onChange={onTabChange}
-                                variant="unstyled"
+                <Box style={{
+                    background: isDark
+                        ? 'linear-gradient(to top, rgba(0, 0, 0, 0.25) 80%, rgba(0, 0, 0, 0) 100%)'
+                        : 'linear-gradient(to top, rgba(227, 227, 227, 0.5) 80%, rgba(255, 255, 255, 0) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    width: '100%',
+                    marginTop: 10,
+                }}>
+                    <Container size="lg" px="md">
+                        <Tabs
+                            value={activeTab}
+                            onChange={onTabChange}
+                            variant="unstyled"
+                        >
+                            <Tabs.List
+                                ref={tabsListRef}
+                                style={{
+                                    display: 'flex',
+                                    flexWrap: 'nowrap',
+                                    justifyContent: 'flex-start',
+                                    overflowX: 'auto',
+                                    scrollbarWidth: 'none',
+                                    WebkitOverflowScrolling: 'touch',
+                                    gap: tabGap,
+                                    position: 'relative',
+                                    padding: '12px 16px 0px 16px'
+                                }}
                             >
-                                <Tabs.List
-                                    ref={tabsListRef}
-                                    style={{
-                                        display: 'flex',
-                                        flexWrap: 'nowrap',
-                                        justifyContent: 'flex-start',
-                                        overflowX: 'auto',
-                                        scrollbarWidth: 'none',
-                                        WebkitOverflowScrolling: 'touch',
-                                        gap: tabGap,
-                                        position: 'relative',
-                                        padding: '12px 16px 0px 16px'
-                                    }}
-                                >
-                                    {[
+                                {(pet.status === 'deceased'
+                                    ? [
+                                        { value: 'timeline', label: t('Deceased.memories') },
+                                        { value: 'gallery', label: t('tabs.gallery') },
+                                      ]
+                                    : [
                                         { value: 'summary', label: t('tabs.summary') },
                                         { value: 'timeline', label: t('tabs.timeline') },
                                         { value: 'health', label: t('tabs.health') },
                                         { value: 'gallery', label: t('tabs.gallery') },
-                                    ].map((tab) => {
-                                        const isActive = activeTab === tab.value;
-                                        return (
-                                            <MagicParticles key={tab.value} color={isActive ? `var(--mantine-color-${identityColor}-filled)` : []}>
-                                                <Tabs.Tab
-                                                    value={tab.value}
-                                                    style={{
-                                                        flex: '0 1 auto',
-                                                        minWidth: 'fit-content',
-                                                        padding: tabPadding,
-                                                        textTransform: 'uppercase',
-                                                        letterSpacing: '1px',
-                                                        fontSize: '0.75rem',
-                                                        fontWeight: 700,
-                                                        borderRadius: '12px 12px 0 0',
-                                                        transition: 'color 0.4s ease',
-                                                        cursor: 'pointer',
-                                                        position: 'relative',
-                                                        color: isActive
-                                                            ? (isDark ? '#fff' : '#000')
-                                                            : (isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)'),
-                                                        background: 'transparent',
-                                                        border: 'none',
-                                                    }}
-                                                >
-                                                    <span style={{ position: 'relative', zIndex: 2 }}>
-                                                        {tab.label}
-                                                    </span>
-                                                    {isActive && (
-                                                        <motion.div
-                                                            layoutId="aurora-pill"
-                                                            style={{
-                                                                position: 'absolute',
-                                                                inset: 0,
-                                                                borderTopLeftRadius: '12px',
-                                                                borderTopRightRadius: '12px',
-                                                                borderBottomLeftRadius: '0px',
-                                                                borderBottomRightRadius: '0px',
-                                                                background: isDark
-                                                                    ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-8) 0%, var(--mantine-color-${identityColor}-7) 100%)`
-                                                                    : `linear-gradient(135deg, var(--mantine-color-${identityColor}-1) 0%, var(--mantine-color-${identityColor}-2) 100%)`,
-                                                                boxShadow: isDark
-                                                                    ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1)`
-                                                                    : `0 4px 12px var(--mantine-color-${identityColor}-light-color), inset 0 1px 1px rgba(255,255,255,0.8)`,
-                                                                zIndex: 1
-                                                            }}
-                                                            transition={{
-                                                                type: 'spring',
-                                                                bounce: 0.15,
-                                                                duration: 0.4,
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Tabs.Tab>
-                                            </MagicParticles>
-                                        );
-                                    })}
-                                </Tabs.List>
-                            </Tabs>
-                        </Container>
-                    </Box>
-                )}
+                                      ]
+                                ).map((tab) => {
+                                    const isActive = activeTab === tab.value;
+                                    return (
+                                        <MagicParticles key={tab.value} color={isActive ? `var(--mantine-color-${identityColor}-filled)` : []}>
+                                            <Tabs.Tab
+                                                value={tab.value}
+                                                style={{
+                                                    flex: '0 1 auto',
+                                                    minWidth: 'fit-content',
+                                                    padding: tabPadding,
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 700,
+                                                    borderRadius: '12px 12px 0 0',
+                                                    transition: 'color 0.4s ease',
+                                                    cursor: 'pointer',
+                                                    position: 'relative',
+                                                    color: isActive
+                                                        ? (isDark ? '#fff' : '#000')
+                                                        : (isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)'),
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                }}
+                                            >
+                                                <span style={{ position: 'relative', zIndex: 2 }}>
+                                                    {tab.label}
+                                                </span>
+                                                {isActive && (
+                                                    <motion.div
+                                                        layoutId="aurora-pill"
+                                                        style={{
+                                                            position: 'absolute',
+                                                            inset: 0,
+                                                            borderTopLeftRadius: '12px',
+                                                            borderTopRightRadius: '12px',
+                                                            borderBottomLeftRadius: '0px',
+                                                            borderBottomRightRadius: '0px',
+                                                            background: isDark
+                                                                ? `linear-gradient(135deg, var(--mantine-color-${identityColor}-8) 0%, var(--mantine-color-${identityColor}-7) 100%)`
+                                                                : `linear-gradient(135deg, var(--mantine-color-${identityColor}-1) 0%, var(--mantine-color-${identityColor}-2) 100%)`,
+                                                            boxShadow: isDark
+                                                                ? `0 4px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1)`
+                                                                : `0 4px 12px var(--mantine-color-${identityColor}-light-color), inset 0 1px 1px rgba(255,255,255,0.8)`,
+                                                            zIndex: 1
+                                                        }}
+                                                        transition={{
+                                                            type: 'spring',
+                                                            bounce: 0.15,
+                                                            duration: 0.4,
+                                                        }}
+                                                    />
+                                                )}
+                                            </Tabs.Tab>
+                                        </MagicParticles>
+                                    );
+                                })}
+                            </Tabs.List>
+                        </Tabs>
+                    </Container>
+                </Box>
             </Paper>
 
             {onAddRecord && (

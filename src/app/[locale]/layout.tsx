@@ -3,13 +3,20 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { ColorSchemeScript } from '@mantine/core';
 import { Providers } from '@/components/providers/Providers';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { inter, poppins } from '@/styles/fonts';
 
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import '@/styles/globals.css';
+
+export const viewport: Viewport = {
+    themeColor: '#14B8A6',
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+};
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -43,6 +50,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             ],
         },
         manifest: '/manifest.json',
+        appleWebApp: {
+            capable: true,
+            title: 'PetClan',
+            statusBarStyle: 'default',
+        },
         openGraph: {
             title: 'PetClan',
             description: 'Libreta Sanitaria Digital para tus mascotas. Historial clínico, recordatorios de vacunas y más.',

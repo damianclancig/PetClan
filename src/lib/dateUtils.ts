@@ -19,20 +19,36 @@ export function now() {
 }
 
 /**
- * Parses a date value into a dayjs object.
+ * Converts a stored date string (UTC midnight) to a local Date object preserving the calendar day.
+ * Useful for component inputs like DatePicker or DateInput that operate in local time.
+ */
+export function toLocalDate(date: string | Date | undefined | null): Date | null {
+    if (!date) return null;
+    const d = dayjs(date).utc();
+    return new Date(d.year(), d.month(), d.date());
+}
+
+/**
+ * Parses a date value into a dayjs object, ensuring string dates preserve their calendar day.
  */
 export function parseDate(date: string | Date | undefined | null) {
     if (!date) return null;
+    if (typeof date === 'string') {
+        const d = dayjs(date).utc();
+        return dayjs(new Date(d.year(), d.month(), d.date()));
+    }
     return dayjs(date);
 }
 
 /**
  * Formats a date for display (e.g. DD/MM/YYYY).
- * Forces UTC interpretation to avoid timezone shifts for stored dates (midnight UTC).
+ * Forces UTC interpretation for string dates (which represent pure calendar dates) to avoid timezone shifts.
  */
 export function formatDate(date: string | Date | undefined | null, format: string = DATE_FORMAT_DISPLAY) {
     if (!date) return '';
-    // Display in local time to match user's context (e.g. late night entries stored as next day UTC should show as today local)
+    if (typeof date === 'string') {
+        return dayjs(date).utc().format(format);
+    }
     return dayjs(date).format(format);
 }
 
@@ -42,12 +58,15 @@ export function formatDate(date: string | Date | undefined | null, format: strin
  */
 export function formatDateForInput(date: string | Date | undefined | null) {
     if (!date) return '';
-    // If it's a stored date (UTC midnight), .utc() keeps it as is.
     return dayjs(date).utc().format(DATE_FORMAT_INPUT);
 }
 
 export function calculateAge(birthDate: string | Date) {
-    return dayjs().diff(birthDate, 'year');
+    const birthStr = typeof birthDate === 'string'
+        ? dayjs(birthDate).utc().format('YYYY-MM-DD')
+        : dayjs(birthDate).format('YYYY-MM-DD');
+    const nowStr = dayjs().format('YYYY-MM-DD');
+    return dayjs.utc(nowStr).diff(dayjs.utc(birthStr), 'year');
 }
 
 /**
@@ -90,14 +109,19 @@ export function formatAgeTranslated(birthDate: string | Date | undefined, t: (ke
 
 /**
  * Calculates pet age in multiple units using Calendar Day logic (Start of Day).
- * This ensures consistency: If born yesterday at 11PM and now is today 1AM, it is "1 day old".
+ * Treats dates in UTC to avoid timezone shifts.
  */
 export function getPetAge(birthDate: string | Date) {
-    const now = dayjs();
-    const birth = dayjs(birthDate);
+    const birthStr = typeof birthDate === 'string'
+        ? dayjs(birthDate).utc().format('YYYY-MM-DD')
+        : dayjs(birthDate).format('YYYY-MM-DD');
+    const nowStr = dayjs().format('YYYY-MM-DD');
+
+    const birth = dayjs.utc(birthStr);
+    const now = dayjs.utc(nowStr);
 
     // Calendar differences (ignoring time)
-    const days = now.startOf('day').diff(birth.startOf('day'), 'days');
+    const days = now.diff(birth, 'days');
     const weeks = now.diff(birth, 'weeks');
     const months = now.diff(birth, 'months');
     const years = now.diff(birth, 'years');

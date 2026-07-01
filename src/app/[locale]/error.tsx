@@ -9,8 +9,14 @@ import { Providers } from '@/components/providers/Providers';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import esMessages from '../../../messages/es.json';
 
+interface ErrorProps {
+    error: Error & { digest?: string };
+    reset: () => void;
+}
+
 function ErrorContent({ reset }: { reset: () => void }) {
     const t = useTranslations('Errors.ServerError');
+
     return (
         <div className="relative h-screen w-full overflow-hidden">
             <AnimatedBackground />
@@ -39,7 +45,7 @@ function ErrorContent({ reset }: { reset: () => void }) {
                             {t('button')}
                         </Button>
                         <Button component={Link} href="/dashboard" size="lg" variant="light" color="gray">
-                            Volver al Inicio
+                            {t('backHome')}
                         </Button>
                     </Group>
                 </Stack>
@@ -48,15 +54,11 @@ function ErrorContent({ reset }: { reset: () => void }) {
     );
 }
 
-export default function Error({
-    error,
-    reset,
-}: {
-    error: Error & { digest?: string };
-    reset: () => void;
-}) {
+export default function Error({ error, reset }: ErrorProps) {
     useEffect(() => {
-        console.error(error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Client Exception Captured:', error);
+        }
     }, [error]);
 
     return (

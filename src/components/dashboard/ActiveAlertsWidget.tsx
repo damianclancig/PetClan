@@ -18,14 +18,27 @@ export function ActiveAlertsWidget({ alerts }: ActiveAlertsWidgetProps) {
 
     if (alerts.length === 0) {
         return (
-            <Paper withBorder p="md" radius="md">
-                <Group>
-                    <ThemeIcon color="green" variant="light" size="lg" radius="xl">
-                        <IconCheck size={20} />
+            <Paper
+                withBorder
+                py={12}
+                px="sm"
+                radius="md"
+                style={{
+                    backgroundColor: 'var(--mantine-color-body)',
+                    transition: 'border-color 0.2s ease',
+                }}
+            >
+                <Group wrap="nowrap" gap="sm" align="center">
+                    <ThemeIcon color="green" variant="light" size={36} radius="xl" style={{ flexShrink: 0 }}>
+                        <IconCheck size={18} stroke={2.5} />
                     </ThemeIcon>
-                    <Box>
-                        <Text fw={500}>{t('allGood')}</Text>
-                        <Text size="sm" c="dimmed">{t('noAlerts')}</Text>
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                        <Text size="sm" fw={600} style={{ lineHeight: 1.2 }}>
+                            {t('allGood')}
+                        </Text>
+                        <Text size="xs" c="dimmed" style={{ lineHeight: 1.3, marginTop: 2 }}>
+                            {t('noAlerts')}
+                        </Text>
                     </Box>
                 </Group>
             </Paper>

@@ -34,10 +34,34 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const isOwner = pet.owners.some((p: any) => p.toString() === currentUser._id.toString());
         if (!isOwner) return NextResponse.json({ error: 'Not an owner' }, { status: 403 });
 
+        // Clean up/expire any previous requests for this pet and target user that have expired by date but are still pending
+        await Invitation.updateMany({
+            petId: pet._id,
+            email: targetUser.email,
+            type: 'removal',
+            status: 'pending',
+            expiresAt: { $lte: new Date() }
+        }, {
+            $set: { status: 'expired' }
+        });
+
+        // Check if there is already an active pending removal request for this target user and pet
+        const existingRequest = await Invitation.findOne({
+            petId: pet._id,
+            email: targetUser.email,
+            type: 'removal',
+            status: 'pending',
+            expiresAt: { $gt: new Date() }
+        });
+
+        if (existingRequest) {
+            return NextResponse.json({ error: 'Ya existe una solicitud de baja pendiente para este copropietario.' }, { status: 400 });
+        }
+
         // Generate Request Token (reusing Invitation model)
         const token = crypto.randomBytes(32).toString('hex');
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiration
+        expiresAt.setHours(expiresAt.getHours() + 72); // 72 hours (3 days) expiration
 
         await Invitation.create({
             token,

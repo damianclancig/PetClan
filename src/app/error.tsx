@@ -9,8 +9,14 @@ import '@mantine/core/styles.css';
 import '@/styles/globals.css';
 import esMessages from '../../messages/es.json';
 
+interface ErrorProps {
+    error: Error & { digest?: string };
+    reset: () => void;
+}
+
 function ErrorContent({ reset }: { reset: () => void }) {
     const t = useTranslations('Errors.ServerError');
+
     return (
         <Container className="h-screen flex items-center justify-center" size="lg">
             <Stack align="center" gap="xl">
@@ -37,7 +43,7 @@ function ErrorContent({ reset }: { reset: () => void }) {
                         {t('button')}
                     </Button>
                     <Button component="a" href="/dashboard" size="lg" variant="light" color="gray">
-                        Volver al Inicio
+                        {t('backHome')}
                     </Button>
                 </Group>
             </Stack>
@@ -45,15 +51,11 @@ function ErrorContent({ reset }: { reset: () => void }) {
     );
 }
 
-export default function Error({
-    error,
-    reset,
-}: {
-    error: Error & { digest?: string };
-    reset: () => void;
-}) {
+export default function Error({ error, reset }: ErrorProps) {
     useEffect(() => {
-        console.error(error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Client Exception Captured:', error);
+        }
     }, [error]);
 
     return (

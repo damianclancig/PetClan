@@ -432,7 +432,7 @@ export async function sendRemovalRequestEmail(
         <p>Hola <strong>${toName}</strong>,</p>
         <p><strong>${requesterName}</strong> ha solicitado que dejes de ser copropietario de <strong>${petName}</strong>.</p>
         <div class="card" style="border-left: 4px solid #e11d48;">
-            <p style="margin: 0;">Esta acción requiere tu validación. Por favor, revisa la solicitud para aceptar o rechazar el cambio.</p>
+            <p style="margin: 0;">Esta acción requiere tu validación. Por favor, revisa la solicitud para aceptar o rechazar el cambio. <strong>Esta solicitud estará activa por un tiempo límite de 72 horas (3 días)</strong>; si no hay novedad en este plazo, se cancelará automáticamente.</p>
         </div>
         
         <div style="text-align: center; margin-top: 35px;">
@@ -467,6 +467,32 @@ export async function sendRemovalResultEmail(
             ? `${responderName} ya no tiene acceso a la mascota.`
             : `${responderName} sigue manteniendo el acceso como copropietario.`
         }</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="${process.env.NEXTAUTH_URL}/dashboard" class="btn">Ir al Dashboard</a>
+        </div>
+    `;
+    return sendMailerooEmail(toEmail, toName, subject, getEmailLayout(content));
+}
+
+export async function sendRemovalExpiredEmail(
+    toEmail: string,
+    toName: string,
+    otherUserName: string,
+    petName: string,
+    isRequester: boolean
+) {
+    const subject = `Solicitud de baja expirada para ${petName} ⏳`;
+    const content = `
+        <h2 style="color: #64748b;">Solicitud de Baja Expirada</h2>
+        <p>Hola <strong>${toName}</strong>,</p>
+        <p>${isRequester 
+            ? `La solicitud que enviaste para que <strong>${otherUserName}</strong> deje de ser dueño de <strong>${petName}</strong> ha expirado tras 72 horas sin respuesta y se ha cancelado automáticamente.` 
+            : `La solicitud enviada por <strong>${otherUserName}</strong> para que dejes de ser dueño de <strong>${petName}</strong> ha expirado tras 72 horas sin respuesta y se ha cancelado automáticamente.`
+        }</p>
+        <div class="card">
+            <p style="margin: 0;">Ambos usuarios mantienen su acceso actual a la mascota. Si aún deseas realizar este cambio, deberás iniciar una nueva solicitud desde el panel de control de la mascota.</p>
         </div>
         
         <div style="text-align: center; margin-top: 30px;">

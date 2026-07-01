@@ -21,7 +21,7 @@ async function createPet(newPet: any) {
 }
 
 async function fetchPet(id: string) {
-    const res = await fetch(`/api/pets/${id}`);
+    const res = await fetch(`/api/pets/${id}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Error fetching pet');
     return res.json();
 }

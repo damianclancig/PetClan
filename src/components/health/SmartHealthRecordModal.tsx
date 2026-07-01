@@ -51,6 +51,7 @@ import {
 import { IHealthRecord } from '@/models/HealthRecord'
 import { MagicParticles } from '@/components/ui/MagicWrappers'
 import { CounterInput } from '@/components/ui/CounterInput'
+import { toLocalDate } from '@/lib/dateUtils'
 
 interface SmartHealthRecordModalProps {
   opened: boolean
@@ -136,8 +137,8 @@ export function SmartHealthRecordModal({
                 ? 'weight'
                 : 'consultation'
 
-        const appliedAt = initialRecord.appliedAt ? new Date(initialRecord.appliedAt) : new Date()
-        const nextDueAt = initialRecord.nextDueAt ? new Date(initialRecord.nextDueAt) : undefined
+        const appliedAt = initialRecord.appliedAt ? (toLocalDate(initialRecord.appliedAt) || new Date()) : new Date()
+        const nextDueAt = initialRecord.nextDueAt ? (toLocalDate(initialRecord.nextDueAt) || undefined) : undefined
 
         setSelectedType(recordType)
         setStep(2)
@@ -427,6 +428,8 @@ export function SmartHealthRecordModal({
       petId,
       vetName: vetClinic || undefined,
       clinicName: vetClinic || undefined,
+      appliedAt: values.appliedAt ? dayjs(values.appliedAt).format('YYYY-MM-DD') : undefined,
+      nextDueAt: values.nextDueAt ? dayjs(values.nextDueAt).format('YYYY-MM-DD') : undefined,
     }
     if (onSubmitRecord) {
       await onSubmitRecord(payload)

@@ -9,6 +9,8 @@ import { sendPetUpdateEmail } from '@/lib/email';
 import { formatAge } from '@/lib/dateUtils';
 import mongoose, { Types } from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 async function getAuthenticatedUser() {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) return null;
@@ -39,7 +41,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const pendingRequests = await Invitation.find({
         petId: id,
         type: 'removal',
-        status: 'pending'
+        status: 'pending',
+        expiresAt: { $gt: new Date() }
     });
 
     const petObj = pet.toObject();
@@ -47,7 +50,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     // Enrich owners with pending removal status
     petObj.owners = petObj.owners.map((owner: any) => ({
         ...owner,
-        hasPendingRemoval: pendingRequests.some(req => req.email === owner.email)
+        hasPendingRemoval: pendingRequests.some(req => req.email.toLowerCase() === owner.email.toLowerCase())
     }));
 
     return NextResponse.json(petObj);

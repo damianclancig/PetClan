@@ -62,16 +62,15 @@ export function HealthTimeline({
 
   // Inject "Death" event if exists (most recent usually)
   if (petDeathDate) {
-    const deathDateObj = new Date(petDeathDate)
     sortedRecords.unshift({
       _id: 'death-event',
       type: 'death_event' as any,
       title: t('Timeline.deathTitle'),
       description: t('Timeline.deathDesc'),
-      appliedAt: deathDateObj,
+      appliedAt: petDeathDate,
       petId: petId as any,
       createdBy: 'system' as any,
-      createdAt: deathDateObj,
+      createdAt: petDeathDate,
       version: 1,
       isSystemEvent: true,
     } as any)

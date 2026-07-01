@@ -125,7 +125,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
         if (title.includes('Accepted') || title.includes('Aceptada') || title.includes('Aceita') || title === 'INVITATION_ACCEPTED' || msg.startsWith('INVITATION_ACCEPTED|')) return <IconCheck size={45} stroke={1.5} />;
         if (title.includes('Rejected') || title.includes('Rechazada') || title.includes('Rejeitada') || title === 'INVITATION_REJECTED' || msg.startsWith('INVITATION_REJECTED|')) return <IconX size={45} stroke={1.5} />;
         if (title.includes('Updated') || title.includes('Actualizado') || title.includes('Atualizado') || title === 'PET_UPDATED_TITLE' || msg.startsWith('PET_UPDATE_V2|')) return <IconEdit size={45} stroke={1.5} />;
-        if (title.includes('Record') || title.includes('Registro') || title === 'REMOVE_REQUEST' || msg.startsWith('REMOVE_REQUEST|')) return <IconStethoscope size={45} stroke={1.5} />;
+        if (title.includes('Record') || title.includes('Registro') || title === 'REMOVE_REQUEST' || msg.startsWith('REMOVE_REQUEST|') || msg.startsWith('REMOVE_REQUEST_EXPIRED|')) return <IconStethoscope size={45} stroke={1.5} />;
         return <IconInfoCircle size={45} stroke={1.5} />;
     };
 
@@ -136,7 +136,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
         if (title.includes('Accepted') || title.includes('Aceptada') || title.includes('Aceita') || title === 'INVITATION_ACCEPTED' || msg.startsWith('INVITATION_ACCEPTED|')) return 'green';
         if (title.includes('Rejected') || title.includes('Rechazada') || title.includes('Rejeitada') || title === 'INVITATION_REJECTED' || msg.startsWith('INVITATION_REJECTED|')) return 'red';
         if (title.includes('Updated') || title.includes('Actualizado') || title.includes('Atualizado') || title === 'PET_UPDATED_TITLE' || msg.startsWith('PET_UPDATE_V2|')) return 'blue';
-        if (title.includes('Record') || title.includes('Registro') || title === 'REMOVE_REQUEST' || msg.startsWith('REMOVE_REQUEST|')) return 'teal';
+        if (title.includes('Record') || title.includes('Registro') || title === 'REMOVE_REQUEST' || msg.startsWith('REMOVE_REQUEST|') || msg.startsWith('REMOVE_REQUEST_EXPIRED|')) return 'teal';
         return 'cyan';
     };
 
@@ -209,7 +209,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
             const type = parts[0];
             let content = notification.message;
 
-            if (type === 'INVITATION_NEW' || type === 'INVITATION_ACCEPTED' || type === 'INVITATION_REJECTED' || type === 'REMOVE_REQUEST') {
+            if (type === 'INVITATION_NEW' || type === 'INVITATION_ACCEPTED' || type === 'INVITATION_REJECTED' || type === 'REMOVE_REQUEST' || type === 'REMOVE_REQUEST_EXPIRED') {
                 const name = parts[1] || '';
                 const pet = parts[2] || '';
                 let key = type.toLowerCase();
@@ -305,6 +305,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
                             if (notification.title === 'INVITATION_NEW' || notification.message.startsWith('INVITATION_NEW|')) return t('invitation_title');
                             if (notification.title === 'INVITATION_ACCEPTED' || notification.message.startsWith('INVITATION_ACCEPTED|')) return t('invitation_accepted_title');
                             if (notification.title === 'INVITATION_REJECTED' || notification.message.startsWith('INVITATION_REJECTED|')) return t('invitation_rejected_title');
+                            if (notification.message.startsWith('REMOVE_REQUEST_EXPIRED|')) return t('remove_request_expired_title');
                             if (notification.title === 'REMOVE_REQUEST' || notification.message.startsWith('REMOVE_REQUEST|')) return t('remove_request_title');
                             return notification.title;
                         })()}

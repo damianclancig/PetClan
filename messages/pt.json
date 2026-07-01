@@ -553,6 +553,7 @@
       "linkCopied": "Link Copiado",
       "cafecito": "Me pague um Café",
       "paypal": "Colaborar com PayPal",
+      "mercadopago": "Doar com Mercado Pago",
       "portfolio": "Visitar meu Portfólio",
       "github": "Ver no GitHub"
     }
@@ -710,22 +711,23 @@
       "title": "Entrar | PetClan",
       "description": "Acesse sua conta PetClan para gerenciar a saúde de seus pets.",
       "keywords": "login, entrar, petclan, pets"
+    }
+  },
+  "Errors": {
+    "NotFound": {
+      "title": "Ops! Não encontramos o que você estava procurando",
+      "description": "Parece que a página que você está tentando visitar não existe ou foi movida. Nossos amigos peludos estão farejando o problema.",
+      "button": "Voltar ao Início"
     },
-    "Errors": {
-      "NotFound": {
-        "title": "Ops! Não encontramos o que você estava procurando",
-        "description": "Parece que a página que você está tentando visitar não existe ou foi movida. Nossos amigos peludos estão farejando o problema.",
-        "button": "Voltar ao Início"
-      },
-      "ServerError": {
-        "title": "Algo deu errado",
-        "description": "Estamos tendo alguns problemas técnicos. Nossos veterinários de sistemas já estão trabalhando nisso.",
-        "button": "Tentar Novamente"
-      },
-      "PetNotFound": {
-        "title": "Pet não encontrado",
-        "description": "Desculpe, não conseguimos encontrar as informações deste pet. O link pode estar incorreto ou o pet pode não estar mais disponível."
-      }
+    "ServerError": {
+      "title": "Algo deu errado",
+      "description": "Estamos tendo alguns problemas técnicos. Nossos veterinários de sistemas já estão trabalhando nisso.",
+      "button": "Tentar Novamente",
+      "backHome": "Voltar ao Início"
+    },
+    "PetNotFound": {
+      "title": "Pet não encontrado",
+      "description": "Desculpe, não conseguimos encontrar as informações deste pet. O link pode estar incorreto ou o pet pode não estar mais disponível."
     }
   },
   "PublicPet": {
@@ -801,6 +803,8 @@
     "invitation_rejected_title": "Convite Rejeitado",
     "invitation_rejected_message": "{name} rejeitou seu convite para {pet}",
     "remove_request_title": "Solicitação de Baixa",
-    "remove_request_message": "{name} solicita que você deixe de ser proprietário de {pet}"
+    "remove_request_message": "{name} solicita que você deixe de ser proprietário de {pet}",
+    "remove_request_expired_title": "Solicitação de Remoção Expirada",
+    "remove_request_expired_message": "A solicitação de remoção de {pet} expirou após 72 horas sem resposta."
   }
 }

@@ -67,6 +67,7 @@
 - **🛡️ Protección de Datos**: Control de acceso basado en roles y relaciones (owner, co-owner).
 - **🔑 Tokens Seguros**: Sistema de invitaciones y compartición con tokens encriptados.
 - **📜 Páginas Legales**: Implementación completa de **Términos y Condiciones** y **Política de Privacidad** (requerimiento de Google OAuth) con navegación inteligente.
+- **📈 Monitoreo y Logging Unificado**: Sistema robusto de observabilidad en servidor con Pino para trazabilidad de errores sin exponer datos sensibles.
 
 ---
 
@@ -126,6 +127,7 @@ PetClan está construido sobre un stack moderno, escalable y eficiente que garan
 - **TypeScript Compiler** - Verificación de tipos estricta
 
 ### 📱 Extras & Utilidades
+- **[Pino 10.3.1](https://getpino.io/)** - Sistema unificado de logging estructurado de alto rendimiento para monitoreo y depuración de servidor
 - **[react-qr-code 2.0.18](https://github.com/rosskhanas/react-qr-code)** - Generación de códigos QR
 - **Cloudinary** - Almacenamiento y optimización de imágenes
 - **Maileroo** - Servicio de emails transaccionales
@@ -246,7 +248,8 @@ PetClan/
 │   │   ├── dewormingLogic.ts             # Lógica de desparasitación
 │   │   ├── veterinaryRules.ts            # Reglas veterinarias
 │   │   ├── recordUtils.ts                # Utils de registros
-│   │   └── pet-identity.ts               # Identidad de mascotas
+│   │   ├── pet-identity.ts               # Identidad de mascotas
+│   │   └── server-logger.ts              # Logger unificado de servidor (Pino)
 │   ├── 📁 types/                        # Definiciones de tipos
 │   │   ├── dashboard.ts                  # Tipos del dashboard
 │   │   └── next-auth.d.ts                # Extensiones de NextAuth
@@ -363,7 +366,7 @@ Sigue estos pasos para correr el proyecto localmente:
 
 Asegúrate de tener instalado:
 - **Node.js 18+** (Recomendado: LTS 20.x)
-- **npm 9+** o **yarn 1.22+**
+- **pnpm 11+** (o npm/yarn)
 - **MongoDB** (Local o cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
 - **Git** para clonar el repositorio
 
@@ -377,9 +380,7 @@ cd PetClan
 ### 📦 2. Instalar Dependencias
 
 ```bash
-npm install
-# o
-yarn install
+pnpm install
 ```
 
 ### 🔐 3. Configurar Variables de Entorno
@@ -433,6 +434,7 @@ MAILEROO_FROM_EMAIL=no-reply@tudominio.com
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 NEXT_PUBLIC_CAFECITO_USER=tu-usuario-cafecito
 NEXT_PUBLIC_PAYPAL_URL=https://paypal.me/tuusuario
+NEXT_PUBLIC_MERCADOPAGO_URL=https://link.mercadopago.com.ar/tu-enlace
 NEXT_PUBLIC_PORTFOLIO_URL=https://tuportfolio.com
 NEXT_PUBLIC_GITHUB_REPO_URL=https://github.com/damianclancig/PetClan
 
@@ -448,9 +450,7 @@ CLOUDINARY_API_SECRET=tu-api-secret
 ### 🚀 4. Iniciar Servidor de Desarrollo
 
 ```bash
-npm run dev
-# o
-yarn dev
+pnpm dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
@@ -461,14 +461,14 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la 
 
 ```bash
 # 🚀 Desarrollo
-npm run dev          # Inicia servidor de desarrollo (http://localhost:3000)
+pnpm dev             # Inicia servidor de desarrollo (http://localhost:3000)
 
 # 🏗️ Producción
-npm run build        # Genera build optimizado para producción
-npm run start        # Inicia servidor de producción
+pnpm build           # Genera build optimizado para producción
+pnpm start           # Inicia servidor de producción
 
 # 🧹 Linting
-npm run lint         # Ejecuta ESLint para verificar código
+pnpm lint            # Ejecuta ESLint para verificar código
 ```
 
 ---
@@ -648,7 +648,8 @@ Si te gusta PetClan y quieres apoyar su desarrollo:
 - 🐛 Reporta bugs y sugiere mejoras
 - 🤝 Contribuye con código
 - ☕ Invítame un café en [Cafecito](https://cafecito.app/damianclancig)
-- 💙 Comparte el proyecto con otros amantes de las mascotas
+- 💙 Colabora fácilmente con [Mercado Pago](https://link.mercadopago.com.ar/clancigfullstackdev) o [PayPal](https://paypal.me/Clancig)
+- 📢 Comparte el proyecto con otros amantes de las mascotas
 
 ---
 

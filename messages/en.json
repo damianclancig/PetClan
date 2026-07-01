@@ -553,6 +553,7 @@
       "linkCopied": "Link Copied",
       "cafecito": "Buy me a Coffee",
       "paypal": "Support via PayPal",
+      "mercadopago": "Donate with Mercado Pago",
       "portfolio": "Visit my Portfolio",
       "github": "View on GitHub"
     }
@@ -721,7 +722,8 @@
     "ServerError": {
       "title": "Something went wrong",
       "description": "We are having some technical issues. Our system vets are already working on it.",
-      "button": "Try Again"
+      "button": "Try Again",
+      "backHome": "Back to Home"
     },
     "PetNotFound": {
       "title": "Pet Not Found",
@@ -801,6 +803,8 @@
     "invitation_rejected_title": "Invitation Rejected",
     "invitation_rejected_message": "{name} rejected your invitation for {pet}",
     "remove_request_title": "Removal Request",
-    "remove_request_message": "{name} requests that you stop being an owner of {pet}"
+    "remove_request_message": "{name} requests that you stop being an owner of {pet}",
+    "remove_request_expired_title": "Ownership Removal Request Expired",
+    "remove_request_expired_message": "The ownership removal request for {pet} has expired after 72 hours with no response."
   }
 }

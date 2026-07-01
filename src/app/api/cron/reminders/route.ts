@@ -4,7 +4,8 @@ import HealthRecord from '@/models/HealthRecord';
 import Pet from '@/models/Pet';
 import User from '@/models/User';
 import Notification from '@/models/Notification';
-import { sendReminderEmail } from '@/lib/email';
+import { sendReminderEmail, sendRemovalExpiredEmail } from '@/lib/email';
+import Invitation from '@/models/Invitation';
 import { getTomorrowRange, now } from '@/lib/dateUtils';
 import dayjs from 'dayjs';
 import { getVaccinationStatus } from '@/utils/vaccinationLogic';
@@ -33,21 +34,17 @@ export async function GET(request: Request) {
 
         for (const record of recordsDueTomorrow) {
             const pet = record.petId as any;
-            if (!pet) continue;
+            if (!pet || pet.status === 'archived' || pet.status === 'deceased') continue;
 
             // Notify ALL owners
-            // We need to fetch owners if not populated in Pet (Pet model usually has IDs)
-            // But HealthRecord.populate('petId') populates the Pet document.
-            // Be careful: pet.owners might be just IDs.
-
-            // Let's assume pet.owners are IDs.
             const owners = await User.find({ _id: { $in: pet.owners } });
 
             for (const owner of owners) {
-                // Email (Only if we want to span all owners, originally was just creator)
-                // Let's keep original behavior for Email (or upgrade? User asked for notification system updates).
-                // Let's send Email to ALL owners for robustness.
-                if (owner.email && record.nextDueAt) {
+                const wantsEmail = owner.notificationPreferences?.email !== false;
+                const wantsInApp = owner.notificationPreferences?.inApp !== false;
+
+                // Email
+                if (wantsEmail && owner.email && record.nextDueAt) {
                     await sendReminderEmail(
                         { email: owner.email, name: owner.name },
                         pet.name,
@@ -58,14 +55,16 @@ export async function GET(request: Request) {
                 }
 
                 // In-App Notification
-                await Notification.create({
-                    userId: owner._id,
-                    type: 'health',
-                    title: 'Recordatorio de Salud',
-                    message: `Mañana vence: ${record.title} para ${pet.name}.`,
-                    link: `/dashboard/pets/${pet._id}`
-                });
-                pNotificationsCreated++;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: owner._id,
+                        type: 'health',
+                        title: 'Recordatorio de Salud',
+                        message: `Mañana vence: ${record.title} para ${pet.name}.`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                    pNotificationsCreated++;
+                }
             }
         }
 
@@ -81,18 +80,21 @@ export async function GET(request: Request) {
 
         for (const record of recordsOverdue) {
             const pet = record.petId as any;
-            if (!pet) continue;
+            if (!pet || pet.status === 'archived' || pet.status === 'deceased') continue;
             const owners = await User.find({ _id: { $in: pet.owners } });
 
             for (const owner of owners) {
-                await Notification.create({
-                    userId: owner._id,
-                    type: 'health',
-                    title: 'Vacuna Vencida',
-                    message: `La vacuna ${record.title} de ${pet.name} venció ayer. ¡Actualízala!`,
-                    link: `/dashboard/pets/${pet._id}`
-                });
-                pNotificationsCreated++;
+                const wantsInApp = owner.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: owner._id,
+                        type: 'health',
+                        title: 'Vacuna Vencida',
+                        message: `La vacuna ${record.title} de ${pet.name} venció ayer. ¡Actualízala!`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                    pNotificationsCreated++;
+                }
             }
         }
 
@@ -105,6 +107,11 @@ export async function GET(request: Request) {
         const day = today.date();
 
         const birthdayPets = await Pet.aggregate([
+            {
+                $match: {
+                    status: { $nin: ['archived', 'deceased'] }
+                }
+            },
             {
                 $project: {
                     name: 1,
@@ -124,14 +131,17 @@ export async function GET(request: Request) {
         for (const pet of birthdayPets) {
             const owners = await User.find({ _id: { $in: pet.owners } });
             for (const owner of owners) {
-                await Notification.create({
-                    userId: owner._id,
-                    type: 'social',
-                    title: '¡Feliz Cumpleaños! 🎂',
-                    message: `Hoy es el cumpleaños de ${pet.name}. ¡Dale un abrazo de nuestra parte!`,
-                    link: `/dashboard/pets/${pet._id}`
-                });
-                pNotificationsCreated++;
+                const wantsInApp = owner.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: owner._id,
+                        type: 'social',
+                        title: '¡Feliz Cumpleaños! 🎂',
+                        message: `Hoy es el cumpleaños de ${pet.name}. ¡Dale un abrazo de nuestra parte!`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                    pNotificationsCreated++;
+                }
             }
         }
 
@@ -248,6 +258,92 @@ export async function GET(request: Request) {
                             pNotificationsCreated++;
                         }
                     }
+                }
+            }
+        }
+
+        // --- 5. Clean up expired removal requests ---
+        const expiredRemovals = await Invitation.find({
+            type: 'removal',
+            status: 'pending',
+            expiresAt: { $lte: new Date() }
+        }).populate('inviterId');
+
+        for (const request of expiredRemovals) {
+            request.status = 'expired';
+            await request.save();
+
+            const requester = request.inviterId as any;
+            const pet = await Pet.findById(request.petId);
+            if (!pet) continue;
+
+            const targetUser = await User.findOne({ email: request.email });
+
+            // A. Notify Requester (Inviter)
+            if (requester) {
+                const wantsInApp = requester.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: requester._id,
+                        type: 'social',
+                        title: 'REMOVE_REQUEST_EXPIRED',
+                        message: `REMOVE_REQUEST_EXPIRED|${pet.name}|${requester.name}|${targetUser?.name || request.email}`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                }
+
+                const wantsEmail = requester.notificationPreferences?.email !== false;
+                if (wantsEmail && requester.email && requester.name) {
+                    try {
+                        await sendRemovalExpiredEmail(
+                            requester.email,
+                            requester.name,
+                            targetUser?.name || request.email,
+                            pet.name,
+                            true // isRequester
+                        );
+                    } catch (e) {
+                        console.error('[CRON] Error sending expired email to requester:', e);
+                    }
+                }
+            }
+
+            // B. Notify Target User
+            if (targetUser) {
+                const wantsInApp = targetUser.notificationPreferences?.inApp !== false;
+                if (wantsInApp) {
+                    await Notification.create({
+                        userId: targetUser._id,
+                        type: 'social',
+                        title: 'REMOVE_REQUEST_EXPIRED',
+                        message: `REMOVE_REQUEST_EXPIRED|${pet.name}|${requester?.name || 'Otro usuario'}|${targetUser.name}`,
+                        link: `/dashboard/pets/${pet._id}`
+                    });
+                }
+
+                const wantsEmail = targetUser.notificationPreferences?.email !== false;
+                if (wantsEmail && targetUser.email && targetUser.name) {
+                    try {
+                        await sendRemovalExpiredEmail(
+                            targetUser.email,
+                            targetUser.name,
+                            requester?.name || 'Otro usuario',
+                            pet.name,
+                            false // isRequester = false
+                        );
+                    } catch (e) {
+                        console.error('[CRON] Error sending expired email to target:', e);
+                    }
+                }
+
+                // Auto-delete the pending removal request notification for target user
+                try {
+                    await Notification.findOneAndDelete({
+                        userId: targetUser._id,
+                        link: { $regex: new RegExp(`/requests/${request.token}$`) }
+                    });
+                } catch (e) {
+                    console.error('[CRON] Failed to delete target pending notification:', e);
                 }
             }
         }

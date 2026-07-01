@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Group } from '@mantine/core';
+import { Button, Flex } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -93,11 +93,20 @@ export default function NotificationActions({ notificationId, actionType, action
     };
 
     return (
-        <Group justify="center" mt="xl" gap="md">
+        <Flex 
+            direction={{ base: 'column-reverse', sm: 'row' }} 
+            gap="md" 
+            mt="xl" 
+            justify="center"
+            align={{ base: 'stretch', sm: 'center' }}
+            w="100%"
+        >
             <Button
                 variant="default"
                 size="md"
                 radius="xl"
+                w={{ base: '100%', sm: 'auto' }}
+                miw={{ sm: 160 }}
                 leftSection={<IconArrowLeft size={18} />}
                 onClick={() => router.push('/dashboard')}
                 disabled={isPending}
@@ -112,6 +121,8 @@ export default function NotificationActions({ notificationId, actionType, action
                         color="red"
                         size="md"
                         radius="xl"
+                        w={{ base: '100%', sm: 'auto' }}
+                        miw={{ sm: 160 }}
                         leftSection={<IconX size={18} />}
                         loading={isPending}
                         onClick={() => handleAction('reject')}
@@ -123,6 +134,8 @@ export default function NotificationActions({ notificationId, actionType, action
                         color="green"
                         size="md"
                         radius="xl"
+                        w={{ base: '100%', sm: 'auto' }}
+                        miw={{ sm: 160 }}
                         leftSection={<IconCheck size={18} />}
                         loading={isPending}
                         onClick={() => handleAction('accept')}
@@ -136,6 +149,8 @@ export default function NotificationActions({ notificationId, actionType, action
                     color="red"
                     size="md"
                     radius="xl"
+                    w={{ base: '100%', sm: 'auto' }}
+                    miw={{ sm: 160 }}
                     leftSection={<IconTrash size={18} />}
                     loading={isPending}
                     onClick={handleDelete}
@@ -143,7 +158,7 @@ export default function NotificationActions({ notificationId, actionType, action
                     {t('delete')}
                 </Button>
             )}
-        </Group>
+        </Flex>
     );
 }
 
