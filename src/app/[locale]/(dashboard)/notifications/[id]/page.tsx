@@ -25,29 +25,10 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { Link } from '@/i18n/routing';
 import { getTranslations } from 'next-intl/server';
+import { PetClanLogo } from '@/components/ui/PetClanLogo';
 import dayjs from 'dayjs';
 
-import dbConnect from '@/lib/mongodb';
-import NotificationModel, { INotification } from '@/models/Notification';
-import User from '@/models/User';
-
-async function getNotification(id: string, userEmail: string): Promise<INotification | null> {
-    try {
-        await dbConnect();
-        const currentUser = await User.findOne({ email: userEmail });
-        if (!currentUser) return null;
-
-        const notification = await NotificationModel.findOne({ _id: id, userId: currentUser._id });
-        if (!notification) return null;
-
-        // Ensure we pass a plain object to the client component if needed, 
-        // though here we just render it directly.
-        return typeof notification.toObject === 'function' ? notification.toObject() : notification;
-    } catch (e) {
-        console.error("Error fetching notification", e);
-        return null;
-    }
-}
+import { NotificationService } from '@/services/NotificationService';
 
 export default async function NotificationPage({ params }: { params: Promise<{ id: string, locale: string }> }) {
     const { id, locale } = await params;
@@ -62,7 +43,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
         redirect(`/api/auth/signin?callbackUrl=/notifications/${id}`);
     }
 
-    const notification = await getNotification(id, session.user.email);
+    const notification = await NotificationService.getNotificationForUser(id, session.user.email);
 
     // Render Function Layout to keep it DRY
     const renderLayout = (children: React.ReactNode) => (
@@ -74,18 +55,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
                 <Group justify="space-between" mb="xl" gap="xs">
                     <Link href="/dashboard" style={{ textDecoration: 'none' }}>
                         <UnstyledButton>
-                            <Group gap="xs">
-                                <Box w={34} h={34} style={{ position: 'relative' }}>
-                                    <img src="/assets/logo-icon.png" alt="PetClan Isotype" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                </Box>
-                                <Box w={{ base: 100, sm: 140 }} h={40} style={{ position: 'relative' }}>
-                                    <img
-                                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
-                                        alt="PetClan"
-                                        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
-                                    />
-                                </Box>
-                            </Group>
+                            <PetClanLogo textWidth={{ base: 100, sm: 140 }} textHeight={40} priority />
                         </UnstyledButton>
                     </Link>
 
@@ -253,7 +223,7 @@ export default async function NotificationPage({ params }: { params: Promise<{ i
         }
 
         const intro = lines[0];
-        const changes = lines.slice(1).filter(l => l.trim().startsWith('•'));
+        const changes = lines.slice(1).filter((l: string) => l.trim().startsWith('•'));
 
         return (
             <Stack gap="md" w="100%">

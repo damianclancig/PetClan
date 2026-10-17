@@ -265,7 +265,7 @@ export function PetProfileHeader({ pet, activeTab, onTabChange, onShare, onAddRe
                     </Container>
 
                     {/* Back Button Top Left */}
-                    <HoverScale className="absolute top-4 left-4" style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
+                    <HoverScale style={{ position: 'absolute', top: 16, left: 16, zIndex: 10 }}>
                         <MagicParticles color={`var(--mantine-color-${identityColor}-2)`}>
                             <Button
                                 component={Link}

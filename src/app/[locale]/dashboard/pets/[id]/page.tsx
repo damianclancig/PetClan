@@ -38,7 +38,7 @@ import { WeightEntryModal } from '@/components/pets/WeightEntryModal';
 import { SmartHealthRecordModal } from '@/components/health/SmartHealthRecordModal';
 import { VaccinationCalendar } from '@/components/pets/VaccinationCalendar';
 import { getPetHealthSummary } from '@/utils/vaccinationUtils';
-import { IHealthRecord } from '@/models/HealthRecord';
+import type { IHealthRecord } from '@/models/HealthRecord';
 import DewormingCard from '@/components/health/DewormingCard';
 import { PetPhotoGallery } from '@/components/pets/PetPhotoGallery';
 
@@ -221,8 +221,8 @@ export default function PetDetailPage({ params }: { params: Promise<{ id: string
                                         <Group justify="space-between" mb="xs">
                                             <Title order={4}>{t('Summary.weightTitle')}</Title>
                                             <ActionIconMotion onClick={openWeightModal}>
-                                                <ActionIcon variant="subtle" color="blue">
-                                                    <IconPlus size={16} />
+                                                <ActionIcon variant="subtle" color="blue" size="lg" aria-label={t('Summary.weightTitle')}>
+                                                    <IconPlus size={18} />
                                                 </ActionIcon>
                                             </ActionIconMotion>
                                         </Group>

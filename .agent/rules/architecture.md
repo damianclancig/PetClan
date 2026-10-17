@@ -2,27 +2,27 @@
 trigger: always_on
 ---
 
-# Skill: Software Architecture & Clean Code (SOLID/DRY)
+# Rule: Software Architecture & Clean Code (SOLID/DRY/KISS)
 
 ## Role & Context
-Eres un desarrollador Senior especializado en arquitecturas escalables. Tu prioridad absoluta es mantener el codebase de PetClan limpio, mantenible y libre de redundancias.
+Estándares de arquitectura escalable y código limpio para PetClan (Next.js 16, React 19, TypeScript, Mantine 8 y MongoDB/Mongoose 9). Prioridad absoluta en simplicidad, mantenibilidad y ausencia de sobre-ingeniería.
 
-## Core Principles to Enforce
+## 1. Principios de Diseño: KISS vs DRY
+- **Regla de Tres para DRY**: No abstraigas prematuramente. Aplica la regla: "La primera vez se escribe, la segunda se duplica (KISS), la tercera se refactoriza y se abstrae (DRY)".
+- **Evita la Abstracción Compleja**: Es preferible la duplicación temporal antes que una abstracción incorrecta o acoplada. Si una función o componente requiere más de 3 props o parámetros para cubrir casos de borde, la abstracción falló; divídela en piezas simples.
+- **Legibilidad sobre Concisión**: El código debe leerse como prosa clara. Evita one-liners crípticos.
+- **Estandarización de Fechas**: Mantine 8 depende internamente de `dayjs`. Prioriza `dayjs` sobre `date-fns` en nuevos desarrollos para evitar duplicidad de bundles en el cliente.
 
-### 1. DRY (Don't Repeat Yourself)
-- **Search Before Coding**: Antes de generar cualquier lógica o utilidad, busca en `src/utils`, `src/hooks`, o `src/services` si ya existe una solución similar.
-- **Abstraction**: Si detectas que una lógica se repite en más de dos lugares, propón una abstracción (Custom Hook o Utility function) en lugar de duplicar el código.
+## 2. Componentes y Separación Server/Client
+- **Single Responsibility Principle (SRP)**:
+  - Los componentes de React se encargan únicamente de la presentación y la orquestación mínima.
+  - Extrae lógica compleja de mutaciones, estado o cálculo a custom hooks (`src/hooks/`) o servicios en el servidor.
+- **Separación Server/Client**:
+  - Los componentes de React deben ser Server Components por defecto.
+  - Usa `'use client'` únicamente cuando exista interactividad (hooks, listeners de eventos o estado local).
+  - En vistas con Mantine, sitúa `'use client'` en los límites hoja interactivos o en contenedores de layout dedicados (`PageContainer`, `DashboardShell`).
 
-### 2. Single Responsibility Principle (SRP)
-- **Component Limits**: Los componentes de React deben encargarse únicamente de la presentación y la orquestación mínima.
-- **Logic Extraction**: Extrae toda la lógica compleja, cálculos de datos o efectos secundarios a Custom Hooks dedicados.
-- **File Purpose**: Cada archivo debe tener un único propósito. No mezcles lógica de validación, llamadas a API y estilos en el mismo archivo del componente.
-
-### 3. SOLID Compliance
-- **Open/Closed**: Diseña componentes que se puedan extender (vía props) sin necesidad de modificar su código fuente interno.
-- **Dependency Inversion**: Los componentes no deben depender de implementaciones concretas de Firebase o Azure directamente; utiliza la capa de servicios o el contexto de la aplicación.
-
-## Workflow Rules
-- Si el usuario te pide una funcionalidad que rompería estos principios, debes advertirle primero y proponer la alternativa "limpia".
-- Al realizar refactorizaciones, asegúrate de que el código resultante sea más legible y escalable que el anterior.
-- Analiza el código dos veces y cuestionate la solucion que apliques si cumplen con los requisitos y que no tengan errores.
+## 3. Capa de Acceso a Datos y Persistencia
+- **Aislamiento de Modelos**: Queda prohibido instanciar o consultar modelos de Mongoose directamente dentro de componentes de presentación. Toda consulta o mutación debe residir en `src/services/` o en Server Actions dedicadas.
+- **Manejo de Conexiones Serverless**: Cualquier interacción con MongoDB debe reutilizar la conexión singleton cacheada importada desde `src/lib/mongodb.ts` para no saturar el pool de conexiones.
+- **Tipado y Serialización de IDs**: Al transferir datos desde Server Components o servicios a Client Components, serializa siempre los `ObjectId` de MongoDB a `string` (`_id.toString()`) para evitar errores de hidratación y serialización de Next.js.

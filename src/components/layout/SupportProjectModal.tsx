@@ -15,6 +15,7 @@
  */
 
 import { Modal, Text, Button, Stack, Group, ThemeIcon, CopyButton, ModalProps, Divider, Box, Center } from '@mantine/core';
+import Image from 'next/image';
 import { IconCoffee, IconBrandPaypal, IconBrandGithub, IconBriefcase, IconCopy, IconCheck, IconHeart } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 
@@ -98,10 +99,13 @@ export function SupportProjectModal({ opened, onClose, ...props }: SupportProjec
                         color="cyan" // MercadoPago blue-ish
                         fullWidth
                         leftSection={
-                            <img
+                            <Image
                                 src="/assets/mp.svg"
                                 alt="Mercado Pago"
+                                width={22}
+                                height={18}
                                 style={{ height: 18, width: 'auto', filter: 'brightness(0) invert(1)' }}
+                                unoptimized
                             />
                         }
                         variant="filled"

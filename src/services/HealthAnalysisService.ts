@@ -16,7 +16,7 @@
 
 import { IPet } from '@/models/Pet';
 import { IHealthRecord } from '@/models/HealthRecord';
-import { differenceInCalendarDays } from 'date-fns';
+import dayjs from 'dayjs';
 import { VeterinaryRules, VET_RULES } from '@/utils/veterinaryRules';
 import { getPetAge } from '@/lib/dateUtils';
 import { VeterinaryStatusService, CategoryStatus } from './VeterinaryStatusService';
@@ -94,7 +94,7 @@ export class HealthAnalysisService {
                 : VET_RULES.WEIGHT.PUPPY_DAYS;
         }
 
-        const daysSinceLastUpdate = differenceInCalendarDays(today, lastUpdate);
+        const daysSinceLastUpdate = dayjs(today).startOf('day').diff(dayjs(lastUpdate).startOf('day'), 'day');
         const daysRemaining = daysThreshold - daysSinceLastUpdate;
 
         // 1. Overdue (Due today or past due)

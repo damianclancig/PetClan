@@ -33,6 +33,7 @@ import {
 import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { useDisclosure } from '@mantine/hooks';
 import { TermsOfService } from '@/components/legal/TermsOfService';
@@ -131,11 +132,16 @@ function LoginContent() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <img
-                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png"
-                        alt="PetClan Logo"
-                        style={{ width: '100%', maxWidth: '300px', height: 'auto', objectFit: 'contain' }}
-                    />
+                    <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '180px', margin: '0 auto' }}>
+                        <Image
+                            src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png"
+                            alt="PetClan Logo"
+                            fill
+                            sizes="300px"
+                            style={{ objectFit: 'contain' }}
+                            priority
+                        />
+                    </div>
                     <Text size="xl" mt="xl" maw={400} ta="center" style={{ opacity: 0.9 }}>
                         {tAuth('loginSubtitle')}
                     </Text>
@@ -191,11 +197,16 @@ function LoginContent() {
                             }}
                         >
                             <Stack align="center" mb={30}>
-                                <img
-                                    src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png"
-                                    alt="PetClan"
-                                    style={{ height: '120px', objectFit: 'contain' }}
-                                />
+                                <div style={{ position: 'relative', width: '180px', height: '110px' }}>
+                                    <Image
+                                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png"
+                                        alt="PetClan"
+                                        fill
+                                        sizes="180px"
+                                        style={{ objectFit: 'contain' }}
+                                        priority
+                                    />
+                                </div>
                                 <Text c="dimmed" size="sm" ta="center" mt="sm">
                                     {tAuth('continueMessage')}
                                 </Text>

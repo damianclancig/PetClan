@@ -27,7 +27,7 @@ import esMessages from '../../messages/es.json';
 function NotFoundContent() {
     const t = useTranslations('Errors.NotFound');
     return (
-        <Container className="h-screen flex items-center justify-center" size="lg">
+        <Container size="lg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Stack align="center" gap="xl">
                 <div style={{ position: 'relative', width: '100%', maxWidth: 500, aspectRatio: '4/3' }}>
                     <Image

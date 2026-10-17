@@ -42,7 +42,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
         <html lang="es">
             <body>
                 <Providers messages={esMessages} locale="es">
-                    <Container className="h-screen flex items-center justify-center" size="lg">
+                    <Container size="lg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Stack align="center" gap="xl">
                             <div style={{ position: 'relative', width: '100%', maxWidth: 500, aspectRatio: '4/3' }}>
                                 <Image

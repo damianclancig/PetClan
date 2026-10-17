@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { addDays, addMonths, addYears, differenceInMonths, differenceInDays } from 'date-fns';
 import { IHealthRecord } from '@/models/HealthRecord';
 import dayjs from 'dayjs';
 import { getPetAge } from '@/lib/dateUtils';
@@ -377,30 +376,30 @@ export const VeterinaryRules = {
         appliedAt: Date,
         birthDate: Date
     ): Date {
-        const ageAtApplication = differenceInMonths(appliedAt, birthDate);
+        const ageAtApplication = dayjs(appliedAt).diff(dayjs(birthDate), 'month');
         const isPuppy = ageAtApplication < 12; // Simple threshold
 
         if (type === 'deworming') {
             if (subtype.includes('external')) {
-                return addMonths(appliedAt, VET_RULES.DEWORMING.EXTERNAL.DEFAULT_MONTHS);
+                return dayjs(appliedAt).add(VET_RULES.DEWORMING.EXTERNAL.DEFAULT_MONTHS, 'month').toDate();
             }
             // Internal
             if (isPuppy) {
                 // Determine if very young (less than 2 months) -> 15 days
-                if (ageAtApplication < 2) return addDays(appliedAt, VET_RULES.DEWORMING.INTERNAL.PUPPY_DAYS);
+                if (ageAtApplication < 2) return dayjs(appliedAt).add(VET_RULES.DEWORMING.INTERNAL.PUPPY_DAYS, 'day').toDate();
                 // 2-6 months -> Monthly
-                if (ageAtApplication < 6) return addMonths(appliedAt, 1);
+                if (ageAtApplication < 6) return dayjs(appliedAt).add(1, 'month').toDate();
                 // 6-12 months -> Quarterly (Adult schedule starts taking over, or keep monthly? Standard is monthly until 6mo, then trimestral)
-                return addMonths(appliedAt, VET_RULES.DEWORMING.INTERNAL.ADULT_MONTHS);
+                return dayjs(appliedAt).add(VET_RULES.DEWORMING.INTERNAL.ADULT_MONTHS, 'month').toDate();
             }
-            return addMonths(appliedAt, VET_RULES.DEWORMING.INTERNAL.ADULT_MONTHS);
+            return dayjs(appliedAt).add(VET_RULES.DEWORMING.INTERNAL.ADULT_MONTHS, 'month').toDate();
         }
 
         if (type === 'vaccine') {
             const normalized = this.normalizeVaccineType(subtype);
 
             if (normalized === 'rabies') {
-                return addYears(appliedAt, 1); // Always annual
+                return dayjs(appliedAt).add(1, 'year').toDate(); // Always annual
             }
 
             if (normalized === 'polyvalent') {
@@ -408,16 +407,16 @@ export const VeterinaryRules = {
                 // If puppy (<4-5 mo): typically every 21-30 days until ~4 months old.
                 // If adult: Annual.
                 if (ageAtApplication < 4) {
-                    return addDays(appliedAt, 21); // Booster soon
+                    return dayjs(appliedAt).add(21, 'day').toDate(); // Booster soon
                 }
-                return addYears(appliedAt, 1); // Annual booster
+                return dayjs(appliedAt).add(1, 'year').toDate(); // Annual booster
             }
 
             // Fallback for unknown vaccines
-            return addYears(appliedAt, 1);
+            return dayjs(appliedAt).add(1, 'year').toDate();
         }
 
-        return addYears(appliedAt, 1); // Safe default
+        return dayjs(appliedAt).add(1, 'year').toDate(); // Safe default
     },
 
     normalizeVaccineType(rawName: string): VaccineType {
@@ -431,7 +430,7 @@ export const VeterinaryRules = {
      * Determines if a pet counts as "Puppy" for frequency rules
      */
     isPuppy(birthDate: Date): boolean {
-        return differenceInMonths(new Date(), birthDate) < VET_RULES.PUPPY_AGE_MONTHS;
+        return dayjs().diff(dayjs(birthDate), 'month') < VET_RULES.PUPPY_AGE_MONTHS;
     },
 
     /**
@@ -440,14 +439,14 @@ export const VeterinaryRules = {
     isWeightValid(birthDate: Date | string, lastWeightUpdate: Date | string | undefined): boolean {
         if (!lastWeightUpdate) return false;
 
-        const today = new Date();
-        const birth = new Date(birthDate);
-        const lastUpdate = new Date(lastWeightUpdate);
+        const today = dayjs();
+        const birth = dayjs(birthDate);
+        const lastUpdate = dayjs(lastWeightUpdate);
 
-        const ageInMonths = differenceInMonths(today, birth);
-        const ageInDays = differenceInDays(today, birth);
+        const ageInMonths = today.diff(birth, 'month');
+        const ageInDays = today.diff(birth, 'day');
 
-        const daysSinceUpdate = differenceInDays(today, lastUpdate);
+        const daysSinceUpdate = today.diff(lastUpdate, 'day');
 
         // < 2 months: Valid for 7 days
         if (ageInDays < 60) return daysSinceUpdate <= VET_RULES.WEIGHT.VERY_YOUNG_PUPPY_DAYS;

@@ -221,7 +221,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                             {owners && owners.map((owner: any) => {
                                 const isMe = isCurrentUser(owner);
                                 return (
-                                    <Group key={owner._id} justify="space-between" p="xs" style={{ border: '1px solid #eee', borderRadius: '8px' }}>
+                                    <Group key={owner._id} justify="space-between" p="xs" style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: '8px' }}>
                                         <Group>
                                             <Avatar src={owner.image} radius="xl" color="cyan">
                                                 {owner.name?.charAt(0)}
@@ -236,14 +236,14 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                             owners.length === 1 ? (
                                                 <Tooltip label={tModalShare('ownersTab.onlyOwnerTooltip')}>
                                                     <span style={{ cursor: 'not-allowed', display: 'inline-block' }}>
-                                                        <ActionIcon color="gray" variant="subtle" disabled>
+                                                        <ActionIcon color="gray" variant="subtle" size="lg" disabled>
                                                             <IconLogout size={16} />
                                                         </ActionIcon>
                                                     </span>
                                                 </Tooltip>
                                             ) : (
                                                 <Tooltip label={tModalShare('leavePetTooltip')}>
-                                                    <ActionIcon color="red" variant="subtle" onClick={handleLeave}>
+                                                    <ActionIcon color="red" variant="subtle" size="lg" onClick={handleLeave}>
                                                         <IconLogout size={16} />
                                                     </ActionIcon>
                                                 </Tooltip>
@@ -266,7 +266,7 @@ export function SharePetModal({ opened, onClose, petId, petName, owners }: Share
                                             </Tooltip>
                                         ) : (
                                             <Tooltip label={tModalShare('ownersTab.requestRemoveTooltip')}>
-                                                <ActionIcon color="orange" variant="transparent" onClick={() => handleRequestRemove(owner._id, owner.name)}>
+                                                <ActionIcon color="orange" variant="subtle" size="lg" onClick={() => handleRequestRemove(owner._id, owner.name)}>
                                                     <IconUserMinus size={16} />
                                                 </ActionIcon>
                                             </Tooltip>

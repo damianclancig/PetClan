@@ -717,7 +717,8 @@
     "NotFound": {
       "title": "Ops! Não encontramos o que você estava procurando",
       "description": "Parece que a página que você está tentando visitar não existe ou foi movida. Nossos amigos peludos estão farejando o problema.",
-      "button": "Voltar ao Início"
+      "button": "Voltar ao Início",
+      "backDashboard": "Voltar ao Painel"
     },
     "ServerError": {
       "title": "Algo deu errado",

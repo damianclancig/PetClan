@@ -34,7 +34,7 @@ function ErrorContent({ reset }: { reset: () => void }) {
     const t = useTranslations('Errors.ServerError');
 
     return (
-        <Container className="h-screen flex items-center justify-center" size="lg">
+        <Container size="lg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Stack align="center" gap="xl">
                 <div style={{ position: 'relative', width: '100%', maxWidth: 500, aspectRatio: '4/3' }}>
                     <Image

@@ -34,9 +34,9 @@ function ErrorContent({ reset }: { reset: () => void }) {
     const t = useTranslations('Errors.ServerError');
 
     return (
-        <div className="relative h-screen w-full overflow-hidden">
+        <div style={{ position: 'relative', minHeight: '100vh', width: '100%', overflow: 'hidden' }}>
             <AnimatedBackground />
-            <Container className="relative h-full flex items-center justify-center" size="lg">
+            <Container size="lg" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Stack align="center" gap="xl">
                     <div style={{ position: 'relative', width: '100%', maxWidth: 500, aspectRatio: '4/3' }}>
                         <Image

@@ -25,6 +25,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { Link } from '@/i18n/routing';
 import { getTranslations } from 'next-intl/server';
+import { PetClanLogo } from '@/components/ui/PetClanLogo';
 
 async function getRequest(token: string) {
     const res = await fetch(`${process.env.NEXTAUTH_URL}/api/requests/${token}`, {
@@ -56,18 +57,7 @@ export default async function RequestPage({ params }: { params: Promise<{ token:
                 <Group justify="space-between" mb="xl" gap="xs">
                     <Link href="/dashboard" style={{ textDecoration: 'none' }}>
                         <UnstyledButton>
-                            <Group gap="xs">
-                                <Box w={34} h={34} style={{ position: 'relative' }}>
-                                    <img src="/assets/logo-icon.png" alt="PetClan Isotype" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                </Box>
-                                <Box w={{ base: 100, sm: 140 }} h={40} style={{ position: 'relative' }}>
-                                    <img
-                                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
-                                        alt="PetClan"
-                                        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
-                                    />
-                                </Box>
-                            </Group>
+                            <PetClanLogo textWidth={{ base: 100, sm: 140 }} textHeight={40} priority />
                         </UnstyledButton>
                     </Link>
 
