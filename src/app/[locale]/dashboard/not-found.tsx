@@ -18,15 +18,27 @@
 
 import { Button, Container, Title, Text, Stack } from '@mantine/core';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
-export default function NotFound() {
+export default function DashboardNotFound() {
+    const t = useTranslations('Errors.NotFound');
+
     return (
-        <Container className="h-full flex items-center justify-center" size="lg" style={{ minHeight: 'calc(100vh - 80px)' }}> {/* Adjusted height for dashboard */}
+        <Container
+            size="lg"
+            style={{
+                minHeight: 'calc(100vh - 80px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
             <Stack align="center" gap="xl">
                 <div style={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '4/3' }}>
                     <Image
                         src="/assets/images/404.png"
-                        alt="404 - Página no encontrada"
+                        alt="404"
                         fill
                         style={{ objectFit: 'contain' }}
                         priority
@@ -34,15 +46,15 @@ export default function NotFound() {
                 </div>
 
                 <Title order={1} size="h2" ta="center">
-                    ¡Ups! No encontramos lo que buscabas
+                    {t('title')}
                 </Title>
 
                 <Text c="dimmed" size="lg" ta="center" maw={500}>
-                    Parece que la página que intentas visitar no existe o ha sido movida.
+                    {t('description')}
                 </Text>
 
-                <Button component="a" href="/dashboard" size="lg" variant="light" color="teal">
-                    Volver al Dashboard
+                <Button component={Link} href="/dashboard" size="lg" variant="light" color="teal">
+                    {t('backDashboard')}
                 </Button>
             </Stack>
         </Container>

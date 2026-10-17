@@ -27,7 +27,7 @@ import { formatDateForInput } from '@/lib/dateUtils';
 import { IconAlertTriangle, IconArchive, IconTrash } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useHealthRecords } from '@/hooks/useHealthRecords';
-import { IHealthRecord } from '@/models/HealthRecord';
+import type { IHealthRecord } from '@/models/HealthRecord';
 
 export default function EditPetPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);

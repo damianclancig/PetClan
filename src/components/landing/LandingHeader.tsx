@@ -22,6 +22,7 @@ import { Link } from '@/i18n/routing';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { IconPaw } from '@tabler/icons-react';
+import { PetClanLogo } from '@/components/ui/PetClanLogo';
 
 export function LandingHeader() {
     const t = useTranslations('Landing.Header');
@@ -45,24 +46,7 @@ export function LandingHeader() {
                 <Group h="100%" justify="space-between" wrap="nowrap" gap="xs">
                     {/* Logo (izquierda) */}
                     <UnstyledButton component={Link} href="/">
-                        <Group gap="xs" wrap="nowrap">
-                            {/* Isotype */}
-                            <Box w={34} h={34} style={{ position: 'relative' }}>
-                                <img
-                                    src="/assets/logo-icon.png"
-                                    alt="PetClan Isotype"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
-                            </Box>
-                            {/* Full Logo Text - Oculto en pantallas pequeñas de móvil */}
-                            <Box w={{ base: 110, sm: 150 }} h={50} visibleFrom="sm" style={{ position: 'relative' }}>
-                                <img
-                                    src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
-                                    alt="PetClan"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
-                                />
-                            </Box>
-                        </Group>
+                        <PetClanLogo hideTextOnMobile textWidth={{ base: 110, sm: 150 }} textHeight={50} priority />
                     </UnstyledButton>
 
                     {/* Navigation links (centro) - Hidden on mobile */}

@@ -20,6 +20,7 @@ import { Container, Title, Text, Button, Group, Box, rem, ThemeIcon, Flex } from
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { motion, Variants } from 'framer-motion';
+import Image from 'next/image';
 import { IconPaw, IconHeartbeat, IconVaccine } from '@tabler/icons-react';
 
 export function HeroSection() {
@@ -102,10 +103,13 @@ export function HeroSection() {
                         <motion.div variants={itemVariants}>
                             <Box mb={20}>
                                 <div style={{ position: 'relative', width: '100%', maxWidth: 350, height: 250, margin: '0 auto' }}>
-                                    <img
+                                    <Image
                                         src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054971/PetClan/Logo_PetClan_h9vtjo.png"
                                         alt="PetClan Logo"
-                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                        fill
+                                        sizes="350px"
+                                        style={{ objectFit: 'contain' }}
+                                        priority
                                     />
                                 </div>
                             </Box>

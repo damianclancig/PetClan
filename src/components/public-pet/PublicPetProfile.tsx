@@ -30,6 +30,7 @@ import { formatAgeTranslated, formatDate } from '@/lib/dateUtils';
 import { useTranslations } from 'next-intl';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { LinkifiedText } from '@/components/ui/LinkifiedText';
+import { PetClanLogo } from '@/components/ui/PetClanLogo';
 
 interface PublicPetProfileProps {
     pet: any;
@@ -129,22 +130,7 @@ export default function PublicPetProfile({
                 {/* Top Header: Logo & Toggles */}
                 <Group justify="space-between" mb="xl" gap="xs">
                     <UnstyledButton component={Link} href="/">
-                        <Group gap="xs">
-                            <Box w={34} h={34} style={{ position: 'relative' }}>
-                                <img
-                                    src="/assets/logo-icon.png"
-                                    alt="PetClan Isotype"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
-                            </Box>
-                            <Box w={{ base: 100, sm: 140 }} h={40} style={{ position: 'relative' }}>
-                                <img
-                                    src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
-                                    alt="PetClan"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
-                                />
-                            </Box>
-                        </Group>
+                        <PetClanLogo textWidth={{ base: 100, sm: 140 }} textHeight={40} priority />
                     </UnstyledButton>
 
                     <Group gap="xs">

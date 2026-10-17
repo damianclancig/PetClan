@@ -210,7 +210,7 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                                         padding: '40px'
                                     }}
                                 >
-                                    <img
+                                    <Image
                                         src={selectedPhoto.url}
                                         alt={t('altFull')}
                                         onClick={() => {
@@ -219,15 +219,14 @@ export function PetPhotoGallery({ photos }: PetPhotoGalleryProps) {
                                                 setSelectedIndex(nextIndex);
                                             }
                                         }}
-                                        draggable={false}
+                                        fit="contain"
+                                        radius="md"
                                         style={{
                                             maxWidth: '100%',
                                             maxHeight: '100%',
-                                            objectFit: 'contain',
                                             cursor: 'pointer',
                                             userSelect: 'none',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+                                            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
                                         }}
                                     />
                                 </motion.div>

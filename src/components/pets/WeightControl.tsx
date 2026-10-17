@@ -109,7 +109,7 @@ export function WeightControl({ petId, currentWeight, history }: WeightControlPr
             <Collapse in={showHistory}>
                 <Stack gap="xs" mt="md">
                     {data.slice().reverse().map((record, i) => (
-                        <Group key={i} justify="space-between" py="xs" style={{ borderBottom: '1px solid #eee' }}>
+                        <Group key={i} justify="space-between" py="xs" style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
                             <Text size="sm">{record.date}</Text>
                             <Text size="sm" fw={600}>{record.weight} kg</Text>
                         </Group>

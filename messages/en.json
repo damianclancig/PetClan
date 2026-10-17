@@ -717,7 +717,8 @@
     "NotFound": {
       "title": "Oops! We couldn't find what you were looking for",
       "description": "It seems the page you are trying to visit doesn't exist or has been moved. Our furry friends are sniffing out the problem.",
-      "button": "Back to Home"
+      "button": "Back to Home",
+      "backDashboard": "Back to Dashboard"
     },
     "ServerError": {
       "title": "Something went wrong",

@@ -30,6 +30,7 @@ import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 import { HoverShine } from '@/components/ui/MotionWrappers';
 import { Footer } from '@/components/layout/Footer';
 import { TipsCarousel } from '@/components/ui/TipsCarousel';
+import { PetClanLogo } from '@/components/ui/PetClanLogo';
 
 export function DashboardShell({ children, user }: { children: React.ReactNode; user: any }) {
     const [opened, { toggle }] = useDisclosure();
@@ -97,24 +98,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
                     <Group wrap="nowrap" gap="xs">
                         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
                         <UnstyledButton component={Link} href="/dashboard">
-                            <Group gap="xs">
-                                {/* Isotype */}
-                                <Box w={34} h={34} style={{ position: 'relative' }}>
-                                    <img
-                                        src="/assets/logo-icon.png"
-                                        alt="PetClan Isotype"
-                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                    />
-                                </Box>
-                                {/* Full Logo Text */}
-                                <Box w={{ base: 110, sm: 160 }} h={55} style={{ position: 'relative' }}>
-                                    <img
-                                        src="https://res.cloudinary.com/dqh1coa3c/image/upload/v1770054970/PetClan/Logo_PetClan_text_k9ibqy.png"
-                                        alt="PetClan"
-                                        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
-                                    />
-                                </Box>
-                            </Group>
+                            <PetClanLogo textWidth={{ base: 110, sm: 160 }} textHeight={55} priority />
                         </UnstyledButton>
                     </Group>
 
@@ -167,7 +151,7 @@ export function DashboardShell({ children, user }: { children: React.ReactNode; 
 
             <AppShell.Navbar p="md" bg="var(--bg-surface-muted)">
                 <AnimatedBackground />
-                <ScrollArea className="flex-1" style={{ position: 'relative', zIndex: 1 }}>
+                <ScrollArea style={{ flex: 1, position: 'relative', zIndex: 1 }}>
                     <Box>
                         {navItems.map((item) => {
                             const active = isActive(item.link) && (item.link !== '/dashboard' || pathname === '/dashboard');
